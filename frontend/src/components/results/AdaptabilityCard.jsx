@@ -24,6 +24,53 @@ const AdaptabilityCard = ({ data }) => {
     return <XCircle className="w-6 h-6 text-danger-600" />
   }
 
+  // 获取维度得分 - 使用后端返回的实际得分
+  const getDimensionScore = (dimensionName) => {
+    if (!data.dimension_scores) {
+      // 兼容旧数据：如果没有dimension_scores，使用原有逻辑
+      return getOldDimensionScore(dimensionName);
+    }
+    
+    switch(dimensionName) {
+      case 'amplitude': return data.dimension_scores.amplitude_score || 0;
+      case 'volatility': return data.dimension_scores.volatility_score || 0;
+      case 'market': return data.dimension_scores.market_score || 0;
+      case 'liquidity': return data.dimension_scores.liquidity_score || 0;
+      case 'grid_params': return data.dimension_scores.grid_params_score || 0;
+      default: return 0;
+    }
+  };
+
+  // 兼容旧数据的计算逻辑
+  const getOldDimensionScore = (dimensionName) => {
+    switch(dimensionName) {
+      case 'amplitude': 
+        return Math.max(0, Math.round((data.score / 100) * 30));
+      case 'volatility': 
+        return Math.max(0, Math.round(((Math.max(30, data.score) - 30) / 100) * 25));
+      case 'market': 
+        return Math.max(0, Math.round(((Math.max(55, data.score) - 55) / 100) * 20));
+      case 'liquidity': 
+        return Math.max(0, Math.round(((Math.max(75, data.score) - 75) / 100) * 15));
+      case 'grid_params': 
+        return Math.max(0, Math.round(((Math.max(85, data.score) - 85) / 100) * 10));
+      default: return 0;
+    }
+  };
+
+  // 获取维度颜色
+  const getDimensionColor = (score, maxScore) => {
+    const percentage = (score / maxScore) * 100;
+    if (percentage >= 80) return 'bg-success-500';
+    if (percentage >= 60) return 'bg-warning-500';
+    return 'bg-danger-500';
+  };
+
+  // 获取维度宽度
+  const getDimensionWidth = (score, maxScore) => {
+    return Math.max(0, Math.min(100, (score / maxScore) * 100));
+  };
+
   return (
     <div className="card">
       <div className="card-header">
@@ -70,108 +117,102 @@ const AdaptabilityCard = ({ data }) => {
         </div>
       </div>
 
-      {/* 评估维度 */}
+      {/* 评估维度 - 使用实际维度得分 */}
       <div className="space-y-4 mb-6">
+        {/* 振幅评估 - 30分 */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">振幅评估</span>
           <div className="flex items-center space-x-2">
             <div className="w-20 bg-gray-200 rounded-full h-2">
               <div 
-                className={`h-2 rounded-full ${data.score >= 30 ? 'bg-success-500' : data.score >= 20 ? 'bg-warning-500' : 'bg-danger-500'}`}
-                style={{ width: `${Math.min(100, (data.score / 100) * 120)}%` }}
+                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('amplitude'), 30)}`}
+                style={{ width: `${getDimensionWidth(getDimensionScore('amplitude'), 30)}%` }}
               ></div>
             </div>
-            <span className="text-xs text-gray-500">30分</span>
+            <span className="text-xs text-gray-500">
+              {getDimensionScore('amplitude')}/30分
+            </span>
           </div>
         </div>
         
+        {/* 波动率评估 - 25分 */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">波动率评估</span>
           <div className="flex items-center space-x-2">
             <div className="w-20 bg-gray-200 rounded-full h-2">
               <div 
-                className={`h-2 rounded-full ${data.score >= 55 ? 'bg-success-500' : data.score >= 40 ? 'bg-warning-500' : 'bg-danger-500'}`}
-                style={{ width: `${Math.min(100, ((data.score - 30) / 100) * 120)}%` }}
+                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('volatility'), 25)}`}
+                style={{ width: `${getDimensionWidth(getDimensionScore('volatility'), 25)}%` }}
               ></div>
             </div>
-            <span className="text-xs text-gray-500">25分</span>
+            <span className="text-xs text-gray-500">
+              {getDimensionScore('volatility')}/25分
+            </span>
           </div>
         </div>
         
+        {/* 市场特征 - 20分 */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">市场特征</span>
           <div className="flex items-center space-x-2">
             <div className="w-20 bg-gray-200 rounded-full h-2">
               <div 
-                className={`h-2 rounded-full ${data.score >= 75 ? 'bg-success-500' : data.score >= 60 ? 'bg-warning-500' : 'bg-danger-500'}`}
-                style={{ width: `${Math.min(100, ((data.score - 55) / 100) * 120)}%` }}
+                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('market'), 20)}`}
+                style={{ width: `${getDimensionWidth(getDimensionScore('market'), 20)}%` }}
               ></div>
             </div>
-            <span className="text-xs text-gray-500">20分</span>
+            <span className="text-xs text-gray-500">
+              {getDimensionScore('market')}/20分
+            </span>
           </div>
         </div>
         
+        {/* 流动性评估 - 15分 */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">流动性评估</span>
           <div className="flex items-center space-x-2">
             <div className="w-20 bg-gray-200 rounded-full h-2">
               <div 
-                className={`h-2 rounded-full ${data.score >= 90 ? 'bg-success-500' : data.score >= 80 ? 'bg-warning-500' : 'bg-danger-500'}`}
-                style={{ width: `${Math.min(100, ((data.score - 75) / 100) * 120)}%` }}
+                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('liquidity'), 15)}`}
+                style={{ width: `${getDimensionWidth(getDimensionScore('liquidity'), 15)}%` }}
               ></div>
             </div>
-            <span className="text-xs text-gray-500">15分</span>
+            <span className="text-xs text-gray-500">
+              {getDimensionScore('liquidity')}/15分
+            </span>
+          </div>
+        </div>
+        
+        {/* 网格参数评估 - 10分 (新增) */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-gray-600">网格参数评估</span>
+          <div className="flex items-center space-x-2">
+            <div className="w-20 bg-gray-200 rounded-full h-2">
+              <div 
+                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('grid_params'), 10)}`}
+                style={{ width: `${getDimensionWidth(getDimensionScore('grid_params'), 10)}%` }}
+              ></div>
+            </div>
+            <span className="text-xs text-gray-500">
+              {getDimensionScore('grid_params')}/10分
+            </span>
           </div>
         </div>
       </div>
 
-      {/* 推荐理由 */}
+      {/* 汇总信息提示框 - 只显示recommendation，避免重复 */}
       {data.recommendation && (
-        <div className={`p-4 rounded-lg ${getScoreBackground(data.score)}`}>
+        <div className={`p-4 rounded-lg border ${data.is_suitable ? 'bg-success-50 border-success-200' : 'bg-warning-50 border-warning-200'}`}>
           <div className="flex items-start space-x-2">
-            <Info className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" />
-            <div className="text-sm text-gray-800 whitespace-pre-line">
-              {data.recommendation}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 警告信息 */}
-      {data.warnings && data.warnings.length > 0 && (
-        <div className="bg-warning-50 border border-warning-200 rounded-lg p-4">
-          <div className="flex items-start space-x-2">
-            <AlertTriangle className="w-5 h-5 text-warning-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <h4 className="text-sm font-medium text-warning-800 mb-2">注意事项</h4>
-              <ul className="text-sm text-warning-700 space-y-1">
-                {data.warnings.map((warning, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="w-1 h-1 bg-warning-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                    {warning}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 不适合的原因 */}
-      {!data.is_suitable && data.reasons && data.reasons.length > 0 && (
-        <div className="bg-danger-50 border border-danger-200 rounded-lg p-4">
-          <div className="flex items-start space-x-2">
-            <XCircle className="w-5 h-5 text-danger-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <h4 className="text-sm font-medium text-danger-800 mb-2">主要原因</h4>
-              <ul className="text-sm text-danger-700 space-y-1">
-                {data.reasons.map((reason, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="w-1 h-1 bg-danger-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                    {reason}
-                  </li>
-                ))}
-              </ul>
+            {data.is_suitable ? (
+              <CheckCircle className="w-5 h-5 text-success-600 mt-0.5 flex-shrink-0" />
+            ) : (
+              <AlertTriangle className="w-5 h-5 text-warning-600 mt-0.5 flex-shrink-0" />
+            )}
+            <div className="flex-1">
+              <div className="text-sm text-gray-800 whitespace-pre-line">
+                {data.recommendation}
+              </div>
             </div>
           </div>
         </div>

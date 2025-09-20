@@ -209,31 +209,53 @@ class ETFAnalyzer:
                 return {
                     'is_suitable': False,
                     'reason': analysis_result['error'],
-                    'score': 0
+                    'score': 0,
+                    'dimension_scores': {
+                        'amplitude_score': 0,
+                        'volatility_score': 0,
+                        'market_score': 0,
+                        'liquidity_score': 0,
+                        'grid_params_score': 0
+                    }
                 }
             
             score = 0
             reasons = []
             warnings = []
             
+            # 记录各维度得分
+            dimension_scores = {
+                'amplitude_score': 0,
+                'volatility_score': 0,
+                'market_score': 0,
+                'liquidity_score': 0,
+                'grid_params_score': 0
+            }
+            
             # 1. 振幅评估 (30分)
             avg_amplitude = analysis_result.get('avg_amplitude', 0)
             if avg_amplitude >= 2.0:
+                dimension_scores['amplitude_score'] = 30
                 score += 30
             elif avg_amplitude >= 1.5:
+                dimension_scores['amplitude_score'] = 20
                 score += 20
                 warnings.append("日均振幅偏低，可能影响网格收益")
             else:
+                dimension_scores['amplitude_score'] = 0
                 reasons.append("日均振幅过小，难以覆盖交易成本")
             
             # 2. 波动率评估 (25分)
             volatility = analysis_result.get('volatility', 0)
             if 15 <= volatility <= 40:
+                dimension_scores['volatility_score'] = 25
                 score += 25
             elif volatility < 15:
+                dimension_scores['volatility_score'] = 15
                 score += 15
                 warnings.append("波动率偏低，网格交易机会较少")
             else:
+                dimension_scores['volatility_score'] = 10
                 score += 10
                 warnings.append("波动率过高，风险较大")
             
@@ -242,23 +264,31 @@ class ETFAnalyzer:
             oscillation_score = analysis_result.get('oscillation_score', 0)
             
             if market_character == '震荡':
+                dimension_scores['market_score'] = 20
                 score += 20
             elif market_character == '弱趋势':
+                dimension_scores['market_score'] = 15
                 score += 15
             elif market_character == '强趋势':
+                dimension_scores['market_score'] = 5
                 score += 5
                 reasons.append("市场趋势性较强，不适合网格交易")
+            else:
+                dimension_scores['market_score'] = 0
             
             # 4. 流动性评估 (15分)
             liquidity_score = analysis_result.get('liquidity_score', 0)
             avg_volume = analysis_result.get('avg_volume', 0)
             
             if liquidity_score >= 0.7 and avg_volume >= 1000000:  # 100万股
+                dimension_scores['liquidity_score'] = 15
                 score += 15
             elif liquidity_score >= 0.5 and avg_volume >= 500000:
+                dimension_scores['liquidity_score'] = 10
                 score += 10
                 warnings.append("流动性一般，需注意交易冲击成本")
             else:
+                dimension_scores['liquidity_score'] = 0
                 reasons.append("流动性不足，可能存在交易风险")
             
             # 5. 网格参数合理性评估 (10分)
@@ -266,8 +296,10 @@ class ETFAnalyzer:
             grid_count = grid_params.get('grid_count', 0)
             
             if 0.15 <= grid_range <= 0.35 and 5 <= grid_count <= 20:
+                dimension_scores['grid_params_score'] = 10
                 score += 10
             else:
+                dimension_scores['grid_params_score'] = 0
                 warnings.append("网格参数设置可能需要优化")
             
             # 综合评估
@@ -277,6 +309,7 @@ class ETFAnalyzer:
                 'is_suitable': is_suitable,
                 'score': score,
                 'max_score': 100,
+                'dimension_scores': dimension_scores,  # 新增：各维度详细得分
                 'reasons': reasons,
                 'warnings': warnings,
                 'recommendation': self._generate_recommendation(is_suitable, score, reasons, warnings)

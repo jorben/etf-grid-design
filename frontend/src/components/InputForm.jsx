@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Search, DollarSign, Zap, Info } from 'lucide-react'
+import { popularETFsWithNames, getETFName, extractETFCode } from '../config/etfNames'
 
 const InputForm = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -37,9 +38,16 @@ const InputForm = ({ onSubmit }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
+    
+    // 如果是ETF代码输入，提取纯数字编号
+    let processedValue = value
+    if (name === 'etf_code') {
+      processedValue = extractETFCode(value)
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: processedValue
     }))
     
     // 清除对应字段的错误
@@ -79,10 +87,6 @@ const InputForm = ({ onSubmit }) => {
     { value: 'low', label: '低频', description: '约1次买卖/天', icon: Zap }
   ]
 
-  const popularETFs = [
-    '510300', '510500', '159915', '159919', '510050',
-    '159901', '159902', '510880', '159928', '510900'
-  ]
 
   return (
     <div className="card">
@@ -116,24 +120,70 @@ const InputForm = ({ onSubmit }) => {
           {errors.etf_code && (
             <p className="mt-1 text-sm text-danger-600">{errors.etf_code}</p>
           )}
+          {/* 显示ETF名称 */}
+          {formData.etf_code && formData.etf_code.length === 6 && !errors.etf_code && (
+            <p className="mt-1 text-sm text-success-600">
+              {getETFName(formData.etf_code)}
+            </p>
+          )}
+          
+          {/* ETF输入框下方的按钮 - 放在热门ETF列表上方 */}
+          <div className="flex justify-center space-x-4 pt-4 pb-3">
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  etf_code: '',
+                  frequency: 'medium',
+                  initial_capital: '100000'
+                })
+                setErrors({})
+              }}
+              className="btn-secondary"
+            >
+              重置
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-primary"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="loading-spinner mr-2"></div>
+                  分析中...
+                </>
+              ) : (
+                '开始分析'
+              )}
+            </button>
+          </div>
+          
           <div className="mt-2">
             <p className="text-xs text-gray-500 mb-2">热门ETF：</p>
             <div className="flex flex-wrap gap-2">
-              {popularETFs.map(code => (
+              {popularETFsWithNames.map(etf => (
                 <button
-                  key={code}
+                  key={etf.code}
                   type="button"
-                  onClick={() => handleInputChange({ target: { name: 'etf_code', value: code } })}
+                  onClick={() => handleInputChange({ target: { name: 'etf_code', value: etf.code } })}
                   className={`px-2 py-1 text-xs rounded border transition-colors ${
-                    formData.etf_code === code
+                    formData.etf_code === etf.code
                       ? 'bg-primary-100 border-primary-300 text-primary-700'
                       : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  {code}
+                  {etf.code} {etf.name}
                 </button>
               ))}
             </div>
+          </div>
+          
+          {/* 分割线和更多设置标题 */}
+          <div className="relative flex items-center justify-center mt-6 mb-4">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="mx-4 text-sm text-gray-500 bg-white px-2">更多设置</span>
+            <div className="flex-grow border-t border-gray-300"></div>
           </div>
         </div>
 
@@ -245,37 +295,6 @@ const InputForm = ({ onSubmit }) => {
           </div>
         </div>
 
-        {/* 提交按钮 */}
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={() => {
-              setFormData({
-                etf_code: '',
-                frequency: 'medium',
-                initial_capital: '100000'
-              })
-              setErrors({})
-            }}
-            className="btn-secondary"
-          >
-            重置
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="btn-primary"
-          >
-            {isSubmitting ? (
-              <>
-                <div className="loading-spinner mr-2"></div>
-                分析中...
-              </>
-            ) : (
-              '开始分析'
-            )}
-          </button>
-        </div>
       </form>
     </div>
   )

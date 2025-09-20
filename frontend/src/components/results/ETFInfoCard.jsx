@@ -1,6 +1,7 @@
 import React from 'react'
 import { TrendingUp, TrendingDown, Minus, Calendar, DollarSign, BarChart3, Clock } from 'lucide-react'
 import { formatNumber, formatPercent, getPriceChangeClass } from '../../services/api'
+import { getETFName } from '../../config/etfNames'
 
 const ETFInfoCard = ({ data }) => {
   if (!data) return null
@@ -50,7 +51,7 @@ const ETFInfoCard = ({ data }) => {
           </div>
           <div>
             <div className="text-sm text-gray-600">名称</div>
-            <div className="font-medium">{data.name}</div>
+            <div className="font-medium">{getETFName(data.code) || data.name}</div>
           </div>
           <div>
             <div className="text-sm text-gray-600">管理人</div>

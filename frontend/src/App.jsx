@@ -20,9 +20,12 @@ function App() {
     try {
       const result = await analyzeETF(formData)
       setAnalysisResult(result)
+      setError(null) // 成功后清除错误
     } catch (err) {
       setError(err.message || '分析过程中发生错误')
+      // 保持错误状态，但停止loading
     } finally {
+      // 无论成功还是失败，都要停止loading
       setLoading(false)
     }
   }
@@ -32,12 +35,28 @@ function App() {
     setError(null)
   }
 
+  // 定义应用状态
+  const getCurrentState = () => {
+    if (loading) {
+      return 'loading' // 加载状态，显示LoadingSpinner
+    }
+    if (error && !analysisResult) {
+      return 'error' // 错误状态，显示错误信息
+    }
+    if (analysisResult) {
+      return 'result' // 结果状态，显示分析结果
+    }
+    return 'input' // 输入状态，显示输入表单
+  }
+
+  const currentState = getCurrentState()
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {!analysisResult && !loading && (
+        {currentState === 'input' && (
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -52,23 +71,33 @@ function App() {
           </div>
         )}
 
-        {loading && (
+        {currentState === 'loading' && (
           <div className="flex justify-center items-center min-h-[400px]">
-            <LoadingSpinner message="正在分析ETF数据，请稍候..." />
+            <LoadingSpinner 
+              message="正在分析ETF数据，请稍候..." 
+              error={error}
+              onRetry={() => {
+                setError(null)
+                // 清除错误后，用户可以通过重新提交表单来重试
+              }}
+            />
           </div>
         )}
 
-        {error && (
+        {currentState === 'error' && (
           <div className="max-w-2xl mx-auto">
             <ErrorMessage 
               message={error} 
-              onRetry={() => setError(null)}
+              onRetry={() => {
+                setError(null)
+                // 清除错误，回到输入状态
+              }}
               onReset={handleReset}
             />
           </div>
         )}
 
-        {analysisResult && (
+        {currentState === 'result' && (
           <ResultsPanel 
             result={analysisResult} 
             onReset={handleReset}
