@@ -1,0 +1,34 @@
+
+services:
+  etf-grid-trading:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: etf-grid-trading
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=production
+      - HOST=0.0.0.0
+      - PORT=5001
+      - TUSHARE_TOKEN=${TUSHARE_TOKEN}
+    env_file:
+      - .env
+    volumes:
+      # 挂载日志目录（可选）
+      - ./logs:/app/logs
+      # 挂载缓存目录（可选）
+      - ./cache:/app/cache
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - etf-network
+
+networks:
+  etf-network:
+    driver: bridge

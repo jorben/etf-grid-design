@@ -1,0 +1,65 @@
+# Docker忽略文件 - ETF网格交易工具
+
+# 开发环境文件
+.env.local
+.env.development
+*.log
+
+# 前端开发文件
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+
+# 后端开发文件
+backend/__pycache__/
+backend/*.pyc
+backend/.pytest_cache/
+.venv/
+venv/
+
+# 缓存和临时文件
+cache/
+*.tmp
+*.temp
+
+# 版本控制
+.git/
+.gitignore
+
+# IDE文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 文档和说明
+README.md
+LICENSE
+*.md
+
+# 测试文件
+tests/
+test/
+
+# 构建产物（会在Docker内重新构建）
+build/
+dist/
+
+# 开发脚本
+start.sh
+start.bat
+
+# Python相关
+*.egg-info/
+.coverage
+.pytest_cache/
+
+# Node.js相关
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

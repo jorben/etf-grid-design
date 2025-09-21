@@ -1,6 +1,6 @@
 # ETF网格交易策略设计工具
 
-一个基于历史数据和专业算法的ETF网格交易策略参数设计工具，帮助投资者科学制定网格交易策略。
+一个基于日线数据和专业算法的ETF网格交易策略参数设计工具，帮助投资者科学制定网格交易策略。
 
 ## 🎯 功能特点
 
@@ -27,45 +27,65 @@
 
 ## 🚀 快速开始
 
-### 环境要求
+### 方式一：Docker部署（推荐）
+
+#### 环境要求
+- Docker
+- Docker Compose（可选）
+
+#### 一键部署
+```bash
+# 1. 克隆项目
+git clone <repository-url>
+cd etf-grid-trading
+
+# 2. 配置环境变量
+cp deploy/.env.production .env
+# 编辑.env文件，配置TUSHARE_TOKEN
+
+# 3. 一键部署
+docker-compose up -d
+```
+
+#### 访问应用
+- **Web应用**: http://localhost:5001
+- **API接口**: http://localhost:5001/api/
+- **健康检查**: http://localhost:5001/api/health
+
+### 方式二：本地开发
+
+#### 环境要求
 - Python 3.8+
 - Node.js 16+
 - tushare API token
 
-### 1. 克隆项目
+#### 开发步骤
 ```bash
+# 1. 克隆项目
 git clone <repository-url>
 cd etf-grid-trading
-```
 
-### 2. 配置环境
+# 2. 配置环境
 创建 `.env` 文件并添加您的tushare token：
-```
 TUSHARE_TOKEN=your_tushare_token_here
-```
 
-### 3. 安装依赖
-```bash
+# 3. 安装依赖
 # 安装Python依赖
-uv add flask flask-cors tushare pandas numpy python-dotenv requests
+uv sync
 
 # 安装前端依赖
-cd frontend
-npm install
-```
+cd frontend && npm install
 
-### 4. 启动服务
-```bash
-# 启动后端服务（端口5000）
+# 4. 启动服务
+# 启动后端服务（端口5001）
 uv run python backend/app.py
 
 # 启动前端服务（端口3000）
-cd frontend
-npm run dev
-```
+cd frontend && npm run dev
 
-### 5. 访问应用
-打开浏览器访问：http://localhost:3000
+# 5. 访问应用
+# 开发环境：http://localhost:3000
+```
 
 ## 📊 核心功能
 
@@ -91,20 +111,6 @@ npm run dev
 - **波动率下降**：缩小区间、增加网格、提高仓位
 - **趋势市场**：调整网格中心、加强风险管理
 
-## 📈 使用示例
-
-### 输入参数
-- ETF代码：510300（沪深300ETF）
-- 交易频率：中频（约4次买卖/天）
-- 初始资金：100,000元
-
-### 输出结果
-- 推荐价格区间：[4.20, 4.80]元
-- 网格数量：12个
-- 步长比例：0.50%
-- 单笔交易：8,000元
-- 月触发预估：80次
-- 适应性评分：85/100（适合）
 
 ## ⚠️ 风险提示
 
@@ -113,55 +119,7 @@ npm run dev
 3. **流动性风险**：确保ETF有足够的流动性支持频繁交易
 4. **参数调整**：市场环境变化时需要及时调整策略参数
 
-## 🔧 开发指南
 
-### 后端开发
-```bash
-# 进入后端目录
-cd backend
-
-# 运行测试
-python -m pytest
-
-# 代码格式化
-black .
-```
-
-### 前端开发
-```bash
-# 进入前端目录
-cd frontend
-
-# 运行开发服务器
-npm run dev
-
-# 构建生产版本
-npm run build
-```
-
-## 📋 API接口
-
-### 健康检查
-```
-GET /api/health
-```
-
-### ETF分析
-```
-POST /api/etf/analyze
-Content-Type: application/json
-
-{
-  "etf_code": "510300",
-  "frequency": "medium",
-  "initial_capital": 100000
-}
-```
-
-### ETF搜索
-```
-GET /api/etf/search?query=510300
-```
 
 ## 🤝 贡献指南
 
@@ -173,12 +131,9 @@ GET /api/etf/search?query=510300
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+本项目采用 Apache-2.0 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
 
 ## 📞 联系方式
-
-- 项目维护者：[Your Name]
-- 邮箱：your.email@example.com
 - 问题反馈：请使用 GitHub Issues
 
 ---
