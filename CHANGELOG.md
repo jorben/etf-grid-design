@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.3] - 2025-09-21
+### :sparkles: New Features
+- [`1e925fd`](https://github.com/jorben/etf-grid-design/commit/1e925fdf442bc832ff7e3bb2ce2a396f8efaf73d) - support URL query params for analysis page navigation *(commit by [@jorben](https://github.com/jorben))*
+
+### :bug: Bug Fixes
+- [`683ed56`](https://github.com/jorben/etf-grid-design/commit/683ed56c680b500a4c8ba46449857573ceee24c3) - update copyright text to include domain name *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.0.2] - 2025-09-21
 ### :sparkles: New Features
 - [`acad14c`](https://github.com/jorben/etf-grid-design/commit/acad14ccf755802dd4d2c2c148d0e2ee6a3ac918) - Initialize ETF Grid Trading Strategy Design Tool project *(commit by [@jorben](https://github.com/jorben))*
@@ -23,3 +31,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [`62e5bdc`](https://github.com/jorben/etf-grid-design/commit/62e5bdc44d1ccb0c3b3db79c24c9594af4d349cd) - swap success/danger color semantics for price indicators *(commit by [@jorben](https://github.com/jorben))*
 
 [0.0.2]: https://github.com/jorben/etf-grid-design/compare/0.0.1...0.0.2
+[0.0.3]: https://github.com/jorben/etf-grid-design/compare/0.0.2...0.0.3
