@@ -14,12 +14,14 @@
 ## 🏗️ 技术架构
 
 ### 后端
+
 - **框架**：Python + Flask
 - **数据**：tushare金融数据接口
 - **分析**：pandas + numpy 数据处理
 - **算法**：专业量化分析算法
 
 ### 前端
+
 - **框架**：React + Vite
 - **UI**：Tailwind CSS 现代化设计
 - **图表**：Recharts 数据可视化
@@ -30,10 +32,12 @@
 ### 方式一：Docker部署（推荐）
 
 #### 环境要求
+
 - Docker
 - Docker Compose（可选）
 
 #### 一键部署
+
 ```bash
 # 1. 克隆项目
 git clone <repository-url>
@@ -48,6 +52,7 @@ docker-compose up -d
 ```
 
 #### 访问应用
+
 - **Web应用**: http://localhost:5001
 - **API接口**: http://localhost:5001/api/
 - **健康检查**: http://localhost:5001/api/health
@@ -55,15 +60,17 @@ docker-compose up -d
 ### 方式二：本地开发
 
 #### 环境要求
+
 - Python 3.8+
 - Node.js 16+
 - tushare API token
 
 #### 开发步骤
+
 ```bash
 # 1. 克隆项目
-git clone <repository-url>
-cd etf-grid-trading
+git clone https://github.com/jorben/etf-grid-design.git
+cd etf-grid-design
 
 # 2. 配置环境
 创建 `.env` 文件并添加您的tushare token：
@@ -90,27 +97,30 @@ cd frontend && npm run dev
 ## 📊 核心功能
 
 ### 1. ETF分析
+
 - 获取ETF基本信息和最新价格
 - 分析近3个月的历史数据
 - 计算日振幅、波动率、趋势等关键指标
 
 ### 2. 网格策略计算
+
 - **价格区间**：基于历史波动确定合理的网格上下边界
 - **网格数量**：根据交易频率自动计算最优网格数
 - **资金配置**：科学的仓位管理和资金分配方案
 - **收益预估**：预测网格交易的潜在收益和风险
 
 ### 3. 适应性评估
+
 - **振幅评估**：判断日均振幅是否适合网格交易
 - **波动率评估**：分析价格波动水平对策略的影响
 - **流动性评估**：确保有足够的交易量支持网格策略
 - **趋势评估**：识别市场是否处于震荡状态
 
 ### 4. 动态调整建议
+
 - **波动率上升**：扩大区间、减少网格、降低仓位
 - **波动率下降**：缩小区间、增加网格、提高仓位
 - **趋势市场**：调整网格中心、加强风险管理
-
 
 ## ⚠️ 风险提示
 
@@ -118,8 +128,6 @@ cd frontend && npm run dev
 2. **市场风险**：网格交易仍存在亏损风险，需谨慎操作
 3. **流动性风险**：确保ETF有足够的流动性支持频繁交易
 4. **参数调整**：市场环境变化时需要及时调整策略参数
-
-
 
 ## 🤝 贡献指南
 
@@ -134,6 +142,7 @@ cd frontend && npm run dev
 本项目采用 Apache-2.0 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
 
 ## 📞 联系方式
+
 - 问题反馈：请使用 GitHub Issues
 
 ---
