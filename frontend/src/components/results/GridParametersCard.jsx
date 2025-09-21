@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp, DollarSign, Target, Grid, TrendingUp, AlertCircle } from 'lucide-react'
-import { formatNumber, formatPercent, formatCurrency } from '../../services/api'
+import { formatNumber, formatPercent, formatCurrency, formatStepAmount } from '../../services/api'
 
 const GridParametersCard = ({ data }) => {
   const [expandedSections, setExpandedSections] = useState({
@@ -60,7 +60,7 @@ const GridParametersCard = ({ data }) => {
                 <div className="text-xs text-gray-500">({data.frequency})</div>
               </div>
               <div>
-                <div className="text-sm text-gray-600 mb-1">网格数量</div>
+                <div className="text-sm text-gray-600 mb-1">区间内网格数</div>
                 <div className="font-medium">{data.grid_count} 个</div>
               </div>
               <div>
@@ -69,7 +69,7 @@ const GridParametersCard = ({ data }) => {
               </div>
               <div>
                 <div className="text-sm text-gray-600 mb-1">步长金额</div>
-                <div className="font-medium">{formatCurrency(data.step_size_amount)}</div>
+                <div className="font-medium">{formatStepAmount(data.step_size_amount)}</div>
               </div>
               <div>
                 <div className="text-sm text-gray-600 mb-1">目标日频次</div>
@@ -279,7 +279,7 @@ const GridParametersCard = ({ data }) => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">最大回撤预估</span>
-                    <span className="font-medium text-success-600">{formatCurrency(data.max_drawdown_estimate)}</span>
+                    <span className="font-medium text-success-600">{formatPercent(data.max_drawdown_estimate * 100, 2)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">风险等级</span>

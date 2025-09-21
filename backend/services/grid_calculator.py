@@ -401,8 +401,10 @@ class GridCalculator:
             # 盈亏平衡振幅
             break_even_amplitude = (transaction_cost * 2) * 100  # 双边成本
             
-            # 最大回撤预估
-            max_drawdown = step_size * 3  # 假设连续3个网格亏损
+            # 最大回撤预估（百分比）
+            current_price = grid_prices[len(grid_prices) // 2]  # 取中间价格作为当前价格
+            max_drawdown_amount = step_size * 3  # 假设连续3个网格亏损
+            max_drawdown = max_drawdown_amount / current_price  # 转换为百分比
             
             return {
                 'avg_profit': avg_profit,
@@ -419,7 +421,7 @@ class GridCalculator:
                 'avg_profit_rate': 0.01,
                 'monthly_estimate': per_trade_amount * 0.2,
                 'break_even_amplitude': 0.2,
-                'max_drawdown': per_trade_amount * 0.05
+                'max_drawdown': 0.05  # 默认5%回撤
             }
     
     def _estimate_trigger_frequency_legacy(self, avg_amplitude: float, grid_count: int, 

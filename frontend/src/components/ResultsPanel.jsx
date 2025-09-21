@@ -6,7 +6,7 @@ import AdaptabilityCard from './results/AdaptabilityCard'
 import AnalysisCard from './results/AnalysisCard'
 import AdjustmentSuggestionsCard from './results/AdjustmentSuggestionsCard'
 import PriceChart from './results/PriceChart'
-import { formatDate, formatCurrency, formatNumber, formatPercent } from '../services/api'
+import { formatDate, formatCurrency, formatNumber, formatPercent, formatStepAmount } from '../services/api'
 
 const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
   const [activeTab, setActiveTab] = useState('overview')
@@ -130,7 +130,7 @@ const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
                   <div className="text-2xl font-bold text-primary-600">
                     {result.grid_parameters?.grid_count || 0}
                   </div>
-                  <div className="text-sm text-gray-600">网格数量</div>
+                  <div className="text-sm text-gray-600">区间内网格数</div>
                 </div>
                 
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
@@ -142,7 +142,7 @@ const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
                 
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <div className="text-2xl font-bold text-primary-600">
-                    {formatCurrency(result.grid_parameters?.step_size_amount || 0)}
+                    {formatStepAmount(result.grid_parameters?.step_size_amount || 0)}
                   </div>
                   <div className="text-sm text-gray-600">步长金额</div>
                 </div>
@@ -162,10 +162,10 @@ const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
                 </div>
                 
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-primary-600">
-                    {result.grid_parameters?.estimated_triggers_per_month || 0}
+                  <div className="text-xl font-bold text-primary-600">
+                    [{formatNumber(result.grid_parameters?.price_lower_bound || 0, 3)}, {formatNumber(result.grid_parameters?.price_upper_bound || 0, 3)}]
                   </div>
-                  <div className="text-sm text-gray-600">月触发次数</div>
+                  <div className="text-sm text-gray-600">价格区间</div>
                 </div>
               </div>
             </div>

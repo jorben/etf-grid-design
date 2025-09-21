@@ -80,103 +80,106 @@ const AdaptabilityCard = ({ data }) => {
         </div>
       </div>
 
-      {/* 评分圆环 */}
-      <div className="flex items-center justify-center mb-6">
-        <div className="relative">
-          <svg className="w-32 h-32 transform -rotate-90">
-            <circle
-              cx="64"
-              cy="64"
-              r="56"
-              stroke="#e5e7eb"
-              strokeWidth="8"
-              fill="none"
-            />
-            <circle
-              cx="64"
-              cy="64"
-              r="56"
-              stroke={data.score >= 80 ? '#22c55e' : data.score >= 60 ? '#f59e0b' : '#ef4444'}
-              strokeWidth="8"
-              fill="none"
-              strokeDasharray={`${(data.score / 100) * 351.86} 351.86`}
-              strokeLinecap="round"
-            />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <div className={`text-2xl font-bold ${getScoreColor(data.score)}`}>
-                {data.score}
+      {/* 评分圆环和维度评估 - 左右布局 */}
+      <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-8 mb-6">
+        {/* 左侧：评分圆环 */}
+        <div className="flex items-center justify-center mb-6 lg:mb-0 lg:flex-shrink-0">
+          <div className="relative">
+            <svg className="w-32 h-32 transform -rotate-90">
+              <circle
+                cx="64"
+                cy="64"
+                r="56"
+                stroke="#e5e7eb"
+                strokeWidth="8"
+                fill="none"
+              />
+              <circle
+                cx="64"
+                cy="64"
+                r="56"
+                stroke={data.score >= 80 ? '#22c55e' : data.score >= 60 ? '#f59e0b' : '#ef4444'}
+                strokeWidth="8"
+                fill="none"
+                strokeDasharray={`${(data.score / 100) * 351.86} 351.86`}
+                strokeLinecap="round"
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <div className={`text-2xl font-bold ${getScoreColor(data.score)}`}>
+                  {data.score}
+                </div>
+                <div className="text-sm text-gray-600">/ 100</div>
               </div>
-              <div className="text-sm text-gray-600">/ 100</div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* 评估维度 - 使用实际维度得分 (4个维度，总分100分) */}
-      <div className="space-y-4 mb-6">
-        {/* 振幅评估 - 35分 */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">振幅评估</span>
-          <div className="flex items-center space-x-2">
-            <div className="w-20 bg-gray-200 rounded-full h-2">
-              <div 
-                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('amplitude'), 35)}`}
-                style={{ width: `${getDimensionWidth(getDimensionScore('amplitude'), 35)}%` }}
-              ></div>
+        {/* 右侧：评估维度 - 使用实际维度得分 (4个维度，总分100分) */}
+        <div className="flex-1 space-y-4">
+          {/* 振幅评估 - 35分 */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 min-w-0 flex-shrink-0">振幅评估</span>
+            <div className="flex items-center space-x-3 ml-4">
+              <div className="w-24 bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className={`h-2.5 rounded-full ${getDimensionColor(getDimensionScore('amplitude'), 35)}`}
+                  style={{ width: `${getDimensionWidth(getDimensionScore('amplitude'), 35)}%` }}
+                ></div>
+              </div>
+              <span className="text-sm font-medium text-gray-600 min-w-0 flex-shrink-0">
+                {getDimensionScore('amplitude')}/35
+              </span>
             </div>
-            <span className="text-xs text-gray-500">
-              {getDimensionScore('amplitude')}/35分
-            </span>
           </div>
-        </div>
-        
-        {/* 波动率评估 - 30分 */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">波动率评估</span>
-          <div className="flex items-center space-x-2">
-            <div className="w-20 bg-gray-200 rounded-full h-2">
-              <div 
-                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('volatility'), 30)}`}
-                style={{ width: `${getDimensionWidth(getDimensionScore('volatility'), 30)}%` }}
-              ></div>
+          
+          {/* 波动率评估 - 30分 */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 min-w-0 flex-shrink-0">波动率评估</span>
+            <div className="flex items-center space-x-3 ml-4">
+              <div className="w-24 bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className={`h-2.5 rounded-full ${getDimensionColor(getDimensionScore('volatility'), 30)}`}
+                  style={{ width: `${getDimensionWidth(getDimensionScore('volatility'), 30)}%` }}
+                ></div>
+              </div>
+              <span className="text-sm font-medium text-gray-600 min-w-0 flex-shrink-0">
+                {getDimensionScore('volatility')}/30
+              </span>
             </div>
-            <span className="text-xs text-gray-500">
-              {getDimensionScore('volatility')}/30分
-            </span>
           </div>
-        </div>
-        
-        {/* 市场特征 - 25分 */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">市场特征</span>
-          <div className="flex items-center space-x-2">
-            <div className="w-20 bg-gray-200 rounded-full h-2">
-              <div 
-                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('market'), 25)}`}
-                style={{ width: `${getDimensionWidth(getDimensionScore('market'), 25)}%` }}
-              ></div>
+          
+          {/* 市场特征 - 25分 */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 min-w-0 flex-shrink-0">市场特征</span>
+            <div className="flex items-center space-x-3 ml-4">
+              <div className="w-24 bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className={`h-2.5 rounded-full ${getDimensionColor(getDimensionScore('market'), 25)}`}
+                  style={{ width: `${getDimensionWidth(getDimensionScore('market'), 25)}%` }}
+                ></div>
+              </div>
+              <span className="text-sm font-medium text-gray-600 min-w-0 flex-shrink-0">
+                {getDimensionScore('market')}/25
+              </span>
             </div>
-            <span className="text-xs text-gray-500">
-              {getDimensionScore('market')}/25分
-            </span>
           </div>
-        </div>
-        
-        {/* 流动性评估 - 10分 */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">流动性评估</span>
-          <div className="flex items-center space-x-2">
-            <div className="w-20 bg-gray-200 rounded-full h-2">
-              <div 
-                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('liquidity'), 10)}`}
-                style={{ width: `${getDimensionWidth(getDimensionScore('liquidity'), 10)}%` }}
-              ></div>
+          
+          {/* 流动性评估 - 10分 */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 min-w-0 flex-shrink-0">流动性评估</span>
+            <div className="flex items-center space-x-3 ml-4">
+              <div className="w-24 bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className={`h-2.5 rounded-full ${getDimensionColor(getDimensionScore('liquidity'), 10)}`}
+                  style={{ width: `${getDimensionWidth(getDimensionScore('liquidity'), 10)}%` }}
+                ></div>
+              </div>
+              <span className="text-sm font-medium text-gray-600 min-w-0 flex-shrink-0">
+                {getDimensionScore('liquidity')}/10
+              </span>
             </div>
-            <span className="text-xs text-gray-500">
-              {getDimensionScore('liquidity')}/10分
-            </span>
           </div>
         </div>
       </div>

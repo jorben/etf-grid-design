@@ -189,6 +189,16 @@ export const formatCurrency = (num) => {
 }
 
 /**
+ * 格式化步长金额（保留3位小数）
+ * @param {number} num - 数字
+ * @returns {string} 格式化后的货币
+ */
+export const formatStepAmount = (num) => {
+  if (num === null || num === undefined) return '-'
+  return `¥${Number(num).toLocaleString('zh-CN', { minimumFractionDigits: 3, maximumFractionDigits: 3 })}`
+}
+
+/**
  * 格式化日期
  * @param {string} dateString - 日期字符串
  * @returns {string} 格式化后的日期

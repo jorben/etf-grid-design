@@ -43,23 +43,27 @@ const ETFInfoCard = ({ data }) => {
       </div>
 
       <div className="space-y-4">
-        {/* 基本信息 */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <div className="text-sm text-gray-600">代码</div>
-            <div className="font-medium">{data.code}</div>
+        {/* 基本信息 - 四个模块同行展示 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="text-center sm:text-left">
+            <div className="text-sm text-gray-600 mb-1">代码</div>
+            <div className="font-medium text-gray-900">{data.code}</div>
           </div>
-          <div>
-            <div className="text-sm text-gray-600">名称</div>
-            <div className="font-medium">{getETFName(data.code) || data.name}</div>
+          <div className="text-center sm:text-left">
+            <div className="text-sm text-gray-600 mb-1">名称</div>
+            <div className="font-medium text-gray-900 truncate" title={getETFName(data.code) || data.name}>
+              {getETFName(data.code) || data.name}
+            </div>
           </div>
-          <div>
-            <div className="text-sm text-gray-600">管理人</div>
-            <div className="text-sm">{data.management}</div>
+          <div className="text-center sm:text-left">
+            <div className="text-sm text-gray-600 mb-1">成立日期</div>
+            <div className="text-sm text-gray-900">{data.found_date}</div>
           </div>
-          <div>
-            <div className="text-sm text-gray-600">成立日期</div>
-            <div className="text-sm">{data.found_date}</div>
+          <div className="text-center sm:text-left">
+            <div className="text-sm text-gray-600 mb-1">管理人</div>
+            <div className="text-sm text-gray-900 truncate" title={data.management}>
+              {data.management}
+            </div>
           </div>
         </div>
 
