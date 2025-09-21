@@ -268,8 +268,10 @@ const GridParametersCard = ({ data }) => {
                     <span className="font-medium text-danger-600">{formatCurrency(data.monthly_profit_estimate)}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">盈亏平衡振幅</span>
-                    <span className="font-medium">{formatPercent(data.break_even_amplitude, 2)}</span>
+                    <span className="text-sm text-gray-600">月度收益率预估</span>
+                    <span className="font-medium text-danger-600">
+                      {formatPercent((data.monthly_profit_estimate / data.initial_capital) * 100, 2)}
+                    </span>
                   </div>
                 </div>
               </div>
