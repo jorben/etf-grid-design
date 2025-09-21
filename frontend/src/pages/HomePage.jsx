@@ -16,8 +16,13 @@ const HomePage = () => {
     setError(null)
 
     try {
-      // 直接跳转到分析页面，让分析页面处理分析逻辑
-      navigate(`/analysis/${formData.etf_code}`, { 
+      // 构建URL查询参数，包含交易频率和初始资金
+      const searchParams = new URLSearchParams()
+      searchParams.set('frequency', formData.frequency)
+      searchParams.set('capital', formData.initial_capital.toString())
+      
+      // 跳转到分析页面，URL包含完整参数，同时保持state用于向后兼容
+      navigate(`/analysis/${formData.etf_code}?${searchParams.toString()}`, { 
         state: { formData } 
       })
     } catch (err) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useLocation, useNavigate } from 'react-router-dom'
+import { useParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Header from '../components/Header'
 import ResultsPanel from '../components/ResultsPanel'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -10,23 +10,82 @@ const AnalysisPage = () => {
   const { etfCode } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   
   const [analysisResult, setAnalysisResult] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // 从路由state获取表单数据，如果没有则使用默认值
+  // 参数验证和默认值配置
+  const validateAndGetParams = () => {
+    // 默认值配置（与InputForm保持一致）
+    const defaults = {
+      frequency: 'low',
+      initial_capital: 100000
+    }
+
+    // 验证交易频率参数
+    const validateFrequency = (freq) => {
+      const validFrequencies = ['low', 'medium', 'high']
+      return validFrequencies.includes(freq) ? freq : defaults.frequency
+    }
+
+    // 验证初始资金参数
+    const validateCapital = (capital) => {
+      const numCapital = parseFloat(capital)
+      if (isNaN(numCapital) || numCapital < 10000 || numCapital > 10000000) {
+        return defaults.initial_capital
+      }
+      return numCapital
+    }
+
+    return { validateFrequency, validateCapital, defaults }
+  }
+
+  // 从多个来源获取表单数据，优先级：URL参数 > 路由state > 默认值
   const getFormData = () => {
+    const { validateFrequency, validateCapital, defaults } = validateAndGetParams()
+
+    // 优先级1：从路由state获取（表单提交过来的完整数据）
     if (location.state?.formData) {
       return location.state.formData
     }
-    
-    // 默认参数，用于直接访问URL的情况
-    return {
+
+    // 优先级2：从URL查询参数获取
+    const urlFrequency = searchParams.get('frequency')
+    const urlCapital = searchParams.get('capital')
+
+    // 构建参数对象，缺失的参数使用默认值
+    const formData = {
       etf_code: etfCode,
-      frequency: 'medium',
-      initial_capital: 10000
+      frequency: urlFrequency ? validateFrequency(urlFrequency) : defaults.frequency,
+      initial_capital: urlCapital ? validateCapital(urlCapital) : defaults.initial_capital
     }
+
+    // 如果URL参数不完整或无效，更新URL以反映实际使用的参数
+    const shouldUpdateUrl = (
+      !urlFrequency || 
+      !urlCapital || 
+      validateFrequency(urlFrequency) !== urlFrequency ||
+      validateCapital(urlCapital) !== parseFloat(urlCapital)
+    )
+
+    if (shouldUpdateUrl) {
+      // 使用replace避免在浏览器历史中创建新条目
+      const newSearchParams = new URLSearchParams()
+      newSearchParams.set('frequency', formData.frequency)
+      newSearchParams.set('capital', formData.initial_capital.toString())
+      
+      // 异步更新URL，避免在渲染过程中导航
+      setTimeout(() => {
+        navigate(`/analysis/${etfCode}?${newSearchParams.toString()}`, { 
+          replace: true,
+          state: location.state // 保持原有的state
+        })
+      }, 0)
+    }
+
+    return formData
   }
 
   const performAnalysis = async () => {
