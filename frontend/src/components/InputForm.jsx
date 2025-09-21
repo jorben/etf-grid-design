@@ -82,8 +82,8 @@ const InputForm = ({ onSubmit }) => {
   }
 
   const frequencyOptions = [
-    { value: 'high', label: '高频', description: '约8次买卖/天', icon: Zap },
-    { value: 'medium', label: '中频', description: '约4次买卖/天', icon: Zap },
+    { value: 'high', label: '高频', description: '约5-6次买卖/天', icon: Zap },
+    { value: 'medium', label: '中频', description: '约2-3次买卖/天', icon: Zap },
     { value: 'low', label: '低频', description: '约1次买卖/天', icon: Zap }
   ]
 

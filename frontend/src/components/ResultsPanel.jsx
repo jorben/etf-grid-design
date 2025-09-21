@@ -125,7 +125,7 @@ const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
             {/* 关键参数摘要 */}
             <div className="card">
               <h3 className="card-title mb-4">关键策略参数</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <div className="text-2xl font-bold text-primary-600">
                     {result.grid_parameters?.grid_count || 0}
@@ -134,21 +134,35 @@ const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
                 </div>
                 
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-success-600">
+                  <div className="text-2xl font-bold text-primary-600">
                     {formatPercent(result.grid_parameters?.step_size_ratio * 100 || 0, 2)}
                   </div>
                   <div className="text-sm text-gray-600">步长比例</div>
                 </div>
                 
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-warning-600">
+                  <div className="text-2xl font-bold text-primary-600">
+                    {formatCurrency(result.grid_parameters?.step_size_amount || 0)}
+                  </div>
+                  <div className="text-sm text-gray-600">步长金额</div>
+                </div>
+                
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-2xl font-bold text-primary-600">
                     {formatCurrency(result.grid_parameters?.per_grid_amount || 0)}
                   </div>
                   <div className="text-sm text-gray-600">单笔金额</div>
                 </div>
                 
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-info-600">
+                  <div className="text-2xl font-bold text-primary-600">
+                    {formatNumber(result.grid_parameters?.per_grid_shares || 0)}
+                  </div>
+                  <div className="text-sm text-gray-600">单笔股数</div>
+                </div>
+                
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-2xl font-bold text-primary-600">
                     {result.grid_parameters?.estimated_triggers_per_month || 0}
                   </div>
                   <div className="text-sm text-gray-600">月触发次数</div>
@@ -162,6 +176,7 @@ const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
                 currentPrice={result.etf_info?.current_price}
                 gridPrices={result.grid_parameters.grid_prices}
                 priceRange={[result.grid_parameters.price_lower_bound, result.grid_parameters.price_upper_bound]}
+                historicalPrices={result.historical_prices || []}
               />
             )}
           </>

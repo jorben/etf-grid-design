@@ -1,7 +1,9 @@
 import numpy as np
+import pandas as pd
 import logging
 from typing import Dict, List
 from datetime import datetime
+from .frequency_calculator import FrequencyCalculator
 
 logger = logging.getLogger(__name__)
 
@@ -11,28 +13,31 @@ class GridCalculator:
     
     def __init__(self):
         """初始化网格计算器"""
-        # 频率配置
+        # 初始化频次计算器
+        self.frequency_calculator = FrequencyCalculator()
+        
+        # 频率配置 - 针对低价ETF优化的频次设计
         self.frequency_config = {
             'high': {
-                'target_triggers_per_month': 160,  # 约8次/天 * 20交易日
-                'min_grids': 15,
+                'target_daily_triggers': 5.5,    # 5-6次/天（优化后）
+                'min_grids': 10,
                 'max_grids': 25,
-                'min_range_ratio': 0.20,
-                'max_range_ratio': 0.40
+                'min_range_ratio': 0.10,
+                'max_range_ratio': 0.35
             },
             'medium': {
-                'target_triggers_per_month': 80,   # 约4次/天 * 20交易日
-                'min_grids': 8,
+                'target_daily_triggers': 2.5,   # 2-3次/天（优化后）
+                'min_grids': 6,
                 'max_grids': 15,
-                'min_range_ratio': 0.15,
-                'max_range_ratio': 0.30
+                'min_range_ratio': 0.08,
+                'max_range_ratio': 0.25
             },
             'low': {
-                'target_triggers_per_month': 20,   # 约1次/天 * 20交易日
-                'min_grids': 4,
-                'max_grids': 8,
-                'min_range_ratio': 0.10,
-                'max_range_ratio': 0.25
+                'target_daily_triggers': 1,   # 1次/天（保持不变）
+                'min_grids': 3,
+                'max_grids': 10,
+                'min_range_ratio': 0.05,
+                'max_range_ratio': 0.20
             }
         }
         
@@ -42,15 +47,17 @@ class GridCalculator:
         logger.info("网格策略计算器初始化成功")
     
     def calculate_grid_parameters(self, current_price: float, analysis_result: Dict, 
-                                frequency: str, initial_capital: float) -> Dict:
+                                frequency: str, initial_capital: float, 
+                                historical_data: pd.DataFrame = None) -> Dict:
         """
-        计算网格策略参数
+        计算网格策略参数 - 基于日交易频次的新逻辑
         
         Args:
             current_price: 当前价格
             analysis_result: ETF分析结果
             frequency: 交易频率 ('high', 'medium', 'low')
             initial_capital: 初始资金
+            historical_data: 历史K线数据（用于频次分析）
             
         Returns:
             Dict: 网格策略参数
@@ -69,27 +76,63 @@ class GridCalculator:
             volatility = analysis_result.get('volatility', 25.0)
             price_std = analysis_result.get('price_std', current_price * 0.02)
             
-            # 1. 计算价格区间
+            # 1. 分析历史交易模式（如果有历史数据）
+            historical_patterns = None
+            if historical_data is not None and not historical_data.empty:
+                historical_patterns = self.frequency_calculator.analyze_historical_patterns(historical_data)
+                if 'error' in historical_patterns:
+                    logger.warning(f"历史模式分析失败: {historical_patterns['error']}")
+                    historical_patterns = None
+            
+            # 2. 计算价格区间
             price_range = self._calculate_price_range(
                 current_price, avg_amplitude, volatility, price_std, freq_config
             )
             
-            # 2. 计算网格数量
-            grid_count = self._calculate_grid_count(
-                price_range, avg_amplitude, frequency, freq_config
-            )
+            # 3. 基于目标日交易频次计算最优网格参数
+            if historical_patterns:
+                frequency_params = self.frequency_calculator.calculate_optimal_grid_parameters(
+                    frequency, current_price, historical_patterns, price_range['range_ratio']
+                )
+                
+                if 'error' not in frequency_params:
+                    # 使用频次计算器的结果
+                    grid_count = frequency_params['optimal_grid_count']
+                    actual_step_ratio = frequency_params['grid_step_ratio']
+                    predicted_daily_triggers = frequency_params['predicted_daily_triggers']
+                    frequency_match_score = frequency_params['frequency_match_score']
+                    
+                    # 重新计算价格区间以匹配网格数量
+                    price_range['range_ratio'] = actual_step_ratio * grid_count
+                    price_range['range_amount'] = current_price * price_range['range_ratio']
+                    price_range['upper'] = current_price + price_range['range_amount'] / 2
+                    price_range['lower'] = current_price - price_range['range_amount'] / 2
+                else:
+                    # 回退到传统方法
+                    grid_count = self._calculate_grid_count(
+                        price_range, avg_amplitude, frequency, freq_config
+                    )
+                    predicted_daily_triggers = freq_config['target_daily_triggers']
+                    frequency_match_score = 0.5
+            else:
+                # 没有历史数据时使用传统方法
+                grid_count = self._calculate_grid_count(
+                    price_range, avg_amplitude, frequency, freq_config
+                )
+                predicted_daily_triggers = freq_config['target_daily_triggers']
+                frequency_match_score = 0.5
             
-            # 3. 计算网格价格
+            # 4. 计算网格价格
             grid_prices = self._calculate_grid_prices(
                 price_range['lower'], price_range['upper'], grid_count
             )
             
-            # 4. 计算资金分配
+            # 5. 计算资金分配
             capital_allocation = self._calculate_capital_allocation(
                 initial_capital, grid_count, current_price
             )
             
-            # 5. 计算单笔交易量
+            # 6. 计算单笔交易量
             per_trade_amount = capital_allocation['per_grid_amount']
             per_trade_shares = int(per_trade_amount / current_price)
             
@@ -98,14 +141,14 @@ class GridCalculator:
                 per_trade_shares = 100
                 per_trade_amount = per_trade_shares * current_price
             
-            # 6. 计算预期收益和风险
+            # 7. 计算预期收益和风险
             profit_analysis = self._calculate_profit_analysis(
                 grid_prices, per_trade_amount, avg_amplitude, self.transaction_cost
             )
             
-            # 7. 计算触发频率预估
-            estimated_frequency = self._estimate_trigger_frequency(
-                avg_amplitude, grid_count, price_range['range_ratio']
+            # 8. 计算基于日频次的月度统计
+            monthly_stats = self.frequency_calculator.estimate_monthly_statistics(
+                predicted_daily_triggers, 0.8  # 假设80%成功率
             )
             
             grid_params = {
@@ -141,19 +184,27 @@ class GridCalculator:
                 'monthly_profit_estimate': profit_analysis['monthly_estimate'],
                 'break_even_amplitude': profit_analysis['break_even_amplitude'],
                 
-                # 频率预估
-                'estimated_triggers_per_month': estimated_frequency['triggers_per_month'],
-                'estimated_success_rate': estimated_frequency['success_rate'],
+                # 频率预估 - 新的基于日频次的逻辑
+                'target_daily_triggers': freq_config['target_daily_triggers'],
+                'predicted_daily_triggers': predicted_daily_triggers,
+                'estimated_triggers_per_month': monthly_stats['monthly_triggers'],
+                'estimated_success_rate': monthly_stats['success_rate'],
+                'frequency_match_score': frequency_match_score,
                 
                 # 风险评估
                 'max_drawdown_estimate': profit_analysis['max_drawdown'],
                 'risk_level': self._assess_risk_level(volatility, price_range['range_ratio']),
                 
+                # 计算方法标识
+                'calculation_method': 'frequency_based' if historical_patterns else 'traditional',
+                'historical_data_available': historical_patterns is not None,
                 'calculation_date': datetime.now().isoformat()
             }
             
             logger.info(f"网格参数计算完成 - 频率: {frequency}, 网格数: {grid_count}, "
-                       f"价格区间: [{price_range['lower']:.3f}, {price_range['upper']:.3f}]")
+                       f"价格区间: [{price_range['lower']:.3f}, {price_range['upper']:.3f}], "
+                       f"目标日频次: {freq_config['target_daily_triggers']}, "
+                       f"预测日频次: {predicted_daily_triggers:.2f}")
             
             return grid_params
             
@@ -243,15 +294,20 @@ class GridCalculator:
     
     def _calculate_grid_count(self, price_range: Dict, avg_amplitude: float, 
                             frequency: str, freq_config: Dict) -> int:
-        """计算网格数量"""
+        """计算网格数量 - 传统方法（当没有历史数据时使用）"""
         try:
             range_amount = price_range['range_amount']
-            range_ratio = price_range['range_ratio']
+            target_daily_triggers = freq_config['target_daily_triggers']
             
-            # 基础网格数：基于平均振幅和总范围
-            # 目标：每个网格的步长约等于平均振幅的0.8-1.2倍
-            target_step_size = avg_amplitude * 0.8 / 100 * price_range['lower']
-            base_grid_count = int(range_amount / target_step_size)
+            # 基于目标日交易频次估算网格数量
+            # 假设每个网格步长应该能在日振幅范围内被触发
+            estimated_daily_amplitude_ratio = avg_amplitude / 100  # 转换为比例
+            
+            # 理论上需要的网格步长来达到目标频次
+            target_step_ratio = estimated_daily_amplitude_ratio / target_daily_triggers * 2
+            
+            # 计算网格数量
+            base_grid_count = int(price_range['range_ratio'] / target_step_ratio)
             
             # 应用频率配置约束
             min_grids = freq_config['min_grids']
@@ -262,6 +318,10 @@ class GridCalculator:
             
             # 确保为整数
             grid_count = int(grid_count)
+            
+            logger.debug(f"传统方法计算网格数量: 目标频次={target_daily_triggers}, "
+                        f"估算振幅={estimated_daily_amplitude_ratio:.4f}, "
+                        f"网格数={grid_count}")
             
             return grid_count
             
@@ -362,9 +422,9 @@ class GridCalculator:
                 'max_drawdown': per_trade_amount * 0.05
             }
     
-    def _estimate_trigger_frequency(self, avg_amplitude: float, grid_count: int, 
-                                  range_ratio: float) -> Dict:
-        """估算触发频率"""
+    def _estimate_trigger_frequency_legacy(self, avg_amplitude: float, grid_count: int, 
+                                         range_ratio: float) -> Dict:
+        """估算触发频率 - 传统方法（已弃用，保留用于兼容性）"""
         try:
             # 每个网格的步长比例
             step_ratio = range_ratio / grid_count
@@ -372,13 +432,17 @@ class GridCalculator:
             # 触发概率：日均振幅能覆盖网格步长的概率
             trigger_probability = min(1.0, avg_amplitude / (step_ratio * 100))
             
+            # 日触发次数预估
+            daily_triggers = trigger_probability * 2  # 假设每日可能有2次机会
+            
             # 月触发次数预估
-            triggers_per_month = trigger_probability * 20  # 20个交易日
+            triggers_per_month = daily_triggers * 20  # 20个交易日
             
             # 成功率预估
             success_rate = min(0.9, trigger_probability * 1.2)
             
             return {
+                'daily_triggers': daily_triggers,
                 'triggers_per_month': int(triggers_per_month),
                 'success_rate': success_rate
             }
@@ -386,7 +450,8 @@ class GridCalculator:
         except Exception as e:
             logger.error(f"估算触发频率失败: {str(e)}")
             return {
-                'triggers_per_month': 10,
+                'daily_triggers': 1.0,
+                'triggers_per_month': 20,
                 'success_rate': 0.7
             }
     

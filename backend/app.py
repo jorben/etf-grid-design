@@ -84,22 +84,35 @@ def analyze_etf():
         # 分析ETF特征
         analysis_result = etf_analyzer.analyze_etf_characteristics(historical_data)
         
-        # 计算网格策略参数
+        # 计算网格策略参数 - 传递历史数据用于频次分析
         grid_params = grid_calculator.calculate_grid_parameters(
             current_price=etf_info['current_price'],
             analysis_result=analysis_result,
             frequency=frequency,
-            initial_capital=initial_capital
+            initial_capital=initial_capital,
+            historical_data=historical_data  # 新增：传递历史数据
         )
         
-        # 评估适应性
-        adaptability = etf_analyzer.evaluate_adaptability(analysis_result, grid_params)
+        # 评估适应性 - 传递用户频率参数
+        adaptability = etf_analyzer.evaluate_adaptability(analysis_result, grid_params, frequency)
         
         # 生成动态调整建议
         adjustment_suggestions = grid_calculator.generate_adjustment_suggestions(
             analysis_result, grid_params
         )
         
+        # 准备历史价格数据（最近30个交易日）
+        historical_prices = []
+        if historical_data is not None and not historical_data.empty:
+            # 取最近30个交易日的数据
+            recent_data = historical_data.tail(30).copy()
+            for _, row in recent_data.iterrows():
+                historical_prices.append({
+                    'date': row['trade_date'].strftime('%Y-%m-%d'),
+                    'price': float(row['close']),
+                    'volume': float(row['vol']) if 'vol' in row else 0
+                })
+
         # 组合结果
         result = {
             'etf_info': etf_info,
@@ -107,6 +120,7 @@ def analyze_etf():
             'grid_parameters': grid_params,
             'adaptability': adaptability,
             'adjustment_suggestions': adjustment_suggestions,
+            'historical_prices': historical_prices,  # 新增：历史价格数据
             'timestamp': datetime.now().isoformat()
         }
         

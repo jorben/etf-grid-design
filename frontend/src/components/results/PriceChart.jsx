@@ -2,45 +2,51 @@ import React from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { formatNumber } from '../../services/api'
 
-const PriceChart = ({ currentPrice, gridPrices, priceRange }) => {
-  // 生成模拟的历史价格数据（用于图表展示）
-  const generateMockData = () => {
-    const data = []
-    const [lowerBound, upperBound] = priceRange
-    const priceRangeAmount = upperBound - lowerBound
-    
-    // 生成30个数据点，确保包含边界值
-    for (let i = 0; i < 30; i++) {
-      const date = new Date()
-      date.setDate(date.getDate() - (29 - i))
+const PriceChart = ({ currentPrice, gridPrices, priceRange, historicalPrices = [] }) => {
+  // 处理历史价格数据
+  const processHistoricalData = () => {
+    if (historicalPrices && historicalPrices.length > 0) {
+      // 使用真实历史数据
+      return historicalPrices.map((item, index) => ({
+        date: item.date,
+        price: item.price,
+        volume: item.volume,
+        day: index + 1
+      }))
+    } else {
+      // 如果没有历史数据，生成模拟数据作为备用
+      const data = []
+      const [lowerBound, upperBound] = priceRange
+      const priceRangeAmount = upperBound - lowerBound
       
-      // 生成更贴近实际的价格数据，包含边界附近的价格
-      let price
-      if (i < 5) {
-        // 前5天接近下边界
-        price = lowerBound + (priceRangeAmount * 0.1 * Math.random())
-      } else if (i > 24) {
-        // 后5天接近上边界
-        price = upperBound - (priceRangeAmount * 0.1 * Math.random())
-      } else {
-        // 中间天数在主要区间内
-        price = lowerBound + (priceRangeAmount * 0.2) + (priceRangeAmount * 0.6 * Math.random())
+      for (let i = 0; i < 30; i++) {
+        const date = new Date()
+        date.setDate(date.getDate() - (29 - i))
+        
+        let price
+        if (i < 5) {
+          price = lowerBound + (priceRangeAmount * 0.1 * Math.random())
+        } else if (i > 24) {
+          price = upperBound - (priceRangeAmount * 0.1 * Math.random())
+        } else {
+          price = lowerBound + (priceRangeAmount * 0.2) + (priceRangeAmount * 0.6 * Math.random())
+        }
+        
+        price = Math.max(lowerBound * 0.95, Math.min(upperBound * 1.05, price))
+        
+        data.push({
+          date: date.toISOString().split('T')[0],
+          price: price,
+          day: i + 1
+        })
       }
       
-      // 确保价格在合理范围内
-      price = Math.max(lowerBound * 0.95, Math.min(upperBound * 1.05, price))
-      
-      data.push({
-        date: date.toISOString().split('T')[0],
-        price: price,
-        day: i + 1
-      })
+      return data
     }
-    
-    return data
   }
 
-  const mockData = generateMockData()
+  const chartData = processHistoricalData()
+  const isRealData = historicalPrices && historicalPrices.length > 0
   
   // 格式化价格显示
   const formatPrice = (value) => {
@@ -113,10 +119,12 @@ const PriceChart = ({ currentPrice, gridPrices, priceRange }) => {
 
       {/* 价格走势图 */}
       <div className="mb-6">
-        <h4 className="font-medium mb-3">历史价格走势（模拟数据）</h4>
+        <h4 className="font-medium mb-3">
+          历史价格走势{isRealData ? '（最近30个交易日）' : '（模拟数据）'}
+        </h4>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={mockData}>
+            <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis 
                 dataKey="day" 
@@ -183,10 +191,7 @@ const PriceChart = ({ currentPrice, gridPrices, priceRange }) => {
               `}
               title={`网格${index + 1}: ¥${formatNumber(price, 3)}`}
             >
-              <div className="font-medium">¥{formatNumber(price, 2)}</div>
-              {Math.abs(price - currentPrice) < 0.01 && (
-                <div className="text-[10px] text-blue-600 mt-1">当前</div>
-              )}
+              <div className="font-medium">¥{formatNumber(price, 3)}</div>
             </div>
           ))}
         </div>
@@ -203,11 +208,10 @@ const PriceChart = ({ currentPrice, gridPrices, priceRange }) => {
           <div className="text-xs text-blue-700">
             <strong>图表说明：</strong>
             <ul className="mt-1 space-y-1">
-              <li>• 灰色线条：历史价格走势（模拟数据，仅用于展示网格概念）</li>
+              <li>• 灰色线条：历史价格走势{isRealData ? '' : '（模拟数据，仅用于展示网格概念）'}</li>
               <li>• 蓝色虚线：当前价格水平</li>
               <li>• 绿色虚线：网格下边界</li>
               <li>• 红色虚线：网格上边界</li>
-              <li>• 蓝色高亮：当前价格所在的网格位置</li>
             </ul>
           </div>
         </div>

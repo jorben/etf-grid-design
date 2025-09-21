@@ -193,13 +193,14 @@ class ETFAnalyzer:
             logger.error(f"分析ETF特征失败: {str(e)}")
             return {'error': f'分析失败: {str(e)}'}
     
-    def evaluate_adaptability(self, analysis_result: Dict, grid_params: Dict) -> Dict:
+    def evaluate_adaptability(self, analysis_result: Dict, grid_params: Dict, user_frequency: str = 'medium') -> Dict:
         """
         评估ETF对网格交易的适应性
         
         Args:
             analysis_result: 分析结果
             grid_params: 网格参数
+            user_frequency: 用户期望频率 ('high', 'medium', 'low')
             
         Returns:
             Dict: 适应性评估结果
@@ -291,16 +292,16 @@ class ETFAnalyzer:
                 dimension_scores['liquidity_score'] = 0
                 reasons.append("流动性不足，可能存在交易风险")
             
-            # 5. 网格参数合理性评估 (10分)
-            grid_range = grid_params.get('price_range_ratio', 0)
-            grid_count = grid_params.get('grid_count', 0)
+            # 5. 网格参数合理性评估 (10分) - 新的动态评估逻辑
+            grid_params_evaluation = self._evaluate_grid_params_with_frequency_matching(
+                analysis_result, grid_params, user_frequency
+            )
+            dimension_scores['grid_params_score'] = grid_params_evaluation['total_score']
+            score += grid_params_evaluation['total_score']
             
-            if 0.15 <= grid_range <= 0.35 and 5 <= grid_count <= 20:
-                dimension_scores['grid_params_score'] = 10
-                score += 10
-            else:
-                dimension_scores['grid_params_score'] = 0
-                warnings.append("网格参数设置可能需要优化")
+            # 添加网格参数相关的警告和建议
+            if grid_params_evaluation['total_score'] < 8:
+                warnings.extend(grid_params_evaluation['warnings'])
             
             # 综合评估
             is_suitable = score >= 60 and len(reasons) == 0
@@ -309,7 +310,8 @@ class ETFAnalyzer:
                 'is_suitable': is_suitable,
                 'score': score,
                 'max_score': 100,
-                'dimension_scores': dimension_scores,  # 新增：各维度详细得分
+                'dimension_scores': dimension_scores,
+                'grid_params_details': grid_params_evaluation,  # 新增：网格参数详细评估
                 'reasons': reasons,
                 'warnings': warnings,
                 'recommendation': self._generate_recommendation(is_suitable, score, reasons, warnings)
@@ -449,6 +451,242 @@ class ETFAnalyzer:
         else:
             return '其他分布'
     
+    def _evaluate_grid_params_with_frequency_matching(self, analysis_result: Dict, 
+                                                    grid_params: Dict, 
+                                                    user_frequency: str) -> Dict:
+        """
+        基于用户频率期望的动态网格参数评估
+        
+        Args:
+            analysis_result: ETF分析结果
+            grid_params: 网格参数
+            user_frequency: 用户期望频率
+            
+        Returns:
+            Dict: 网格参数评估结果
+        """
+        try:
+            # 用户期望的日交易频次
+            target_daily_frequencies = {
+                'high': 5.5,    # 高频：5-6次/天
+                'medium': 2.5,  # 中频：2-3次/天
+                'low': 1.0      # 低频：1次/天
+            }
+            
+            target_triggers = target_daily_frequencies.get(user_frequency, 2.5)
+            avg_amplitude = analysis_result.get('avg_amplitude', 0.02)
+            
+            # 1. 动态计算合理的价格区间范围
+            optimal_range = self._calculate_optimal_price_range(avg_amplitude, target_triggers)
+            
+            # 2. 动态计算合理的网格数量范围
+            optimal_grid_count = self._calculate_optimal_grid_count(
+                user_frequency, target_triggers, optimal_range['base_range'], avg_amplitude
+            )
+            
+            # 3. 评估实际参数
+            actual_range = grid_params.get('price_range_ratio', 0)
+            actual_count = grid_params.get('grid_count', 0)
+            
+            # 4. 价格区间评分 (5分)
+            range_score = self._score_price_range(actual_range, optimal_range)
+            
+            # 5. 网格数量评分 (5分)
+            count_score = self._score_grid_count(actual_count, optimal_grid_count)
+            
+            # 6. 频次匹配度奖励 (最多2分额外奖励)
+            frequency_match_score = grid_params.get('frequency_match_score', 0)
+            bonus_score = 0
+            if frequency_match_score > 0.8:
+                bonus_score = 2
+            elif frequency_match_score > 0.6:
+                bonus_score = 1
+            
+            total_score = min(10, range_score + count_score + bonus_score)
+            
+            # 7. 生成警告和建议
+            warnings = []
+            suggestions = []
+            
+            if range_score < 3:
+                if actual_range < optimal_range['min_range']:
+                    warnings.append(f"价格区间过小({actual_range:.1%})，建议调整至{optimal_range['min_range']:.1%}-{optimal_range['max_range']:.1%}")
+                else:
+                    warnings.append(f"价格区间过大({actual_range:.1%})，建议调整至{optimal_range['min_range']:.1%}-{optimal_range['max_range']:.1%}")
+            
+            if count_score < 3:
+                if actual_count < optimal_grid_count['min_count']:
+                    warnings.append(f"网格数量过少({actual_count}个)，建议调整至{optimal_grid_count['min_count']}-{optimal_grid_count['max_count']}个")
+                else:
+                    warnings.append(f"网格数量过多({actual_count}个)，建议调整至{optimal_grid_count['min_count']}-{optimal_grid_count['max_count']}个")
+            
+            if frequency_match_score < 0.6:
+                warnings.append(f"当前参数预计触发频率与期望不符，匹配度仅{frequency_match_score:.1%}")
+            
+            return {
+                'total_score': total_score,
+                'range_evaluation': {
+                    'score': range_score,
+                    'actual': actual_range,
+                    'optimal': optimal_range,
+                    'status': 'good' if range_score >= 4 else 'needs_adjustment'
+                },
+                'count_evaluation': {
+                    'score': count_score,
+                    'actual': actual_count,
+                    'optimal': optimal_grid_count,
+                    'status': 'good' if count_score >= 4 else 'needs_adjustment'
+                },
+                'frequency_matching': {
+                    'target_triggers': target_triggers,
+                    'predicted_triggers': grid_params.get('predicted_daily_triggers', 0),
+                    'match_score': frequency_match_score,
+                    'bonus_score': bonus_score
+                },
+                'warnings': warnings,
+                'suggestions': suggestions
+            }
+            
+        except Exception as e:
+            logger.error(f"网格参数评估失败: {str(e)}")
+            return {
+                'total_score': 0,
+                'warnings': [f'参数评估失败: {str(e)}'],
+                'suggestions': []
+            }
+    
+    def _calculate_optimal_price_range(self, avg_amplitude: float, target_triggers: float) -> Dict:
+        """计算最优价格区间"""
+        try:
+            # 基础公式：区间 = 振幅 × 频率系数 × 安全边际
+            frequency_multiplier = target_triggers * 1.2  # 频率系数
+            safety_margin = 1.5  # 安全边际
+            
+            base_range = avg_amplitude * frequency_multiplier * safety_margin
+            
+            # 应用约束条件
+            min_range = max(0.02, base_range * 0.8)   # 最小2%，考虑交易成本
+            max_range = min(0.50, base_range * 1.3)   # 最大50%，风险控制
+            
+            # 确保min_range < max_range
+            if min_range >= max_range:
+                min_range = max_range * 0.8
+            
+            return {
+                'base_range': base_range,
+                'min_range': min_range,
+                'max_range': max_range,
+                'calculation_basis': f'振幅{avg_amplitude:.1%} × 频率系数{frequency_multiplier:.1f} × 安全边际{safety_margin}'
+            }
+            
+        except Exception as e:
+            logger.error(f"计算最优价格区间失败: {str(e)}")
+            return {
+                'base_range': 0.15,
+                'min_range': 0.10,
+                'max_range': 0.25,
+                'calculation_basis': '使用默认值'
+            }
+    
+    def _calculate_optimal_grid_count(self, frequency_type: str, target_triggers: float, 
+                                    base_range: float, avg_amplitude: float) -> Dict:
+        """计算最优网格数量"""
+        try:
+            # 基于频率类型的基础网格数
+            if frequency_type == 'high':
+                base_count = int(base_range / (avg_amplitude / target_triggers))
+                min_count = max(12, base_count - 5)
+                max_count = min(30, base_count + 8)
+            elif frequency_type == 'medium':
+                base_count = int(base_range / (avg_amplitude / target_triggers))
+                min_count = max(6, base_count - 3)
+                max_count = min(18, base_count + 5)
+            else:  # low
+                base_count = int(base_range / (avg_amplitude / target_triggers))
+                min_count = max(3, base_count - 2)
+                max_count = min(10, base_count + 3)
+            
+            # 确保合理性
+            if min_count >= max_count:
+                max_count = min_count + 3
+            
+            return {
+                'base_count': base_count,
+                'min_count': min_count,
+                'max_count': max_count,
+                'frequency_type': frequency_type
+            }
+            
+        except Exception as e:
+            logger.error(f"计算最优网格数量失败: {str(e)}")
+            # 默认值
+            default_ranges = {
+                'high': {'min_count': 12, 'max_count': 25},
+                'medium': {'min_count': 6, 'max_count': 15},
+                'low': {'min_count': 3, 'max_count': 8}
+            }
+            default = default_ranges.get(frequency_type, default_ranges['medium'])
+            return {
+                'base_count': (default['min_count'] + default['max_count']) // 2,
+                'min_count': default['min_count'],
+                'max_count': default['max_count'],
+                'frequency_type': frequency_type
+            }
+    
+    def _score_price_range(self, actual_range: float, optimal_range: Dict) -> int:
+        """评分价格区间设置"""
+        try:
+            min_range = optimal_range['min_range']
+            max_range = optimal_range['max_range']
+            
+            if min_range <= actual_range <= max_range:
+                return 5  # 完美匹配
+            
+            # 计算偏离程度
+            optimal_center = (min_range + max_range) / 2
+            deviation = abs(actual_range - optimal_center) / optimal_center
+            
+            if deviation < 0.2:  # 偏离20%以内
+                return 4
+            elif deviation < 0.4:  # 偏离40%以内
+                return 3
+            elif deviation < 0.6:  # 偏离60%以内
+                return 2
+            elif deviation < 1.0:  # 偏离100%以内
+                return 1
+            else:
+                return 0
+                
+        except:
+            return 2  # 默认中等分数
+    
+    def _score_grid_count(self, actual_count: int, optimal_count: Dict) -> int:
+        """评分网格数量设置"""
+        try:
+            min_count = optimal_count['min_count']
+            max_count = optimal_count['max_count']
+            
+            if min_count <= actual_count <= max_count:
+                return 5  # 完美匹配
+            
+            # 计算偏离程度
+            optimal_center = (min_count + max_count) / 2
+            deviation = abs(actual_count - optimal_center) / optimal_center
+            
+            if deviation < 0.2:  # 偏离20%以内
+                return 4
+            elif deviation < 0.4:  # 偏离40%以内
+                return 3
+            elif deviation < 0.6:  # 偏离60%以内
+                return 2
+            elif deviation < 1.0:  # 偏离100%以内
+                return 1
+            else:
+                return 0
+                
+        except:
+            return 2  # 默认中等分数
+
     def _generate_recommendation(self, is_suitable: bool, score: int, 
                                 reasons: List[str], warnings: List[str]) -> str:
         """生成推荐建议"""

@@ -72,6 +72,14 @@ const GridParametersCard = ({ data }) => {
                 <div className="font-medium">{formatCurrency(data.step_size_amount)}</div>
               </div>
               <div>
+                <div className="text-sm text-gray-600 mb-1">目标日频次</div>
+                <div className="font-medium">{data.target_daily_triggers} 次/天</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-600 mb-1">预测日频次</div>
+                <div className="font-medium">{data.predicted_daily_triggers?.toFixed(1) || 'N/A'} 次/天</div>
+              </div>
+              <div>
                 <div className="text-sm text-gray-600 mb-1">预估月触发</div>
                 <div className="font-medium">{data.estimated_triggers_per_month} 次</div>
               </div>
@@ -79,6 +87,17 @@ const GridParametersCard = ({ data }) => {
                 <div className="text-sm text-gray-600 mb-1">成功率</div>
                 <div className="font-medium">{formatPercent(data.estimated_success_rate * 100, 1)}</div>
               </div>
+              {data.frequency_match_score && (
+                <div>
+                  <div className="text-sm text-gray-600 mb-1">频次匹配度</div>
+                  <div className={`font-medium ${
+                    data.frequency_match_score > 0.8 ? 'text-success-600' : 
+                    data.frequency_match_score > 0.6 ? 'text-warning-600' : 'text-danger-600'
+                  }`}>
+                    {formatPercent(data.frequency_match_score * 100, 1)}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

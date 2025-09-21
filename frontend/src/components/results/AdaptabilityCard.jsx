@@ -200,6 +200,85 @@ const AdaptabilityCard = ({ data }) => {
         </div>
       </div>
 
+      {/* 网格参数详细评估 */}
+      {data.grid_params_details && (
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <h4 className="font-medium mb-3 text-gray-900">网格参数评估详情</h4>
+          
+          {/* 价格区间评估 */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-600">价格区间设置</span>
+              <span className={`text-xs px-2 py-1 rounded ${
+                data.grid_params_details.range_evaluation?.status === 'good' 
+                  ? 'bg-success-100 text-success-700' 
+                  : 'bg-warning-100 text-warning-700'
+              }`}>
+                {data.grid_params_details.range_evaluation?.status === 'good' ? '合理' : '需调整'}
+              </span>
+            </div>
+            <div className="text-xs text-gray-500 mb-1">
+              实际: {(data.grid_params_details.range_evaluation?.actual * 100)?.toFixed(1)}% | 
+              建议: {(data.grid_params_details.range_evaluation?.optimal?.min_range * 100)?.toFixed(1)}%-{(data.grid_params_details.range_evaluation?.optimal?.max_range * 100)?.toFixed(1)}%
+            </div>
+          </div>
+          
+          {/* 网格数量评估 */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-600">网格数量设置</span>
+              <span className={`text-xs px-2 py-1 rounded ${
+                data.grid_params_details.count_evaluation?.status === 'good' 
+                  ? 'bg-success-100 text-success-700' 
+                  : 'bg-warning-100 text-warning-700'
+              }`}>
+                {data.grid_params_details.count_evaluation?.status === 'good' ? '合理' : '需调整'}
+              </span>
+            </div>
+            <div className="text-xs text-gray-500 mb-1">
+              实际: {data.grid_params_details.count_evaluation?.actual}个 | 
+              建议: {data.grid_params_details.count_evaluation?.optimal?.min_count}-{data.grid_params_details.count_evaluation?.optimal?.max_count}个
+            </div>
+          </div>
+          
+          {/* 频次匹配度 */}
+          {data.grid_params_details.frequency_matching && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">频次匹配度</span>
+                <span className={`text-xs px-2 py-1 rounded ${
+                  data.grid_params_details.frequency_matching.match_score > 0.8 
+                    ? 'bg-success-100 text-success-700' 
+                    : data.grid_params_details.frequency_matching.match_score > 0.6
+                    ? 'bg-warning-100 text-warning-700'
+                    : 'bg-danger-100 text-danger-700'
+                }`}>
+                  {(data.grid_params_details.frequency_matching.match_score * 100)?.toFixed(0)}%
+                </span>
+              </div>
+              <div className="text-xs text-gray-500">
+                目标: {data.grid_params_details.frequency_matching.target_triggers}次/天 | 
+                预测: {data.grid_params_details.frequency_matching.predicted_triggers?.toFixed(1)}次/天
+              </div>
+            </div>
+          )}
+          
+          {/* 优化建议 */}
+          {data.grid_params_details.warnings && data.grid_params_details.warnings.length > 0 && (
+            <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+              <div className="text-xs text-yellow-800">
+                <strong>优化建议：</strong>
+                <ul className="mt-1 list-disc list-inside space-y-1">
+                  {data.grid_params_details.warnings.map((warning, index) => (
+                    <li key={index}>{warning}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* 汇总信息提示框 - 只显示recommendation，避免重复 */}
       {data.recommendation && (
         <div className={`p-4 rounded-lg border ${data.is_suitable ? 'bg-success-50 border-success-200' : 'bg-warning-50 border-warning-200'}`}>
