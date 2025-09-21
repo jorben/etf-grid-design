@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ChevronDown, ChevronUp, DollarSign, Target, Grid, TrendingUp, AlertCircle } from 'lucide-react'
+import { ChevronDown, ChevronUp, DollarSign, RailSymbol, Grid, TrendingUp, AlertCircle } from 'lucide-react'
 import { formatNumber, formatPercent, formatCurrency, formatStepAmount } from '../../services/api'
 
 const GridParametersCard = ({ data }) => {
@@ -110,7 +110,7 @@ const GridParametersCard = ({ data }) => {
           className="flex items-center justify-between w-full p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
         >
           <div className="flex items-center space-x-3">
-            <Target className="w-5 h-5 text-gray-600" />
+            <RailSymbol className="w-5 h-5 text-gray-600" />
             <span className="font-medium">价格区间设置</span>
           </div>
           {expandedSections.prices ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
