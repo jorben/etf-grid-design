@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { RefreshCw, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Info } from 'lucide-react'
+import { RefreshCw, TrendingUp, TrendingDown, LandPlot, AlertTriangle, CheckCircle, Info } from 'lucide-react'
 
 const AdjustmentSuggestionsCard = ({ data }) => {
   const [activeTab, setActiveTab] = useState('volatility_increase')
@@ -35,7 +35,7 @@ const AdjustmentSuggestionsCard = ({ data }) => {
     {
       id: 'trend_market',
       label: '趋势市场',
-      icon: TrendingUp,
+      icon: LandPlot,
       color: 'text-warning-600',
       bgColor: 'bg-warning-50'
     }

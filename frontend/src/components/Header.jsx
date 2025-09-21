@@ -1,5 +1,5 @@
 import React from 'react'
-import { TrendingUp, Waypoints, Settings } from 'lucide-react'
+import { DatabaseZap, Waypoints, Brain } from 'lucide-react'
 
 const Header = () => {
   return (
@@ -12,21 +12,21 @@ const Header = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">
-                ETF网格交易策略设计工具
+                ETF网格策略设计
               </h1>
               <p className="text-sm text-gray-600">
-                专业的量化投资策略分析平台
+                便捷的ETF的量化投资策略分析工具
               </p>
             </div>
           </div>
           
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <TrendingUp className="w-4 h-4" />
-              <span>基于tushare数据</span>
+              <DatabaseZap className="w-4 h-4" />
+              <span>基于数据</span>
             </div>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <Settings className="w-4 h-4" />
+              <Brain className="w-4 h-4" />
               <span>智能算法</span>
             </div>
           </div>

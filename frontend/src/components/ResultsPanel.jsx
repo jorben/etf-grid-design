@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { RefreshCw, Download, Share2, ArrowLeft, TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { RefreshCw, Share2, ArrowLeft, LayoutDashboard, ScanBarcode, Grid3x3 } from 'lucide-react'
 import ETFInfoCard from './results/ETFInfoCard'
 import GridParametersCard from './results/GridParametersCard'
 import AdaptabilityCard from './results/AdaptabilityCard'
@@ -12,9 +12,9 @@ const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
   const [activeTab, setActiveTab] = useState('overview')
   
   const tabs = [
-    { id: 'overview', label: '概览', icon: TrendingUp },
-    { id: 'parameters', label: '网格参数', icon: Minus },
-    { id: 'analysis', label: '详细分析', icon: TrendingDown },
+    { id: 'overview', label: '概览', icon: LayoutDashboard },
+    { id: 'parameters', label: '网格参数', icon: Grid3x3 },
+    { id: 'analysis', label: '详细分析', icon: ScanBarcode },
     { id: 'suggestions', label: '调整建议', icon: RefreshCw }
   ]
 
@@ -66,6 +66,7 @@ const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
         </div>
         
         <div className="flex items-center space-x-3">
+          {/*
           <button
             onClick={handleExport}
             className="btn-secondary inline-flex items-center"
@@ -73,7 +74,7 @@ const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
             <Download className="w-4 h-4 mr-2" />
             导出
           </button>
-          
+          */}
           <button
             onClick={handleShare}
             className="btn-secondary inline-flex items-center"
