@@ -103,17 +103,17 @@ const GridParametersCard = ({ data }) => {
               <div>
                 <h4 className="font-medium mb-3">价格边界</h4>
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-success-50 rounded-lg">
+                  <div className="flex justify-between items-center p-3 bg-danger-50 rounded-lg">
                     <span className="text-sm text-gray-600">上边界</span>
-                    <span className="font-medium text-success-700">¥{formatNumber(data.price_upper_bound, 3)}</span>
+                    <span className="font-medium text-danger-700">¥{formatNumber(data.price_upper_bound, 3)}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                     <span className="text-sm text-gray-600">当前价格</span>
                     <span className="font-medium">¥{formatNumber(data.current_price, 3)}</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-danger-50 rounded-lg">
+                  <div className="flex justify-between items-center p-3 bg-success-50 rounded-lg">
                     <span className="text-sm text-gray-600">下边界</span>
-                    <span className="font-medium text-danger-700">¥{formatNumber(data.price_lower_bound, 3)}</span>
+                    <span className="font-medium text-success-700">¥{formatNumber(data.price_lower_bound, 3)}</span>
                   </div>
                 </div>
               </div>
@@ -238,15 +238,15 @@ const GridParametersCard = ({ data }) => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">平均每网格收益</span>
-                    <span className="font-medium text-success-600">{formatCurrency(data.avg_profit_per_grid)}</span>
+                    <span className="font-medium text-danger-600">{formatCurrency(data.avg_profit_per_grid)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">平均收益率</span>
-                    <span className="font-medium">{formatPercent(data.avg_profit_rate * 100, 3)}</span>
+                    <span className="font-medium text-danger-600">{formatPercent(data.avg_profit_rate * 100, 3)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">月度收益预估</span>
-                    <span className="font-medium text-success-600">{formatCurrency(data.monthly_profit_estimate)}</span>
+                    <span className="font-medium text-danger-600">{formatCurrency(data.monthly_profit_estimate)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">盈亏平衡振幅</span>
@@ -260,7 +260,7 @@ const GridParametersCard = ({ data }) => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">最大回撤预估</span>
-                    <span className="font-medium text-danger-600">{formatCurrency(data.max_drawdown_estimate)}</span>
+                    <span className="font-medium text-success-600">{formatCurrency(data.max_drawdown_estimate)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">风险等级</span>

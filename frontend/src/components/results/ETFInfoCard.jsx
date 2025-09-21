@@ -13,8 +13,8 @@ const ETFInfoCard = ({ data }) => {
   }
 
   const getPriceColor = (change) => {
-    if (change > 0) return 'text-success-600'
-    if (change < 0) return 'text-danger-600'
+    if (change > 0) return 'text-danger-600'
+    if (change < 0) return 'text-success-600'
     return 'text-gray-600'
   }
 

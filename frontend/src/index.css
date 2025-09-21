@@ -183,11 +183,11 @@
 }
 
 .price-up {
-  @apply text-success-600;
+  @apply text-danger-600;
 }
 
 .price-down {
-  @apply text-danger-600;
+  @apply text-success-600;
 }
 
 .price-neutral {

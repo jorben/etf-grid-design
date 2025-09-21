@@ -81,21 +81,21 @@ const PriceChart = ({ currentPrice, gridPrices, priceRange }) => {
       <div className="mb-6 p-4 bg-gray-50 rounded-lg">
         <div className="flex items-center justify-between mb-3">
           <div className="text-center">
-            <div className="text-sm text-gray-600">上边界</div>
-            <div className="font-medium text-success-600">¥{formatNumber(priceRange[1], 3)}</div>
+            <div className="text-sm text-gray-600">下边界</div>
+            <div className="font-medium text-success-600">¥{formatNumber(priceRange[0], 3)}</div>
           </div>
           <div className="text-center">
             <div className="text-sm text-gray-600">当前价格</div>
             <div className="font-medium text-lg">¥{formatNumber(currentPrice, 3)}</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-600">下边界</div>
-            <div className="font-medium text-danger-600">¥{formatNumber(priceRange[0], 3)}</div>
+            <div className="text-sm text-gray-600">上边界</div>
+            <div className="font-medium text-danger-600">¥{formatNumber(priceRange[1], 3)}</div>
           </div>
         </div>
         
         {/* 价格区间可视化 */}
-        <div className="relative h-4 bg-gradient-to-r from-red-200 via-gray-200 to-green-200 rounded-full">
+        <div className="relative h-4 bg-gradient-to-r from-green-200 via-gray-200 to-red-200 rounded-full">
           <div 
             className="absolute top-0 w-1 h-4 bg-blue-600 rounded-full transform -translate-x-1/2"
             style={{
@@ -142,13 +142,13 @@ const PriceChart = ({ currentPrice, gridPrices, priceRange }) => {
               />
               <ReferenceLine 
                 y={priceRange[0]} 
-                stroke="#ef4444" 
+                stroke="#22c55e" 
                 strokeDasharray="3 3"
                 label={{ value: "下边界", position: "left" }}
               />
               <ReferenceLine 
                 y={priceRange[1]} 
-                stroke="#22c55e" 
+                stroke="#ef4444" 
                 strokeDasharray="3 3"
                 label={{ value: "上边界", position: "left" }}
               />
@@ -205,8 +205,8 @@ const PriceChart = ({ currentPrice, gridPrices, priceRange }) => {
             <ul className="mt-1 space-y-1">
               <li>• 灰色线条：历史价格走势（模拟数据，仅用于展示网格概念）</li>
               <li>• 蓝色虚线：当前价格水平</li>
-              <li>• 红色虚线：网格下边界</li>
-              <li>• 绿色虚线：网格上边界</li>
+              <li>• 绿色虚线：网格下边界</li>
+              <li>• 红色虚线：网格上边界</li>
               <li>• 蓝色高亮：当前价格所在的网格位置</li>
             </ul>
           </div>
