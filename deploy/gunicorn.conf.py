@@ -1,4 +1,4 @@
-# ETF网格交易工具 - Gunicorn生产环境配置
+# ETF网格交易策略工具 - Gunicorn生产环境配置
 
 import os
 import multiprocessing
@@ -25,6 +25,9 @@ accesslog = "/app/logs/access.log"
 errorlog = "/app/logs/error.log"
 loglevel = os.getenv('LOG_LEVEL', 'info').lower()
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" %(D)s'
+
+# 工作目录配置 - 确保在backend目录下运行
+chdir = "/app/backend"
 
 # 进程管理
 pidfile = "/tmp/gunicorn.pid"

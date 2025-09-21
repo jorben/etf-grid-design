@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# ETF网格交易工具 - Docker容器启动脚本
+# ETF网格交易策略设计工具 - Docker容器启动脚本
 
 set -e
 
-echo "🚀 启动ETF网格交易工具..."
+echo "🚀 启动ETF网格交易策略设计工具..."
 
 # 环境变量默认值
 FLASK_ENV=${FLASK_ENV:-production}
@@ -26,10 +26,13 @@ if [ "$FLASK_ENV" = "development" ]; then
 elif [ "$FLASK_ENV" = "production" ]; then
     echo "🏭 生产环境模式启动..."
     
+    # 切换到backend目录以解决模块导入问题
+    cd /app/backend
+    
     # 检查Gunicorn配置文件
     if [ -f "/app/gunicorn.conf.py" ]; then
         echo "📋 使用Gunicorn配置文件启动..."
-        exec gunicorn --config gunicorn.conf.py backend.app_production:app
+        exec gunicorn --config /app/gunicorn.conf.py app_production:app
     else
         echo "📋 使用默认Gunicorn配置启动..."
         exec gunicorn \
@@ -45,7 +48,7 @@ elif [ "$FLASK_ENV" = "production" ]; then
             --access-logfile /app/logs/access.log \
             --error-logfile /app/logs/error.log \
             --log-level ${LOG_LEVEL:-info} \
-            backend.app_production:app
+            app_production:app
     fi
 else
     echo "🔧 直接启动Flask应用..."
