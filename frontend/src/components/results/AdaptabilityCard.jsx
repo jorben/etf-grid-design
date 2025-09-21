@@ -36,24 +36,21 @@ const AdaptabilityCard = ({ data }) => {
       case 'volatility': return data.dimension_scores.volatility_score || 0;
       case 'market': return data.dimension_scores.market_score || 0;
       case 'liquidity': return data.dimension_scores.liquidity_score || 0;
-      case 'grid_params': return data.dimension_scores.grid_params_score || 0;
       default: return 0;
     }
   };
 
-  // 兼容旧数据的计算逻辑
+  // 兼容旧数据的计算逻辑 - 更新为新的分数分布
   const getOldDimensionScore = (dimensionName) => {
     switch(dimensionName) {
       case 'amplitude': 
-        return Math.max(0, Math.round((data.score / 100) * 30));
+        return Math.max(0, Math.round((data.score / 100) * 35));
       case 'volatility': 
-        return Math.max(0, Math.round(((Math.max(30, data.score) - 30) / 100) * 25));
+        return Math.max(0, Math.round(((Math.max(35, data.score) - 35) / 100) * 30));
       case 'market': 
-        return Math.max(0, Math.round(((Math.max(55, data.score) - 55) / 100) * 20));
+        return Math.max(0, Math.round(((Math.max(65, data.score) - 65) / 100) * 25));
       case 'liquidity': 
-        return Math.max(0, Math.round(((Math.max(75, data.score) - 75) / 100) * 15));
-      case 'grid_params': 
-        return Math.max(0, Math.round(((Math.max(85, data.score) - 85) / 100) * 10));
+        return Math.max(0, Math.round(((Math.max(90, data.score) - 90) / 100) * 10));
       default: return 0;
     }
   };
@@ -117,167 +114,74 @@ const AdaptabilityCard = ({ data }) => {
         </div>
       </div>
 
-      {/* 评估维度 - 使用实际维度得分 */}
+      {/* 评估维度 - 使用实际维度得分 (4个维度，总分100分) */}
       <div className="space-y-4 mb-6">
-        {/* 振幅评估 - 30分 */}
+        {/* 振幅评估 - 35分 */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">振幅评估</span>
           <div className="flex items-center space-x-2">
             <div className="w-20 bg-gray-200 rounded-full h-2">
               <div 
-                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('amplitude'), 30)}`}
-                style={{ width: `${getDimensionWidth(getDimensionScore('amplitude'), 30)}%` }}
+                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('amplitude'), 35)}`}
+                style={{ width: `${getDimensionWidth(getDimensionScore('amplitude'), 35)}%` }}
               ></div>
             </div>
             <span className="text-xs text-gray-500">
-              {getDimensionScore('amplitude')}/30分
+              {getDimensionScore('amplitude')}/35分
             </span>
           </div>
         </div>
         
-        {/* 波动率评估 - 25分 */}
+        {/* 波动率评估 - 30分 */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">波动率评估</span>
           <div className="flex items-center space-x-2">
             <div className="w-20 bg-gray-200 rounded-full h-2">
               <div 
-                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('volatility'), 25)}`}
-                style={{ width: `${getDimensionWidth(getDimensionScore('volatility'), 25)}%` }}
+                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('volatility'), 30)}`}
+                style={{ width: `${getDimensionWidth(getDimensionScore('volatility'), 30)}%` }}
               ></div>
             </div>
             <span className="text-xs text-gray-500">
-              {getDimensionScore('volatility')}/25分
+              {getDimensionScore('volatility')}/30分
             </span>
           </div>
         </div>
         
-        {/* 市场特征 - 20分 */}
+        {/* 市场特征 - 25分 */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">市场特征</span>
           <div className="flex items-center space-x-2">
             <div className="w-20 bg-gray-200 rounded-full h-2">
               <div 
-                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('market'), 20)}`}
-                style={{ width: `${getDimensionWidth(getDimensionScore('market'), 20)}%` }}
+                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('market'), 25)}`}
+                style={{ width: `${getDimensionWidth(getDimensionScore('market'), 25)}%` }}
               ></div>
             </div>
             <span className="text-xs text-gray-500">
-              {getDimensionScore('market')}/20分
+              {getDimensionScore('market')}/25分
             </span>
           </div>
         </div>
         
-        {/* 流动性评估 - 15分 */}
+        {/* 流动性评估 - 10分 */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">流动性评估</span>
           <div className="flex items-center space-x-2">
             <div className="w-20 bg-gray-200 rounded-full h-2">
               <div 
-                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('liquidity'), 15)}`}
-                style={{ width: `${getDimensionWidth(getDimensionScore('liquidity'), 15)}%` }}
+                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('liquidity'), 10)}`}
+                style={{ width: `${getDimensionWidth(getDimensionScore('liquidity'), 10)}%` }}
               ></div>
             </div>
             <span className="text-xs text-gray-500">
-              {getDimensionScore('liquidity')}/15分
-            </span>
-          </div>
-        </div>
-        
-        {/* 网格参数评估 - 10分 (新增) */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">网格参数评估</span>
-          <div className="flex items-center space-x-2">
-            <div className="w-20 bg-gray-200 rounded-full h-2">
-              <div 
-                className={`h-2 rounded-full ${getDimensionColor(getDimensionScore('grid_params'), 10)}`}
-                style={{ width: `${getDimensionWidth(getDimensionScore('grid_params'), 10)}%` }}
-              ></div>
-            </div>
-            <span className="text-xs text-gray-500">
-              {getDimensionScore('grid_params')}/10分
+              {getDimensionScore('liquidity')}/10分
             </span>
           </div>
         </div>
       </div>
 
-      {/* 网格参数详细评估 */}
-      {data.grid_params_details && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-medium mb-3 text-gray-900">网格参数评估详情</h4>
-          
-          {/* 价格区间评估 */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">价格区间设置</span>
-              <span className={`text-xs px-2 py-1 rounded ${
-                data.grid_params_details.range_evaluation?.status === 'good' 
-                  ? 'bg-success-100 text-success-700' 
-                  : 'bg-warning-100 text-warning-700'
-              }`}>
-                {data.grid_params_details.range_evaluation?.status === 'good' ? '合理' : '需调整'}
-              </span>
-            </div>
-            <div className="text-xs text-gray-500 mb-1">
-              实际: {(data.grid_params_details.range_evaluation?.actual * 100)?.toFixed(1)}% | 
-              建议: {(data.grid_params_details.range_evaluation?.optimal?.min_range * 100)?.toFixed(1)}%-{(data.grid_params_details.range_evaluation?.optimal?.max_range * 100)?.toFixed(1)}%
-            </div>
-          </div>
-          
-          {/* 网格数量评估 */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">网格数量设置</span>
-              <span className={`text-xs px-2 py-1 rounded ${
-                data.grid_params_details.count_evaluation?.status === 'good' 
-                  ? 'bg-success-100 text-success-700' 
-                  : 'bg-warning-100 text-warning-700'
-              }`}>
-                {data.grid_params_details.count_evaluation?.status === 'good' ? '合理' : '需调整'}
-              </span>
-            </div>
-            <div className="text-xs text-gray-500 mb-1">
-              实际: {data.grid_params_details.count_evaluation?.actual}个 | 
-              建议: {data.grid_params_details.count_evaluation?.optimal?.min_count}-{data.grid_params_details.count_evaluation?.optimal?.max_count}个
-            </div>
-          </div>
-          
-          {/* 频次匹配度 */}
-          {data.grid_params_details.frequency_matching && (
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">频次匹配度</span>
-                <span className={`text-xs px-2 py-1 rounded ${
-                  data.grid_params_details.frequency_matching.match_score > 0.8 
-                    ? 'bg-success-100 text-success-700' 
-                    : data.grid_params_details.frequency_matching.match_score > 0.6
-                    ? 'bg-warning-100 text-warning-700'
-                    : 'bg-danger-100 text-danger-700'
-                }`}>
-                  {(data.grid_params_details.frequency_matching.match_score * 100)?.toFixed(0)}%
-                </span>
-              </div>
-              <div className="text-xs text-gray-500">
-                目标: {data.grid_params_details.frequency_matching.target_triggers}次/天 | 
-                预测: {data.grid_params_details.frequency_matching.predicted_triggers?.toFixed(1)}次/天
-              </div>
-            </div>
-          )}
-          
-          {/* 优化建议 */}
-          {data.grid_params_details.warnings && data.grid_params_details.warnings.length > 0 && (
-            <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
-              <div className="text-xs text-yellow-800">
-                <strong>优化建议：</strong>
-                <ul className="mt-1 list-disc list-inside space-y-1">
-                  {data.grid_params_details.warnings.map((warning, index) => (
-                    <li key={index}>{warning}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+
 
       {/* 汇总信息提示框 - 只显示recommendation，避免重复 */}
       {data.recommendation && (
