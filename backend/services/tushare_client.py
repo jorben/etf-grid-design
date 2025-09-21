@@ -4,6 +4,7 @@ import pandas as pd
 import logging
 from datetime import datetime, timedelta
 from typing import Optional, Dict, List
+from .simple_cache import SimpleCache
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 class TushareClient:
     """Tushare数据客户端"""
     
-    def __init__(self):
+    def __init__(self, cache_dir: str = "cache"):
         """初始化Tushare客户端"""
         self.token = os.getenv('TUSHARE_TOKEN')
         if not self.token:
@@ -19,6 +20,10 @@ class TushareClient:
         
         ts.set_token(self.token)
         self.pro = ts.pro_api()
+        
+        # 初始化缓存管理器
+        self.cache = SimpleCache(cache_dir)
+        
         logger.info("Tushare客户端初始化成功")
     
     def get_etf_daily_data(self, etf_code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
@@ -33,6 +38,22 @@ class TushareClient:
         Returns:
             DataFrame: ETF日线数据
         """
+        # 1. 先检查缓存
+        cached_data = self.cache.get("etf_daily_data", 
+                                    etf_code=etf_code, 
+                                    start_date=start_date, 
+                                    end_date=end_date)
+        if cached_data:
+            logger.info(f"✓ 从缓存获取ETF {etf_code} 日线数据 ({start_date}~{end_date})")
+            # 将缓存的字典数据转换回DataFrame
+            df = pd.DataFrame(cached_data)
+            # 确保trade_date是datetime类型
+            df['trade_date'] = pd.to_datetime(df['trade_date'])
+            return df
+        
+        # 2. 缓存未命中，调用接口
+        logger.info(f"→ 缓存未命中，请求tushare接口获取ETF {etf_code} 日线数据 ({start_date}~{end_date})")
+        
         try:
             # 自动补全市场后缀
             full_code = self._complete_etf_code(etf_code)
@@ -46,7 +67,7 @@ class TushareClient:
             )
             
             if df.empty:
-                logger.warning(f"未获取到ETF {etf_code} 的数据")
+                logger.warning(f"✗ tushare接口返回空数据，ETF {etf_code} 日线数据获取失败")
                 return None
             
             # 数据预处理
@@ -57,11 +78,18 @@ class TushareClient:
             # 计算日振幅
             df['amplitude'] = (df['high'] - df['low']) / df['pre_close'] * 100
             
-            logger.info(f"成功获取ETF {etf_code} 的日线数据，共{len(df)}条记录")
+            # 3. 成功获取数据，保存缓存（转换为字典格式）
+            cache_data = df.to_dict('records')
+            self.cache.set("etf_daily_data", cache_data, 
+                          etf_code=etf_code, 
+                          start_date=start_date, 
+                          end_date=end_date)
+            logger.info(f"✓ ETF {etf_code} 日线数据获取成功并已缓存，共{len(df)}条记录")
+            
             return df
             
         except Exception as e:
-            logger.error(f"获取ETF {etf_code} 数据失败: {str(e)}")
+            logger.error(f"✗ 请求tushare接口失败，ETF {etf_code} 日线数据获取失败: {str(e)}")
             return None
     
     def get_etf_basic_info(self, etf_code: str) -> Optional[Dict]:
@@ -74,6 +102,15 @@ class TushareClient:
         Returns:
             Dict: ETF基本信息
         """
+        # 1. 先检查缓存
+        cached_data = self.cache.get("etf_basic_info", etf_code=etf_code)
+        if cached_data:
+            logger.info(f"✓ 从缓存获取ETF {etf_code} 基本信息")
+            return cached_data
+        
+        # 2. 缓存未命中，调用接口
+        logger.info(f"→ 缓存未命中，请求tushare接口获取ETF {etf_code} 基本信息")
+        
         try:
             # 自动补全市场后缀
             full_code = self._complete_etf_code(etf_code)
@@ -87,7 +124,7 @@ class TushareClient:
             )
             
             if df.empty:
-                logger.warning(f"未找到ETF {etf_code} 的基本信息")
+                logger.warning(f"✗ tushare接口返回空数据，ETF {etf_code} 基本信息获取失败")
                 return None
             
             # 获取最新价格
@@ -98,11 +135,14 @@ class TushareClient:
             basic_info = df.iloc[0].to_dict()
             basic_info.update(latest_data)
             
-            logger.info(f"成功获取ETF {etf_code} 的基本信息")
+            # 3. 成功获取数据，保存缓存
+            self.cache.set("etf_basic_info", basic_info, etf_code=etf_code)
+            logger.info(f"✓ ETF {etf_code} 基本信息获取成功并已缓存")
+            
             return basic_info
             
         except Exception as e:
-            logger.error(f"获取ETF {etf_code} 基本信息失败: {str(e)}")
+            logger.error(f"✗ 请求tushare接口失败，ETF {etf_code} 基本信息获取失败: {str(e)}")
             return None
     
     def get_latest_price(self, etf_code: str) -> Optional[Dict]:
@@ -115,6 +155,16 @@ class TushareClient:
         Returns:
             Dict: 最新价格信息
         """
+        # 1. 先检查缓存（使用当前日期作为缓存键的一部分）
+        today = datetime.now().strftime('%Y%m%d')
+        cached_data = self.cache.get("etf_latest_price", etf_code=etf_code, date=today)
+        if cached_data:
+            logger.info(f"✓ 从缓存获取ETF {etf_code} 最新价格")
+            return cached_data
+        
+        # 2. 缓存未命中，调用接口
+        logger.info(f"→ 缓存未命中，请求tushare接口获取ETF {etf_code} 最新价格")
+        
         try:
             # 自动补全市场后缀
             full_code = self._complete_etf_code(etf_code)
@@ -132,7 +182,7 @@ class TushareClient:
             )
             
             if df.empty:
-                logger.warning(f"未获取到ETF {etf_code} 的最新价格")
+                logger.warning(f"✗ tushare接口返回空数据，ETF {etf_code} 最新价格获取失败")
                 return None
             
             # 按交易日期排序，取最新的数据
@@ -147,7 +197,7 @@ class TushareClient:
                 logger.warning(f"ETF {etf_code} 的最新数据已过期（{days_diff}天前）")
                 # 仍然返回数据，但记录警告
             
-            return {
+            price_info = {
                 'current_price': float(latest_data['close']),
                 'pre_close': float(latest_data['pre_close']),
                 'pct_change': float(latest_data['pct_chg']),
@@ -157,13 +207,19 @@ class TushareClient:
                 'data_age_days': days_diff  # 添加数据年龄信息
             }
             
+            # 3. 成功获取数据，保存缓存（按当日缓存）
+            self.cache.set("etf_latest_price", price_info, etf_code=etf_code, date=today)
+            logger.info(f"✓ ETF {etf_code} 最新价格获取成功并已缓存")
+            
+            return price_info
+            
         except Exception as e:
-            logger.error(f"获取ETF {etf_code} 最新价格失败: {str(e)}")
+            logger.error(f"✗ 请求tushare接口失败，ETF {etf_code} 最新价格获取失败: {str(e)}")
             return None
     
     def search_etf(self, query: str) -> List[Dict]:
         """
-        搜索ETF
+        搜索ETF - 不使用缓存，保持实时性
         
         Args:
             query: 搜索关键词（ETF代码或名称）
@@ -171,6 +227,8 @@ class TushareClient:
         Returns:
             List[Dict]: ETF列表
         """
+        logger.info(f"→ 搜索ETF: '{query}' (不使用缓存)")
+        
         try:
             # 获取所有ETF基本信息
             df = self.pro.fund_basic(
@@ -179,6 +237,7 @@ class TushareClient:
             )
             
             if df.empty:
+                logger.warning(f"✗ 搜索ETF '{query}' 返回空结果")
                 return []
             
             # 根据查询条件过滤
@@ -200,11 +259,11 @@ class TushareClient:
                     'list_date': row['list_date']
                 })
             
-            logger.info(f"搜索ETF '{query}'，找到{len(etf_list)}个结果")
+            logger.info(f"✓ 搜索ETF '{query}' 成功，找到{len(etf_list)}个结果")
             return etf_list
             
         except Exception as e:
-            logger.error(f"搜索ETF失败: {str(e)}")
+            logger.error(f"✗ 搜索ETF '{query}' 失败: {str(e)}")
             return []
     
     def _complete_etf_code(self, etf_code: str) -> str:
@@ -239,6 +298,15 @@ class TushareClient:
         Returns:
             str: ETF名称，如果获取失败返回None
         """
+        # 1. 先检查缓存
+        cached_data = self.cache.get("etf_name", etf_code=etf_code)
+        if cached_data:
+            logger.info(f"✓ 从缓存获取ETF {etf_code} 名称")
+            return cached_data
+        
+        # 2. 缓存未命中，调用接口
+        logger.info(f"→ 缓存未命中，请求tushare接口获取ETF {etf_code} 名称")
+        
         try:
             # 自动补全市场后缀
             full_code = self._complete_etf_code(etf_code)
@@ -251,15 +319,19 @@ class TushareClient:
             )
             
             if df.empty:
-                logger.warning(f"未找到ETF {etf_code} 的名称信息")
+                logger.warning(f"✗ tushare接口返回空数据，ETF {etf_code} 名称获取失败")
                 return None
             
             etf_name = df.iloc[0]['name']
-            logger.info(f"成功获取ETF {etf_code} 的名称: {etf_name}")
+            
+            # 3. 成功获取数据，保存缓存
+            self.cache.set("etf_name", etf_name, etf_code=etf_code)
+            logger.info(f"✓ ETF {etf_code} 名称获取成功并已缓存: {etf_name}")
+            
             return etf_name
             
         except Exception as e:
-            logger.error(f"获取ETF {etf_code} 名称失败: {str(e)}")
+            logger.error(f"✗ 请求tushare接口失败，ETF {etf_code} 名称获取失败: {str(e)}")
             return None
 
     def get_trading_calendar(self, start_date: str, end_date: str) -> List[str]:
@@ -273,6 +345,17 @@ class TushareClient:
         Returns:
             List[str]: 交易日列表
         """
+        # 1. 先检查缓存
+        cached_data = self.cache.get("trading_calendar", 
+                                    start_date=start_date, 
+                                    end_date=end_date)
+        if cached_data:
+            logger.info(f"✓ 从缓存获取交易日历 ({start_date}~{end_date})")
+            return cached_data
+        
+        # 2. 缓存未命中，调用接口
+        logger.info(f"→ 缓存未命中，请求tushare接口获取交易日历 ({start_date}~{end_date})")
+        
         try:
             df = self.pro.trade_cal(
                 exchange='SSE',
@@ -282,10 +365,19 @@ class TushareClient:
             )
             
             if df.empty:
+                logger.warning(f"✗ tushare接口返回空数据，交易日历获取失败")
                 return []
             
-            return df['cal_date'].tolist()
+            trading_days = df['cal_date'].tolist()
+            
+            # 3. 成功获取数据，保存缓存
+            self.cache.set("trading_calendar", trading_days, 
+                          start_date=start_date, 
+                          end_date=end_date)
+            logger.info(f"✓ 交易日历获取成功并已缓存，共{len(trading_days)}个交易日")
+            
+            return trading_days
             
         except Exception as e:
-            logger.error(f"获取交易日历失败: {str(e)}")
+            logger.error(f"✗ 请求tushare接口失败，交易日历获取失败: {str(e)}")
             return []

@@ -188,6 +188,49 @@ def get_etf_name(etf_code):
         }), 500
 
 
+@app.route('/api/cache/info', methods=['GET'])
+def get_cache_info():
+    """获取缓存信息"""
+    try:
+        cache_info = tushare_client.cache.get_cache_info()
+        return jsonify({
+            'success': True,
+            'cache_info': cache_info,
+            'timestamp': datetime.now().isoformat()
+        })
+    except Exception as e:
+        logger.error(f"获取缓存信息时发生错误: {str(e)}", exc_info=True)
+        return jsonify({'error': f'获取缓存信息失败: {str(e)}'}), 500
+
+
+@app.route('/api/cache/clear', methods=['POST'])
+def clear_cache():
+    """清理缓存"""
+    try:
+        data = request.get_json() or {}
+        method_name = data.get('method_name')
+        
+        if method_name:
+            # 清理特定方法的缓存
+            params = {k: v for k, v in data.items() if k != 'method_name'}
+            tushare_client.cache.clear(method_name, **params)
+            message = f"已清理 {method_name} 的缓存"
+        else:
+            # 清理所有缓存
+            tushare_client.cache.clear()
+            message = "已清理所有缓存"
+        
+        return jsonify({
+            'success': True,
+            'message': message,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"清理缓存时发生错误: {str(e)}", exc_info=True)
+        return jsonify({'error': f'清理缓存失败: {str(e)}'}), 500
+
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': '接口不存在'}), 404
