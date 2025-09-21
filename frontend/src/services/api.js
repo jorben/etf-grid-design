@@ -101,6 +101,20 @@ export const searchETF = async (query) => {
 }
 
 /**
+ * 获取ETF名称
+ * @param {string} etfCode - ETF代码（6位数字）
+ * @returns {Promise<Object>} ETF名称信息
+ */
+export const getETFName = async (etfCode) => {
+  try {
+    const response = await api.get(`/etf/name/${etfCode}`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
  * 健康检查
  * @returns {Promise<Object>} 健康状态
  */

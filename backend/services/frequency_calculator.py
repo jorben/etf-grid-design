@@ -11,17 +11,17 @@ class FrequencyCalculator:
     
     def __init__(self):
         """初始化频次计算器"""
-        # 用户期望的日交易频次配置 - 针对低价ETF优化
+        # 用户期望的日交易频次配置 - 优化后提升收益率
         self.target_daily_frequencies = {
-            'high': 5.5,    # 高频：5-6次/天（原8次调整）
-            'medium': 2.5,  # 中频：2-3次/天（原4次调整）
-            'low': 1        # 低频：1次/天（保持不变）
+            'high': 8.0,    # 高频：8次/天（从5.5提升，增加45%）
+            'medium': 4.5,  # 中频：4.5次/天（从2.5提升，增加80%）
+            'low': 2.0      # 低频：2次/天（从1.0提升，增加100%）
         }
         
-        # 市场效率参数
-        self.market_efficiency = 0.6  # 理论触发的60%能实际执行
-        self.max_volume_factor = 2.0  # 成交量调整因子上限
-        self.min_daily_triggers = 0.1  # 最小日触发次数
+        # 市场效率参数 - 优化提升
+        self.market_efficiency = 0.75  # 理论触发的75%能实际执行（从60%提升）
+        self.max_volume_factor = 2.5   # 成交量调整因子上限（从2.0提升）
+        self.min_daily_triggers = 0.2  # 最小日触发次数（从0.1提升）
         self.max_daily_triggers = 20   # 最大日触发次数
         
         logger.info("交易频次计算器初始化成功")
@@ -499,22 +499,22 @@ class FrequencyCalculator:
                                        target_triggers: float) -> float:
         """针对低价ETF优化步长"""
         try:
-            # 基于价格区间的最小步长约束
+            # 基于价格区间的最小步长约束 - 优化降低以增加交易机会
             if current_price <= 2:
-                min_step_ratio = 0.005  # 最小0.5%
+                min_step_ratio = 0.002  # 最小0.2%（从0.5%降低）
             elif current_price <= 5:
-                min_step_ratio = 0.003  # 最小0.3%
+                min_step_ratio = 0.0015 # 最小0.15%（从0.3%降低）
             elif current_price <= 10:
-                min_step_ratio = 0.002  # 最小0.2%
+                min_step_ratio = 0.001  # 最小0.1%（从0.2%降低）
             else:
-                min_step_ratio = 0.001  # 最小0.1%
+                min_step_ratio = 0.0008 # 最小0.08%（从0.1%降低）
             
-            # 交易成本约束（假设双边成本0.06%）
+            # 交易成本约束（假设双边成本0.06%）- 优化降低成本倍数
             transaction_cost_ratio = 0.0006
-            cost_based_min_step = transaction_cost_ratio * 4  # 成本的4倍
+            cost_based_min_step = transaction_cost_ratio * 3  # 成本的3倍（从4倍降低）
             
-            # 流动性约束 - 对于低价ETF，步长不应过小
-            liquidity_based_min = max(0.002, 0.01 / target_triggers)
+            # 流动性约束 - 优化调整，更积极的步长设置
+            liquidity_based_min = max(0.0015, 0.008 / target_triggers)  # 降低基础值
             
             # 取理论值和各种约束的最大值
             optimized_step = max(

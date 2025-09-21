@@ -19,14 +19,14 @@ class TargetReturnConfig:
             monthly_target_return: 月度目标收益率，默认5%
         """
         self.monthly_target_return = monthly_target_return
-        self.min_profit_per_trade = 10.0  # 最小单笔收益（元）
-        self.max_single_trade_ratio = 0.1  # 单笔交易最大资金比例
+        self.min_profit_per_trade = 8.0   # 最小单笔收益（元）- 从10.0降至8.0
+        self.max_single_trade_ratio = 0.15 # 单笔交易最大资金比例 - 从10%提升至15%
         self.risk_adjustment_factor = 0.8  # 风险调整系数
-        self.success_rate = 0.8  # 预期交易成功率
+        self.success_rate = 0.85  # 预期交易成功率 - 从80%提升至85%
         self.trading_days_per_month = 20  # 每月交易日数
         self.min_shares_unit = 100  # 最小交易股数单位
-        self.max_capital_utilization = 0.8  # 最大资金利用率
-        self.cash_reserve_ratio = 0.2  # 现金储备比例
+        self.max_capital_utilization = 0.9  # 最大资金利用率 - 从80%提升至90%
+        self.cash_reserve_ratio = 0.1  # 现金储备比例 - 从20%降至10%
 
 
 class DynamicSharesCalculator:
@@ -72,14 +72,14 @@ class DynamicSharesCalculator:
             # 3. 计算每次交易目标收益（考虑交易成本和现实性）
             target_profit_per_trade = target_monthly_profit / expected_monthly_trades
             
-            # 考虑双边交易成本和风险调整
-            cost_adjustment = 1 + (transaction_cost * 2)
-            risk_adjustment = 1.2  # 20%的风险缓冲
+            # 考虑双边交易成本和风险调整 - 优化降低调整系数
+            cost_adjustment = 1 + (transaction_cost * 1.8)  # 从2.0降至1.8
+            risk_adjustment = 1.1  # 10%的风险缓冲（从20%降至10%）
             net_target_profit = target_profit_per_trade * cost_adjustment * risk_adjustment
             
-            # 设置合理的收益下限和上限
+            # 设置合理的收益下限和上限 - 优化提升上限
             min_profit_per_trade = self.config.min_profit_per_trade
-            max_profit_per_trade = initial_capital * 0.02  # 单次交易收益不超过总资金的2%
+            max_profit_per_trade = initial_capital * 0.025  # 单次交易收益上限提升至2.5%（从2%提升）
             net_target_profit = max(min_profit_per_trade, min(max_profit_per_trade, net_target_profit))
             
             # 4. 计算网格步长金额和所需股数
@@ -203,25 +203,25 @@ class GridCalculator:
         # 频率配置 - 针对低价ETF优化的频次设计
         self.frequency_config = {
             'high': {
-                'target_daily_triggers': 5.5,    # 5-6次/天（优化后）
-                'min_grids': 10,
-                'max_grids': 25,
-                'min_range_ratio': 0.10,
-                'max_range_ratio': 0.35
+                'target_daily_triggers': 8.0,    # 8次/天（从5.5提升，增加45%）
+                'min_grids': 12,                  # 从10增至12
+                'max_grids': 30,                  # 从25增至30
+                'min_range_ratio': 0.12,          # 从0.10增至0.12
+                'max_range_ratio': 0.40           # 从0.35增至0.40
             },
             'medium': {
-                'target_daily_triggers': 2.5,   # 2-3次/天（优化后）
-                'min_grids': 6,
-                'max_grids': 15,
-                'min_range_ratio': 0.08,
-                'max_range_ratio': 0.25
+                'target_daily_triggers': 4.5,   # 4.5次/天（从2.5提升，增加80%）
+                'min_grids': 8,                  # 从6增至8
+                'max_grids': 20,                 # 从15增至20
+                'min_range_ratio': 0.10,         # 从0.08增至0.10
+                'max_range_ratio': 0.30          # 从0.25增至0.30
             },
             'low': {
-                'target_daily_triggers': 1,   # 1次/天（保持不变）
-                'min_grids': 3,
-                'max_grids': 10,
-                'min_range_ratio': 0.05,
-                'max_range_ratio': 0.20
+                'target_daily_triggers': 2.0,   # 2次/天（从1.0提升，增加100%）
+                'min_grids': 5,                  # 从3增至5
+                'max_grids': 12,                 # 从10增至12
+                'min_range_ratio': 0.06,         # 从0.05增至0.06
+                'max_range_ratio': 0.22          # 从0.20增至0.22
             }
         }
         

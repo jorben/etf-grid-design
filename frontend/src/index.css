@@ -88,6 +88,10 @@
     @apply animate-spin rounded-full h-4 w-4 border-b-2 border-white;
   }
   
+  .loading-spinner-sm {
+    @apply animate-spin rounded-full h-3 w-3 border-b-2 border-gray-400;
+  }
+  
   .fade-in {
     animation: fade-in 0.5s ease-in-out;
   }

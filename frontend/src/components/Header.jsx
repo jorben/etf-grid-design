@@ -1,5 +1,5 @@
 import React from 'react'
-import { TrendingUp, BarChart3, Settings } from 'lucide-react'
+import { TrendingUp, Waypoints, Settings } from 'lucide-react'
 
 const Header = () => {
   return (
@@ -8,7 +8,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="flex items-center justify-center w-10 h-10 bg-primary-600 rounded-lg">
-              <BarChart3 className="w-6 h-6 text-white" />
+              <Waypoints className="w-6 h-6 text-white" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">

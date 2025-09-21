@@ -153,6 +153,41 @@ def search_etf():
         return jsonify({'error': f'搜索过程中发生错误: {str(e)}'}), 500
 
 
+@app.route('/api/etf/name/<etf_code>', methods=['GET'])
+def get_etf_name(etf_code):
+    """获取ETF名称"""
+    try:
+        # 验证ETF代码格式
+        if not etf_code or not etf_code.isdigit() or len(etf_code) != 6:
+            return jsonify({'error': 'ETF代码格式错误，应为6位数字'}), 400
+        
+        # 获取ETF名称
+        etf_name = tushare_client.get_etf_name(etf_code)
+        
+        if etf_name:
+            return jsonify({
+                'code': etf_code,
+                'name': etf_name,
+                'success': True
+            })
+        else:
+            return jsonify({
+                'code': etf_code,
+                'name': etf_code,  # 如果获取失败，返回代码本身
+                'success': False,
+                'message': '未找到该ETF的名称信息'
+            })
+        
+    except Exception as e:
+        logger.error(f"获取ETF {etf_code} 名称时发生错误: {str(e)}", exc_info=True)
+        return jsonify({
+            'code': etf_code,
+            'name': etf_code,  # 出错时返回代码本身
+            'success': False,
+            'error': f'获取名称时发生错误: {str(e)}'
+        }), 500
+
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': '接口不存在'}), 404

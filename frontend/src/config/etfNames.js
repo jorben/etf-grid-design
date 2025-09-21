@@ -83,6 +83,31 @@ export const getETFName = (code) => {
   return etfNameMap[code] || code
 }
 
+// 异步获取ETF名称（优先使用后端API）
+export const getETFNameAsync = async (code) => {
+  // 首先检查本地映射表
+  if (etfNameMap[code]) {
+    return etfNameMap[code]
+  }
+  
+  // 如果本地没有，尝试从后端API获取
+  try {
+    const { getETFName: getETFNameAPI } = await import('../services/api')
+    const response = await getETFNameAPI(code)
+    
+    if (response.success && response.name !== code) {
+      // 缓存到本地映射表中，避免重复请求
+      etfNameMap[code] = response.name
+      return response.name
+    }
+  } catch (error) {
+    console.warn(`获取ETF ${code} 名称失败:`, error.message)
+  }
+  
+  // 如果API调用失败，返回代码本身
+  return code
+}
+
 // 从带名称的字符串中提取ETF代码（数字编号）
 export const extractETFCode = (input) => {
   // 如果输入是纯数字，直接返回

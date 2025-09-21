@@ -229,6 +229,39 @@ class TushareClient:
             # 默认上交所
             return f"{etf_code}.SH"
     
+    def get_etf_name(self, etf_code: str) -> Optional[str]:
+        """
+        轻量级获取ETF名称
+        
+        Args:
+            etf_code: ETF代码（不含市场后缀）
+            
+        Returns:
+            str: ETF名称，如果获取失败返回None
+        """
+        try:
+            # 自动补全市场后缀
+            full_code = self._complete_etf_code(etf_code)
+            
+            # 只获取基本信息中的名称字段
+            df = self.pro.fund_basic(
+                ts_code=full_code,
+                market='E',  # ETF市场
+                fields='ts_code,name'
+            )
+            
+            if df.empty:
+                logger.warning(f"未找到ETF {etf_code} 的名称信息")
+                return None
+            
+            etf_name = df.iloc[0]['name']
+            logger.info(f"成功获取ETF {etf_code} 的名称: {etf_name}")
+            return etf_name
+            
+        except Exception as e:
+            logger.error(f"获取ETF {etf_code} 名称失败: {str(e)}")
+            return None
+
     def get_trading_calendar(self, start_date: str, end_date: str) -> List[str]:
         """
         获取交易日历
