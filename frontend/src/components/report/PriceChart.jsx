@@ -3,18 +3,65 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { TrendingUp, BarChart3 } from 'lucide-react';
 
 const PriceChart = ({ etfInfo, gridStrategy, backtestResult }) => {
-  // 模拟价格数据（实际应该从后端获取）
-  const mockPriceData = [
-    { date: '2024-01', price: 3.2, volume: 1000000 },
-    { date: '2024-02', price: 3.1, volume: 1200000 },
-    { date: '2024-03', price: 3.3, volume: 900000 },
-    { date: '2024-04', price: 3.0, volume: 1500000 },
-    { date: '2024-05', price: 3.4, volume: 800000 },
-    { date: '2024-06', price: 3.2, volume: 1100000 },
-  ];
+  // 尝试从后端数据获取价格数据，如果没有则使用模拟数据
+  const getPriceData = () => {
+    // 如果有历史价格数据，使用实际数据
+    if (etfInfo?.price_history && etfInfo.price_history.length > 0) {
+      return etfInfo.price_history.map(item => ({
+        date: item.date || item.trade_date,
+        price: item.close || item.price,
+        volume: item.volume || 1000000
+      }));
+    }
+    
+    // 如果有回测数据中的价格信息，使用回测数据
+    if (backtestResult?.price_data && backtestResult.price_data.length > 0) {
+      return backtestResult.price_data.map(item => ({
+        date: item.date,
+        price: item.price,
+        volume: item.volume || 1000000
+      }));
+    }
+    
+    // 否则使用基于当前价格的模拟数据
+    const currentPrice = etfInfo?.current_price || 3.2;
+    const basePrice = currentPrice;
+    return [
+      { date: '2024-01', price: basePrice * 0.95, volume: 1000000 },
+      { date: '2024-02', price: basePrice * 0.92, volume: 1200000 },
+      { date: '2024-03', price: basePrice * 0.98, volume: 900000 },
+      { date: '2024-04', price: basePrice * 0.89, volume: 1500000 },
+      { date: '2024-05', price: basePrice * 1.01, volume: 800000 },
+      { date: '2024-06', price: basePrice, volume: 1100000 },
+    ];
+  };
 
-  const currentPrice = etfInfo?.current_price || 3.2;
-  const gridLevels = gridStrategy?.grid_levels || [];
+  const priceData = getPriceData();
+  const currentPrice = etfInfo?.current_price || (priceData.length > 0 ? priceData[priceData.length - 1].price : 3.2);
+  
+  // 获取网格价格水平
+  const getGridLevels = () => {
+    if (gridStrategy?.price_levels && gridStrategy.price_levels.length > 0) {
+      return gridStrategy.price_levels;
+    }
+    
+    // 如果没有价格水平，基于价格区间生成
+    if (gridStrategy?.price_range && gridStrategy?.grid_config) {
+      const { lower, upper } = gridStrategy.price_range;
+      const { count } = gridStrategy.grid_config;
+      const levels = [];
+      const step = (upper - lower) / (count - 1);
+      
+      for (let i = 0; i < count; i++) {
+        levels.push(lower + (step * i));
+      }
+      return levels;
+    }
+    
+    return [];
+  };
+
+  const gridLevels = getGridLevels();
 
   return (
     <div className="space-y-6">
@@ -35,7 +82,7 @@ const PriceChart = ({ etfInfo, gridStrategy, backtestResult }) => {
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="h-96 mb-4">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={mockPriceData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <LineChart data={priceData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis 
                 dataKey="date" 
@@ -75,8 +122,8 @@ const PriceChart = ({ etfInfo, gridStrategy, backtestResult }) => {
               {gridLevels.slice(0, 10).map((level, index) => (
                 <ReferenceLine
                   key={index}
-                  y={level.price}
-                  stroke={level.price > currentPrice ? '#ef4444' : '#22c55e'}
+                  y={typeof level === 'number' ? level : level.price}
+                  stroke={(typeof level === 'number' ? level : level.price) > currentPrice ? '#ef4444' : '#22c55e'}
                   strokeDasharray="2 2"
                   strokeWidth={1}
                 />
