@@ -13,7 +13,7 @@
 
 ## 🌟 页面展示
 
-![index](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/screenshot/etfer-inidex.png)
+![index](https://raw.githubusercontent.com/jorben/etf-grid-design/refs/heads/master/screenshot/etfer-inidex.png)
 
 ## 🏗️ 技术架构
 
