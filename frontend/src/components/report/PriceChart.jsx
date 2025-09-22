@@ -3,14 +3,14 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { TrendingUp, BarChart3 } from 'lucide-react';
 
 const PriceChart = ({ etfInfo, gridStrategy, backtestResult }) => {
-  // 尝试从后端数据获取价格数据，如果没有则使用模拟数据
+  // 获取真实的价格数据
   const getPriceData = () => {
     // 如果有历史价格数据，使用实际数据
     if (etfInfo?.price_history && etfInfo.price_history.length > 0) {
       return etfInfo.price_history.map(item => ({
         date: item.date || item.trade_date,
         price: item.close || item.price,
-        volume: item.volume || 1000000
+        volume: item.volume || 0
       }));
     }
     
@@ -19,25 +19,16 @@ const PriceChart = ({ etfInfo, gridStrategy, backtestResult }) => {
       return backtestResult.price_data.map(item => ({
         date: item.date,
         price: item.price,
-        volume: item.volume || 1000000
+        volume: item.volume || 0
       }));
     }
     
-    // 否则使用基于当前价格的模拟数据
-    const currentPrice = etfInfo?.current_price || 3.2;
-    const basePrice = currentPrice;
-    return [
-      { date: '2024-01', price: basePrice * 0.95, volume: 1000000 },
-      { date: '2024-02', price: basePrice * 0.92, volume: 1200000 },
-      { date: '2024-03', price: basePrice * 0.98, volume: 900000 },
-      { date: '2024-04', price: basePrice * 0.89, volume: 1500000 },
-      { date: '2024-05', price: basePrice * 1.01, volume: 800000 },
-      { date: '2024-06', price: basePrice, volume: 1100000 },
-    ];
+    // 如果没有数据，返回空数组
+    return [];
   };
 
   const priceData = getPriceData();
-  const currentPrice = etfInfo?.current_price || (priceData.length > 0 ? priceData[priceData.length - 1].price : 3.2);
+  const currentPrice = etfInfo?.current_price || (priceData.length > 0 ? priceData[priceData.length - 1].price : 0);
   
   // 获取网格价格水平
   const getGridLevels = () => {
@@ -143,21 +134,22 @@ const PriceChart = ({ etfInfo, gridStrategy, backtestResult }) => {
 
           <div className="text-center p-3 bg-green-50 rounded-lg">
             <div className="text-lg font-bold text-green-600">
-              ¥{gridStrategy?.price_range?.lower?.toFixed(3) || '2.800'}
+              ¥{gridStrategy?.price_range?.lower?.toFixed(3) || '0.000'}
             </div>
             <div className="text-sm text-green-700">最低价位</div>
           </div>
 
           <div className="text-center p-3 bg-red-50 rounded-lg">
             <div className="text-lg font-bold text-red-600">
-              ¥{gridStrategy?.price_range?.upper?.toFixed(3) || '3.600'}
+              ¥{gridStrategy?.price_range?.upper?.toFixed(3) || '0.000'}
             </div>
             <div className="text-sm text-red-700">最高价位</div>
           </div>
 
           <div className="text-center p-3 bg-purple-50 rounded-lg">
             <div className="text-lg font-bold text-purple-600">
-              {((gridStrategy?.price_range?.upper - gridStrategy?.price_range?.lower) / gridStrategy?.price_range?.lower * 100)?.toFixed(1) || '25.0'}%
+              {gridStrategy?.price_range?.upper && gridStrategy?.price_range?.lower ? 
+                ((gridStrategy.price_range.upper - gridStrategy.price_range.lower) / gridStrategy.price_range.lower * 100).toFixed(1) : '0.0'}%
             </div>
             <div className="text-sm text-purple-700">价格区间</div>
           </div>
@@ -200,7 +192,7 @@ const PriceChart = ({ etfInfo, gridStrategy, backtestResult }) => {
           <div className="p-4 bg-green-50 rounded-lg">
             <h5 className="font-medium text-green-900 mb-2">买入机会</h5>
             <div className="text-2xl font-bold text-green-600 mb-1">
-              {backtestResult?.trading_stats?.total_trades ? Math.floor(backtestResult.trading_stats.total_trades / 2) : 15}
+              {backtestResult?.trading_stats?.total_trades ? Math.floor(backtestResult.trading_stats.total_trades / 2) : 0}
             </div>
             <p className="text-sm text-green-700">预期买入次数/年</p>
           </div>
@@ -208,7 +200,7 @@ const PriceChart = ({ etfInfo, gridStrategy, backtestResult }) => {
           <div className="p-4 bg-blue-50 rounded-lg">
             <h5 className="font-medium text-blue-900 mb-2">卖出机会</h5>
             <div className="text-2xl font-bold text-blue-600 mb-1">
-              {backtestResult?.trading_stats?.profitable_trades || 12}
+              {backtestResult?.trading_stats?.profitable_trades || 0}
             </div>
             <p className="text-sm text-blue-700">预期卖出次数/年</p>
           </div>
@@ -216,7 +208,7 @@ const PriceChart = ({ etfInfo, gridStrategy, backtestResult }) => {
           <div className="p-4 bg-purple-50 rounded-lg">
             <h5 className="font-medium text-purple-900 mb-2">网格效率</h5>
             <div className="text-2xl font-bold text-purple-600 mb-1">
-              {backtestResult?.performance?.win_rate ? (backtestResult.performance.win_rate * 100).toFixed(1) : '75.0'}%
+              {backtestResult?.performance?.win_rate ? (backtestResult.performance.win_rate * 100).toFixed(1) : '0.0'}%
             </div>
             <p className="text-sm text-purple-700">网格利用率</p>
           </div>
@@ -234,7 +226,7 @@ const PriceChart = ({ etfInfo, gridStrategy, backtestResult }) => {
           <div className="text-sm text-yellow-800">
             <p className="font-medium mb-1">图表说明</p>
             <p>
-              本图表基于历史数据模拟，实际交易中价格可能出现跳空、停牌等情况。
+              本图表基于真实历史数据，实际交易中价格可能出现跳空、停牌等情况。
               网格线仅为理论价位，实际执行时请结合市场情况灵活调整。
             </p>
           </div>

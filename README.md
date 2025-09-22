@@ -76,9 +76,11 @@ docker-compose up -d
 git clone https://github.com/jorben/etf-grid-design.git
 cd etf-grid-design
 
-# 2. 配置环境
-创建 `.env` 文件并添加您的tushare token：
-TUSHARE_TOKEN=your_tushare_token_here
+# 2. 配置环境（必须）
+复制环境变量模板并配置真实的tushare token：
+cp .env.example .env
+# 编辑.env文件，必须配置有效的TUSHARE_TOKEN
+# 获取token：https://tushare.pro/register
 
 # 3. 安装依赖
 # 安装Python依赖
@@ -126,8 +128,13 @@ cd frontend && npm run dev
 - **波动率下降**：缩小区间、增加网格、提高仓位
 - **趋势市场**：调整网格中心、加强风险管理
 
-## ⚠️ 风险提示
+## ⚠️ 重要说明
 
+### 数据要求
+- **token获取**：请访问 https://tushare.pro/register 注册并获取API token
+- **数据质量**：所有分析结果基于tushare提供的真实市场数据
+
+### 风险提示
 1. **历史数据限制**：分析基于历史数据，不能保证未来表现
 2. **市场风险**：网格交易仍存在亏损风险，需谨慎操作
 3. **流动性风险**：确保ETF有足够的流动性支持频繁交易
