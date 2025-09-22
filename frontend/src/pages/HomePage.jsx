@@ -80,7 +80,7 @@ const HomePage = () => {
               本工具提供的分析结果仅供参考，不构成投资建议。投资有风险，入市需谨慎。
             </p>
             <p className="text-sm">
-              © 2024 Etfer.top
+              © 2025 Etfer.top
             </p>
           </div>
         </div>

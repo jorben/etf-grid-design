@@ -11,6 +11,10 @@
 - **动态调整**：根据市场环境变化提供策略调整建议
 - **可视化展示**：直观展示价格区间、网格分布和预期收益
 
+## 🌟 页面展示
+
+![index](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/screenshot/etfer-inidex.png)
+
 ## 🏗️ 技术架构
 
 ### 后端
