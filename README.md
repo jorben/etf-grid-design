@@ -44,8 +44,8 @@
 
 ```bash
 # 1. 克隆项目
-git clone <repository-url>
-cd etf-grid-trading
+git clone https://github.com/jorben/etf-grid-design.git
+cd etf-grid-design
 
 # 2. 配置环境变量
 cp deploy/.env.production .env
