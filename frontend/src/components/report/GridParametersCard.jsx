@@ -89,7 +89,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
               <span className="text-sm font-medium text-gray-700">总投资</span>
             </div>
             <div className="text-lg font-bold text-gray-900">
-              {formatAmount(inputParameters.totalCapital)}
+              {formatAmount(inputParameters?.total_capital || inputParameters?.totalCapital || 0)}
             </div>
             <div className="text-xs text-gray-600">投资资金</div>
           </div>
@@ -263,7 +263,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
             <div>
               <span className="text-gray-600">总投资资金:</span>
               <div className="font-medium text-gray-900">
-                {formatAmount(inputParameters.totalCapital)}
+                {formatAmount(inputParameters?.total_capital || inputParameters?.totalCapital || 0)}
               </div>
             </div>
             <div>

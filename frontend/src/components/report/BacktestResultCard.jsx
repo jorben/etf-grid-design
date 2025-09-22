@@ -43,6 +43,19 @@ const BacktestResultCard = ({ backtestResult, strategyRationale, adjustmentSugge
     return (value * 100).toFixed(2) + '%';
   };
 
+  // 格式化日期为 YYYY-MM-DD 格式
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString; // 如果无法解析，返回原字符串
+    
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  };
+
   // 获取收益率颜色
   const getReturnColor = (value) => {
     if (value > 0) return 'text-red-600';
@@ -52,6 +65,17 @@ const BacktestResultCard = ({ backtestResult, strategyRationale, adjustmentSugge
 
   return (
     <div className="space-y-6">
+      {/* 重要提示 */}
+      <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+        <div className="flex items-start gap-2">
+          <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-yellow-800">
+            <p className="font-medium mb-1">重要提示</p>
+            <p>{disclaimer}</p>
+          </div>
+        </div>
+      </div>
+
       {/* 回测概览 */}
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border border-green-200">
         <div className="flex items-center gap-3 mb-4">
@@ -72,7 +96,7 @@ const BacktestResultCard = ({ backtestResult, strategyRationale, adjustmentSugge
             </div>
             <div className="text-lg font-bold text-gray-900">{backtest_period.total_days}天</div>
             <div className="text-xs text-gray-600">
-              {backtest_period.start_date} - {backtest_period.end_date}
+              {formatDate(backtest_period.start_date)} - {formatDate(backtest_period.end_date)}
             </div>
           </div>
 
@@ -437,16 +461,6 @@ const BacktestResultCard = ({ backtestResult, strategyRationale, adjustmentSugge
         </div>
       )}
 
-      {/* 免责声明 */}
-      <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-        <div className="flex items-start gap-2">
-          <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-yellow-800">
-            <p className="font-medium mb-1">重要提示</p>
-            <p>{disclaimer}</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

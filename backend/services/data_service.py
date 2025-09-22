@@ -237,11 +237,25 @@ class DataService:
         base_price = float(code) / 100000  # 简单的价格生成逻辑
         base_price = max(base_price, 1.0)  # 确保价格合理
         
+        # 根据ETF类型生成更真实的成交数据
+        if code in ['510300', '159919']:  # 沪深300ETF
+            vol = int(np.random.uniform(500000, 2000000))  # 50万-200万手
+            amount = vol * base_price * np.random.uniform(8, 15)  # 成交额放大
+        elif code in ['510500', '159915', '512100']:  # 其他主要宽基ETF
+            vol = int(np.random.uniform(200000, 800000))  # 20万-80万手
+            amount = vol * base_price * np.random.uniform(5, 10)
+        elif code.startswith(('515', '516', '512')):  # 行业主题ETF
+            vol = int(np.random.uniform(50000, 300000))  # 5万-30万手
+            amount = vol * base_price * np.random.uniform(3, 8)
+        else:  # 其他ETF
+            vol = int(np.random.uniform(10000, 100000))  # 1万-10万手
+            amount = vol * base_price * np.random.uniform(2, 5)
+        
         return {
             'close': round(base_price, 3),
             'pct_chg': round(np.random.uniform(-3, 3), 2),
-            'vol': int(np.random.uniform(10000, 100000)),
-            'amount': int(np.random.uniform(100000, 1000000))
+            'vol': vol,
+            'amount': int(amount)
         }
     
     def _get_mock_daily_data(self, code: str, start_date: str, end_date: str) -> pd.DataFrame:
@@ -286,9 +300,19 @@ class DataService:
             high = max(open_price, close) * np.random.uniform(1.0, 1.03)
             low = min(open_price, close) * np.random.uniform(0.97, 1.0)
             
-            # 生成成交量
-            volume = int(np.random.uniform(10000, 100000))
-            amount = volume * close
+            # 根据ETF类型生成更真实的成交量和成交额
+            if code in ['510300', '159919']:  # 沪深300ETF
+                volume = int(np.random.uniform(500000, 2000000))  # 50万-200万手
+                amount = volume * close * np.random.uniform(8, 15)  # 成交额放大
+            elif code in ['510500', '159915', '512100']:  # 其他主要宽基ETF
+                volume = int(np.random.uniform(200000, 800000))  # 20万-80万手
+                amount = volume * close * np.random.uniform(5, 10)
+            elif code.startswith(('515', '516', '512')):  # 行业主题ETF
+                volume = int(np.random.uniform(50000, 300000))  # 5万-30万手
+                amount = volume * close * np.random.uniform(3, 8)
+            else:  # 其他ETF
+                volume = int(np.random.uniform(10000, 100000))  # 1万-10万手
+                amount = volume * close * np.random.uniform(2, 5)
             
             data.append({
                 'date': date,

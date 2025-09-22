@@ -71,7 +71,7 @@ class SuitabilityAnalyzer:
         try:
             vol_pct = volatility * 100
             
-            if 15 <= vol_pct <= 40:
+            if 15 <= vol_pct <= 45:
                 score = 30
                 level = "理想"
                 description = "理想区间，风险收益平衡"
@@ -79,10 +79,10 @@ class SuitabilityAnalyzer:
                 score = 18
                 level = "偏低"
                 description = "波动偏低，收益有限"
-            else:  # vol_pct > 40
+            else:  # vol_pct > 45
                 score = 12
                 level = "偏高"
-                description = "波动过高，风险较大"
+                description = "剧烈波动，风险较高"
             
             return {
                 'score': score,
@@ -115,7 +115,7 @@ class SuitabilityAnalyzer:
                 level = "震荡市"
                 description = "非常适合网格交易"
                 market_type = "震荡"
-            elif adx_value < 25:
+            elif adx_value < 40:
                 score = 18
                 level = "弱趋势"
                 description = "可以进行，需注意风险"
@@ -284,7 +284,10 @@ class SuitabilityAnalyzer:
             adx_value = calculate_adx(df_processed)
             
             # 计算流动性指标
-            avg_amount = df['amount'].mean() / 10000  # 转换为万元
+            # Tushare API返回的amount单位是千元，需要除以10转换为万元
+            avg_amount = df['amount'].mean() / 10  # 千元转换为万元
+            
+            # 成交量稳定性（变异系数）
             volume_stability = df['volume'].std() / df['volume'].mean()  # 变异系数
             
             # 3. 各维度评估
