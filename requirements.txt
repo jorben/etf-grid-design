@@ -1,34 +1,16 @@
-# ETF网格交易工具 - Python依赖
-
-# Web框架
 flask>=2.3.0
 flask-cors>=4.0.0
-
-# 数据处理
-pandas>=2.0.0
-numpy>=1.24.0
-scipy>=1.16.2
-
-# 金融数据
 tushare>=1.2.89
+pandas>=2.2.0
+numpy>=1.26.0
+python-dotenv>=1.0.0
+requests>=2.31.0
 yfinance>=0.2.18
-
-# 图表和可视化
 matplotlib>=3.7.0
 seaborn>=0.12.0
-
-# 网络请求
-requests>=2.31.0
-
-# 环境配置
-python-dotenv>=1.0.0
-
-# 生产环境依赖
-gunicorn>=21.2.0
-gevent>=23.7.0
-
-# 代理和中间件支持
-werkzeug>=2.3.0
-
-# 系统工具（用于健康检查）
-psutil>=5.9.0
+scipy>=1.11.0
+cachetools>=5.3.0
+python-dateutil>=2.8.0
+pytz>=2023.3
+ta-lib==0.4.28
+gunicorn==21.2.0
