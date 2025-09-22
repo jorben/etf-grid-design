@@ -1,5 +1,5 @@
 import React from 'react'
-import { DatabaseZap, Waypoints, Brain } from 'lucide-react'
+import { DatabaseZap, Waypoints, Brain, Github } from 'lucide-react'
 
 const Header = () => {
   return (
@@ -29,6 +29,15 @@ const Header = () => {
               <Brain className="w-4 h-4" />
               <span>智能算法</span>
             </div>
+            <a 
+              href="https://github.com/jorben/etf-grid-design" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <Github className="w-4 h-4" />
+              <span>项目代码</span>
+            </a>
           </div>
         </div>
       </div>
