@@ -14,39 +14,13 @@ const PriceChart = ({ currentPrice, gridPrices, priceRange, historicalPrices = [
         day: index + 1
       }))
     } else {
-      // 如果没有历史数据，生成模拟数据作为备用
-      const data = []
-      const [lowerBound, upperBound] = priceRange
-      const priceRangeAmount = upperBound - lowerBound
-      
-      for (let i = 0; i < 30; i++) {
-        const date = new Date()
-        date.setDate(date.getDate() - (29 - i))
-        
-        let price
-        if (i < 5) {
-          price = lowerBound + (priceRangeAmount * 0.1 * Math.random())
-        } else if (i > 24) {
-          price = upperBound - (priceRangeAmount * 0.1 * Math.random())
-        } else {
-          price = lowerBound + (priceRangeAmount * 0.2) + (priceRangeAmount * 0.6 * Math.random())
-        }
-        
-        price = Math.max(lowerBound * 0.95, Math.min(upperBound * 1.05, price))
-        
-        data.push({
-          date: date.toISOString().split('T')[0],
-          price: price,
-          day: i + 1
-        })
-      }
-      
-      return data
+      // 如果没有历史数据，返回空数组
+      return []
     }
   }
 
   const chartData = processHistoricalData()
-  const isRealData = historicalPrices && historicalPrices.length > 0
+  const hasData = historicalPrices && historicalPrices.length > 0
   
   // 格式化价格显示
   const formatPrice = (value) => {
@@ -120,7 +94,7 @@ const PriceChart = ({ currentPrice, gridPrices, priceRange, historicalPrices = [
       {/* 价格走势图 */}
       <div className="mb-6">
         <h4 className="font-medium mb-3">
-          历史价格走势{isRealData ? '（最近30个交易日）' : '（模拟数据）'}
+          历史价格走势{hasData ? '（最近30个交易日）' : '（暂无数据）'}
         </h4>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
@@ -208,7 +182,7 @@ const PriceChart = ({ currentPrice, gridPrices, priceRange, historicalPrices = [
           <div className="text-xs text-blue-700">
             <strong>图表说明：</strong>
             <ul className="mt-1 space-y-1">
-              <li>• 灰色线条：历史价格走势{isRealData ? '' : '（模拟数据，仅用于展示网格概念）'}</li>
+              <li>• 灰色线条：历史价格走势{hasData ? '' : '（需要真实数据支持）'}</li>
               <li>• 蓝色虚线：当前价格水平</li>
               <li>• 绿色虚线：网格下边界</li>
               <li>• 红色虚线：网格上边界</li>
