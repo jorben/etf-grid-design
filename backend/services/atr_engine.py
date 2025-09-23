@@ -143,12 +143,12 @@ class ATREngine:
         try:
             # 风险系数映射
             risk_multipliers = {
-                '保守': 1.5,
-                '稳健': 3.0,
-                '激进': 4.5
+                '保守': 3,
+                '稳健': 4,
+                '激进': 5,
             }
             
-            multiplier = risk_multipliers.get(risk_preference, 2.0)
+            multiplier = risk_multipliers.get(risk_preference, 4)
             
             # 计算价格区间比例
             price_range_ratio = atr_ratio * multiplier

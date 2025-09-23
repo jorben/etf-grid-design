@@ -48,7 +48,7 @@ class GridStrategy:
             # 市场趋势调整（基于ADX指数）
             if adx_value < 20:      # 震荡市
                 trend_adjustment = -0.05  # 减少底仓，增加网格资金
-            elif adx_value < 25:    # 弱趋势
+            elif adx_value < 40:    # 弱趋势
                 trend_adjustment = 0.05   # 适中调整
             else:                   # 强趋势
                 trend_adjustment = 0.1    # 增加底仓比例
@@ -93,9 +93,9 @@ class GridStrategy:
         try:
             # ATR 基础步长系数（根据风险偏好）
             risk_multipliers = {
-                '保守': 1.0,   # 1.0倍ATR作为步长，步长较大，交易频次较低
-                '稳健': 0.8,   # 0.8倍ATR作为步长，平衡交易频次
-                '激进': 0.6    # 0.6倍ATR作为步长，步长较小，交易频次较高
+                '保守': 0.8,   # 0.8倍ATR作为步长，步长较大，交易频次较低
+                '稳健': 0.5,   # 0.5倍ATR作为步长，平衡交易频次
+                '激进': 0.2    # 0.2倍ATR作为步长，步长较小，交易频次较高
             }
             
             risk_multiplier = risk_multipliers.get(risk_preference, 1)
@@ -146,8 +146,8 @@ class GridStrategy:
                 step_ratio = step_size / avg_price
                 grid_count = int(np.log(price_upper / price_lower) / np.log(1 + step_ratio))
             
-            # 限制网格数量在合理范围内（10-150个）
-            grid_count = max(10, min(150, grid_count))
+            # 限制网格数量在合理范围内（2-160个）
+            grid_count = max(2, min(160, grid_count))
             
             logger.info(f"基于步长计算网格数量: {grid_type}网格, 步长{step_size:.3f}, 数量{grid_count}个")
             
@@ -534,7 +534,7 @@ class GridStrategy:
                 'atr_based': True,
                 'atr_score': atr_score,
                 'atr_description': atr_description,
-                'calculation_method': 'ATR智能步长算法',
+                'calculation_method': 'ATR智能算法',
                 'calculation_logic': {
                     'step1': f'ATR比率: {atr_ratio:.1%}',
                     'step2': f'基于ATR和风险偏好计算最优步长: {step_size:.3f} ({step_ratio:.1%})',
