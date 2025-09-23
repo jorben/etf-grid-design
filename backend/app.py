@@ -177,57 +177,7 @@ def analyze_etf_strategy():
             'error': '分析失败，请稍后重试或检查ETF代码是否正确'
         }), 500
 
-@app.route('/api/preset-configs', methods=['GET'])
-def get_preset_configs():
-    """获取预设配置方案"""
-    try:
-        preset_configs = [
-            {
-                'id': 'conservative',
-                'name': '新手友好型',
-                'description': '适合投资新手，风险较低',
-                'config': {
-                    'gridType': '等差',
-                    'frequencyPreference': '低频',
-                    'riskPreference': '保守'
-                },
-                'features': ['风险较低', '操作简单', '适合新手']
-            },
-            {
-                'id': 'balanced',
-                'name': '稳健增长型',
-                'description': '平衡风险与收益，适合大多数投资者',
-                'config': {
-                    'gridType': '等比',
-                    'frequencyPreference': '中频',
-                    'riskPreference': '稳健'
-                },
-                'features': ['风险适中', '收益稳定', '推荐选择']
-            },
-            {
-                'id': 'aggressive',
-                'name': '积极进取型',
-                'description': '追求高收益，适合有经验的投资者',
-                'config': {
-                    'gridType': '等比',
-                    'frequencyPreference': '高频',
-                    'riskPreference': '激进'
-                },
-                'features': ['收益潜力大', '交易频繁', '需要经验']
-            }
-        ]
-        
-        return jsonify({
-            'success': True,
-            'data': preset_configs
-        })
-        
-    except Exception as e:
-        logger.error(f"获取预设配置失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': '获取预设配置失败'
-        }), 500
+
 
 @app.route('/api/capital-presets', methods=['GET'])
 def get_capital_presets():

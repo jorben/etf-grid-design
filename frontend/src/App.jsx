@@ -116,7 +116,7 @@ function App() {
                         <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
                           <Target className="w-6 h-6 text-green-700" />
                         </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">4维度评估</h3>
+                        <h3 className="font-semibold text-gray-900 mb-2">标的适宜度评估</h3>
                         <p className="text-sm text-gray-600">
                           振幅、波动率、市场特征、流动性四个维度量化评分，科学评估标的适宜度
                         </p>
@@ -126,7 +126,7 @@ function App() {
                         <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center mx-auto mb-4">
                           <TrendingUp className="w-6 h-6 text-purple-700" />
                         </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">智能策略</h3>
+                        <h3 className="font-semibold text-gray-900 mb-2">智能化策略</h3>
                         <p className="text-sm text-gray-600">
                           智能网格参数计算、资金分配优化、历史回测分析，提供完整策略方案
                         </p>
