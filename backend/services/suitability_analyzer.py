@@ -306,15 +306,15 @@ class SuitabilityAnalyzer:
             # 6. 综合结论
             if total_score >= 70:
                 conclusion = "非常适合"
-                recommendation = "强烈推荐进行网格交易"
+                recommendation = "该标的非常适合进行网格交易"
                 risk_level = "低"
             elif total_score >= 60:
                 conclusion = "基本适合"
-                recommendation = "可以进行网格交易，需注意风险控制"
+                recommendation = "该标的可以进行网格交易，需注意风险控制"
                 risk_level = "中"
             else:
                 conclusion = "不适合"
-                recommendation = "不推荐进行网格交易"
+                recommendation = "该标的不推荐进行网格交易"
                 risk_level = "高"
             
             # 7. 检查致命缺陷
@@ -326,7 +326,7 @@ class SuitabilityAnalyzer:
             
             has_fatal_flaw = len(fatal_flaws) > 0
             if has_fatal_flaw:
-                conclusion = "存在致命缺陷"
+                conclusion = "存在严重缺陷"
                 recommendation = f"不推荐：{', '.join(fatal_flaws)}"
                 risk_level = "极高"
             
