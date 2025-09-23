@@ -159,30 +159,79 @@ class GridStrategy:
     
     
     def calculate_price_levels(self, price_lower: float, price_upper: float, 
-                             grid_count: int, grid_type: str) -> List[float]:
+                             grid_count: int, grid_type: str, base_price: float = None) -> List[float]:
         """
-        计算网格价格水平
+        计算网格价格水平（强制包含基准价格）
         
         Args:
             price_lower: 价格下边界
             price_upper: 价格上边界
             grid_count: 网格数量
             grid_type: 网格类型 ('等差' 或 '等比')
+            base_price: 基准价格（当前价格），如果提供则强制包含在网格点中
             
         Returns:
-            价格水平列表
+            价格水平列表（包含基准价格）
         """
         try:
-            if grid_type == '等差':
-                # 等差网格
-                step = (price_upper - price_lower) / grid_count
-                price_levels = [price_lower + i * step for i in range(grid_count + 1)]
+            if base_price is None:
+                # 如果没有提供基准价格，使用原来的逻辑
+                if grid_type == '等差':
+                    step = (price_upper - price_lower) / grid_count
+                    price_levels = [price_lower + i * step for i in range(grid_count + 1)]
+                else:
+                    ratio = (price_upper / price_lower) ** (1 / grid_count)
+                    price_levels = [price_lower * (ratio ** i) for i in range(grid_count + 1)]
             else:
-                # 等比网格（推荐）
-                ratio = (price_upper / price_lower) ** (1 / grid_count)
-                price_levels = [price_lower * (ratio ** i) for i in range(grid_count + 1)]
+                # 强制包含基准价格的新逻辑
+                if grid_type == '等差':
+                    # 等差网格：以基准价格为中心，向上下扩展
+                    step = (price_upper - price_lower) / grid_count
+                    
+                    # 计算基准价格应该在第几个位置（从0开始）
+                    base_position = (base_price - price_lower) / step
+                    base_index = round(base_position)  # 四舍五入到最近的整数位置
+                    
+                    # 确保基准价格索引在有效范围内
+                    base_index = max(0, min(base_index, grid_count))
+                    
+                    # 以基准价格为锚点生成所有价格水平
+                    price_levels = []
+                    for i in range(grid_count + 1):
+                        if i == base_index:
+                            price_levels.append(base_price)  # 确保基准价格精确包含
+                        else:
+                            price = base_price + (i - base_index) * step
+                            price_levels.append(price)
+                    
+                else:
+                    # 等比网格：以基准价格为中心，向上下扩展
+                    ratio = (price_upper / price_lower) ** (1 / grid_count)
+                    
+                    # 计算基准价格应该在第几个位置
+                    if price_lower > 0:
+                        base_position = np.log(base_price / price_lower) / np.log(ratio)
+                        base_index = round(base_position)
+                    else:
+                        base_index = grid_count // 2  # 如果计算有问题，默认放在中间
+                    
+                    # 确保基准价格索引在有效范围内
+                    base_index = max(0, min(base_index, grid_count))
+                    
+                    # 以基准价格为锚点生成所有价格水平
+                    price_levels = []
+                    for i in range(grid_count + 1):
+                        if i == base_index:
+                            price_levels.append(base_price)  # 确保基准价格精确包含
+                        else:
+                            price = base_price * (ratio ** (i - base_index))
+                            price_levels.append(price)
+                
+                # 确保价格水平按升序排列
+                price_levels.sort()
             
-            logger.info(f"价格水平计算完成: {grid_type}网格，{len(price_levels)}个价格点")
+            logger.info(f"价格水平计算完成: {grid_type}网格，{len(price_levels)}个价格点"
+                       f"{f'，包含基准价格{base_price:.3f}' if base_price else ''}")
             return price_levels
             
         except Exception as e:
@@ -190,7 +239,7 @@ class GridStrategy:
             return []
     
     def calculate_fund_allocation(self, total_capital: float, base_position_ratio: float, 
-                                grid_count: int, price_levels: List[float]) -> Dict:
+                                grid_count: int, price_levels: List[float], base_price: float = None) -> Dict:
         """
         智能资金分配计算
         
@@ -224,9 +273,9 @@ class GridStrategy:
             total_required_fund = 0
             
             if price_levels and single_trade_quantity > 0:
-                # 只计算买入网格（价格低于当前价格的网格）
-                current_price = sum(price_levels) / len(price_levels)  # 使用平均价格作为参考
-                buy_levels = [p for p in price_levels[:-1] if p <= current_price]
+                # 只计算买入网格（价格低于基准价格的网格）
+                reference_price = base_price if base_price is not None else sum(price_levels) / len(price_levels)
+                buy_levels = [p for p in price_levels[:-1] if p <= reference_price]
                 
                 for i, price in enumerate(price_levels[:-1]):
                     # 使用统一的单笔数量
@@ -240,7 +289,7 @@ class GridStrategy:
                         'allocated_fund': round(actual_fund, 2),
                         'shares': shares,
                         'actual_fund': round(actual_fund, 2),
-                        'is_buy_level': price <= current_price
+                        'is_buy_level': price <= reference_price
                     })
                 
                 # 验证极端情况：所有买入网格成交时的资金需求
@@ -265,7 +314,7 @@ class GridStrategy:
                             'allocated_fund': round(actual_fund, 2),
                             'shares': shares,
                             'actual_fund': round(actual_fund, 2),
-                            'is_buy_level': price <= current_price
+                            'is_buy_level': price <= reference_price
                         })
             
             # 6. 计算资金利用率
@@ -443,9 +492,9 @@ class GridStrategy:
                 price_lower = current_price * (1 - total_ratio / 2)
                 price_upper = current_price * (1 + total_ratio / 2)
             
-            # 5. 计算价格水平
+            # 5. 计算价格水平（传入基准价格确保包含）
             price_levels = self.calculate_price_levels(
-                price_lower, price_upper, grid_count, grid_type
+                price_lower, price_upper, grid_count, grid_type, current_price
             )
             
             # 6. 计算底仓比例
@@ -455,9 +504,9 @@ class GridStrategy:
                 market_indicators['volatility']
             )
             
-            # 7. 计算资金分配
+            # 7. 计算资金分配（传入基准价格）
             fund_allocation = self.calculate_fund_allocation(
-                total_capital, base_position_ratio, grid_count, price_levels
+                total_capital, base_position_ratio, grid_count, price_levels, current_price
             )
             
             # 8. 计算价格区间比例

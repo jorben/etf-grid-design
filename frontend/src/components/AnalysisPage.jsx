@@ -263,7 +263,7 @@ const AnalysisPage = () => {
               
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
-                  {analysisData?.etf_info?.name || `ETF ${etfCode}`} 策略分析
+                  {analysisData?.etf_info?.name || `ETF ${etfCode}`} 网格策略分析
                 </h1>
                 <p className="text-sm text-gray-600">
                   投资金额：{currentParams?.totalCapital?.toLocaleString()}元 | 
@@ -279,7 +279,7 @@ const AnalysisPage = () => {
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Share2 className="w-4 h-4" />
-                分享分析
+                分享报告
               </button>
             </div>
           </div>
