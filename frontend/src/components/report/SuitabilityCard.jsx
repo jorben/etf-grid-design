@@ -76,7 +76,7 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
               <Target className="w-6 h-6 text-blue-700" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-blue-900">标的适合度评估</h3>
+              <h3 className="text-xl font-bold text-blue-900">标的适宜度评估</h3>
               <p className="text-blue-700">4维度量化评分体系，总分100分</p>
             </div>
           </div>

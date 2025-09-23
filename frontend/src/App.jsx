@@ -135,7 +135,7 @@ function App() {
                         </div>
                         <h3 className="font-semibold text-gray-900 mb-2">4维度评估</h3>
                         <p className="text-sm text-gray-600">
-                          振幅、波动率、市场特征、流动性四个维度量化评分，科学评估标的适合度
+                          振幅、波动率、市场特征、流动性四个维度量化评分，科学评估标的适宜度
                         </p>
                       </div>
 

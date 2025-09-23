@@ -158,7 +158,7 @@ def analyze_etf_strategy():
         analysis_result['report_summary'] = report_summary
         
         logger.info(f"ETF策略分析完成: {etf_code}, "
-                   f"适合度评分{analysis_result['suitability_evaluation']['total_score']}")
+                   f"适宜度评分{analysis_result['suitability_evaluation']['total_score']}")
         
         return jsonify({
             'success': True,

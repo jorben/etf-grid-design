@@ -1,9 +1,9 @@
 [project]
-name = "etf-grid-trading"
+name = "etf-grid-design"
 version = "0.1.0"
 description = "ETF网格交易策略参数设计工具"
 authors = [
-    {name = "ETF Grid Trading", email = "admin@example.com"}
+    {name = "ETF Grid Design", email = "jorbenzhu@gmail.com"}
 ]
 dependencies = [
     "flask>=2.3.0",

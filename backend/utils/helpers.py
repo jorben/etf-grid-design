@@ -126,13 +126,13 @@ def calculate_risk_level(score: float, max_score: float = 100) -> str:
 
 def calculate_suitability_level(score: float) -> Dict[str, Any]:
     """
-    根据适合度评分计算等级
+    根据适宜度评分计算等级
     
     Args:
-        score: 适合度评分（0-100）
+        score: 适宜度评分（0-100）
         
     Returns:
-        适合度等级信息
+        适宜度等级信息
     """
     if score >= 70:
         return {
@@ -178,7 +178,7 @@ def generate_strategy_summary(analysis_result: Dict) -> str:
     summary = f"""
     【{etf_name}】网格交易策略分析摘要：
     
-    ✓ 适合度评分：{total_score:.1f}/100分
+    ✓ 适宜度评分：{total_score:.1f}/100分
     ✓ 预期年化收益：{format_percentage(expected_return)}
     ✓ 网格数量：{grid_params.get('grid_count', 0)}个
     ✓ 价格区间：¥{grid_params.get('price_lower', 0):.3f} - ¥{grid_params.get('price_upper', 0):.3f}
@@ -275,10 +275,10 @@ def generate_risk_warnings(analysis_result: Dict) -> List[str]:
     suitability = analysis_result.get('suitability_analysis', {})
     backtest = analysis_result.get('backtest_result', {})
     
-    # 适合度评分过低
+    # 适宜度评分过低
     total_score = suitability.get('total_score', 0)
     if total_score < 60:
-        warnings.append("⚠️ 该ETF适合度评分较低，不建议进行网格交易")
+        warnings.append("⚠️ 该ETF适宜度评分较低，不建议进行网格交易")
     
     # 最大回撤过大
     max_drawdown = backtest.get('performance', {}).get('max_drawdown', 0)
