@@ -3,12 +3,12 @@ import { Search, TrendingUp, DollarSign, Settings, Shield, BarChart3, Grid3X3 } 
 import { usePersistedState } from '../hooks/usePersistedState';
 import ETFInfoSkeleton from './ETFInfoSkeleton';
 
-const ParameterForm = ({ onAnalysis, loading }) => {
-  // 使用持久化状态
-  const [etfCode, setEtfCode] = usePersistedState('etfCode', '510300');
-  const [totalCapital, setTotalCapital] = usePersistedState('totalCapital', '100000');
-  const [gridType, setGridType] = usePersistedState('gridType', '等比');
-  const [riskPreference, setRiskPreference] = usePersistedState('riskPreference', '稳健');
+const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
+  // 使用持久化状态，但优先使用初始值
+  const [etfCode, setEtfCode] = usePersistedState('etfCode', initialValues?.etfCode || '510300');
+  const [totalCapital, setTotalCapital] = usePersistedState('totalCapital', initialValues?.totalCapital?.toString() || '100000');
+  const [gridType, setGridType] = usePersistedState('gridType', initialValues?.gridType || '等比');
+  const [riskPreference, setRiskPreference] = usePersistedState('riskPreference', initialValues?.riskPreference || '稳健');
 
   // 状态管理
   const [popularETFs, setPopularETFs] = useState([]);
@@ -16,6 +16,24 @@ const ParameterForm = ({ onAnalysis, loading }) => {
   const [etfInfo, setEtfInfo] = useState(null);
   const [etfLoading, setEtfLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // 当初始值变化时更新状态
+  useEffect(() => {
+    if (initialValues) {
+      if (initialValues.etfCode && initialValues.etfCode !== etfCode) {
+        setEtfCode(initialValues.etfCode);
+      }
+      if (initialValues.totalCapital && initialValues.totalCapital.toString() !== totalCapital) {
+        setTotalCapital(initialValues.totalCapital.toString());
+      }
+      if (initialValues.gridType && initialValues.gridType !== gridType) {
+        setGridType(initialValues.gridType);
+      }
+      if (initialValues.riskPreference && initialValues.riskPreference !== riskPreference) {
+        setRiskPreference(initialValues.riskPreference);
+      }
+    }
+  }, [initialValues, etfCode, totalCapital, gridType, riskPreference, setEtfCode, setTotalCapital, setGridType, setRiskPreference]);
 
   // 获取热门ETF列表
   useEffect(() => {
