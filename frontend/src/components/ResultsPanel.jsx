@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { RefreshCw, Share2, ArrowLeft, LayoutDashboard, ScanBarcode, Grid3x3 } from 'lucide-react'
 import ETFInfoCard from './results/ETFInfoCard'
-import GridParametersCard from './results/GridParametersCard'
+import GridParametersCard from './report/GridParametersCard'
 import AdaptabilityCard from './results/AdaptabilityCard'
 import AnalysisCard from './results/AnalysisCard'
 import AdjustmentSuggestionsCard from './results/AdjustmentSuggestionsCard'
-import PriceChart from './results/PriceChart'
+
 import { formatDate, formatCurrency, formatNumber, formatPercent, formatStepAmount } from '../services/api'
 
 const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
@@ -171,15 +171,7 @@ const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
               </div>
             </div>
 
-            {/* 价格区间可视化 */}
-            {result.grid_parameters?.grid_prices && (
-              <PriceChart 
-                currentPrice={result.etf_info?.current_price}
-                gridPrices={result.grid_parameters.grid_prices}
-                priceRange={[result.grid_parameters.price_lower_bound, result.grid_parameters.price_upper_bound]}
-                historicalPrices={result.historical_prices || []}
-              />
-            )}
+
           </>
         )}
 
