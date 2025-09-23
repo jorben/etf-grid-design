@@ -240,76 +240,7 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
         })}
       </div>
 
-      {/* 数据质量评估 */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-gray-200 rounded-lg">
-            <Database className="w-5 h-5 text-gray-700" />
-          </div>
-          <div>
-            <h4 className="font-semibold text-gray-900">数据质量评估</h4>
-            <p className="text-sm text-gray-600">分析数据的时效性和完整性</p>
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Calendar className="w-4 h-4 text-blue-600" />
-              <span className="font-medium text-gray-900">数据时效性</span>
-            </div>
-            <div className={`text-sm px-2 py-1 rounded-full inline-block ${
-              dataQuality.freshness === '优秀' ? 'bg-green-100 text-green-800' :
-              dataQuality.freshness === '良好' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-red-100 text-red-800'
-            }`}>
-              {dataQuality.freshness}
-            </div>
-            <p className="text-xs text-gray-600 mt-1">{dataQuality.freshness_desc}</p>
-            {dataQuality.latest_date && (
-              <p className="text-xs text-gray-500 mt-1">
-                最新数据: {dataQuality.latest_date}
-              </p>
-            )}
-          </div>
-
-          <div className="bg-white p-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-              <span className="font-medium text-gray-900">数据完整性</span>
-            </div>
-            <div className={`text-sm px-2 py-1 rounded-full inline-block ${
-              dataQuality.completeness === '优秀' ? 'bg-green-100 text-green-800' :
-              dataQuality.completeness === '良好' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-red-100 text-red-800'
-            }`}>
-              {dataQuality.completeness}
-            </div>
-            <p className="text-xs text-gray-600 mt-1">{dataQuality.completeness_desc}</p>
-            {dataQuality.total_records && (
-              <p className="text-xs text-gray-500 mt-1">
-                数据记录: {dataQuality.total_records}条
-              </p>
-            )}
-          </div>
-
-          <div className="bg-white p-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <BarChart3 className="w-4 h-4 text-purple-600" />
-              <span className="font-medium text-gray-900">分析范围</span>
-            </div>
-            <div className="text-sm px-2 py-1 rounded-full inline-block bg-green-100 text-green-800">
-              {dataQuality.analysis_days}天
-            </div>
-            <p className="text-xs text-gray-600 mt-1">历史数据分析期间</p>
-            {dataQuality.start_date && (
-              <p className="text-xs text-gray-500 mt-1">
-                {dataQuality.start_date} 至 {dataQuality.latest_date}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
 
       {/* 评分标准说明 */}
       {showDetailed && (

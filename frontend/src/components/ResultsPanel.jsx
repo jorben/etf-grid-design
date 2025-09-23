@@ -134,19 +134,46 @@ const ResultsPanel = ({ result, onReset, onNewAnalysis }) => {
                   <div className="text-sm text-gray-600">区间内网格数</div>
                 </div>
                 
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-primary-600">
-                    {formatPercent(result.grid_parameters?.step_size_ratio * 100 || 0, 2)}
-                  </div>
-                  <div className="text-sm text-gray-600">步长比例</div>
-                </div>
-                
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-primary-600">
-                    {formatStepAmount(result.grid_parameters?.step_size_amount || 0)}
-                  </div>
-                  <div className="text-sm text-gray-600">步长金额</div>
-                </div>
+                {/* 根据网格类型动态展示步长重点 */}
+                {result.grid_parameters?.grid_type === '等比' ? (
+                  <>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-2xl font-bold text-primary-600">
+                        {formatPercent(result.grid_parameters?.step_size_ratio * 100 || 0, 2)}
+                      </div>
+                      <div className="text-sm text-gray-600">步长比例</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {formatStepAmount(result.grid_parameters?.step_size_amount || 0)}
+                      </div>
+                    </div>
+                    
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-lg font-semibold text-gray-700">
+                        {formatStepAmount(result.grid_parameters?.step_size_amount || 0)}
+                      </div>
+                      <div className="text-sm text-gray-600">步长金额</div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-2xl font-bold text-primary-600">
+                        {formatStepAmount(result.grid_parameters?.step_size_amount || 0)}
+                      </div>
+                      <div className="text-sm text-gray-600">步长金额</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {formatPercent(result.grid_parameters?.step_size_ratio * 100 || 0, 2)}
+                      </div>
+                    </div>
+                    
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-lg font-semibold text-gray-700">
+                        {formatPercent(result.grid_parameters?.step_size_ratio * 100 || 0, 2)}
+                      </div>
+                      <div className="text-sm text-gray-600">步长比例</div>
+                    </div>
+                  </>
+                )}
                 
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <div className="text-2xl font-bold text-primary-600">

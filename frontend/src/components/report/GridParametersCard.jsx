@@ -192,10 +192,22 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
               <TrendingUp className="w-4 h-4 text-gray-600" />
               <span className="text-sm font-medium text-gray-700">网格步长</span>
             </div>
-            <div className="text-xl font-bold text-gray-900">¥{grid_config.step_size.toFixed(3)}</div>
-            <div className="text-xs text-gray-600">
-              步长比例 {formatPercent(grid_config.step_ratio)}
-            </div>
+            {/* 根据网格类型动态展示重点 */}
+            {grid_config.type === '等比' ? (
+              <>
+                <div className="text-xl font-bold text-gray-900">{formatPercent(grid_config.step_ratio)}</div>
+                <div className="text-xs text-gray-600">
+                  步长比例 · ¥{grid_config.step_size.toFixed(3)}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-xl font-bold text-gray-900">¥{grid_config.step_size.toFixed(3)}</div>
+                <div className="text-xs text-gray-600">
+                  步长价格 · {formatPercent(grid_config.step_ratio)}
+                </div>
+              </>
+            )}
           </div>
 
           <div className="bg-gray-50 p-4 rounded-lg">
