@@ -276,7 +276,22 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
               )}
               
               {/* 核心指标卡片 */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-lg">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-orange-200 rounded-lg">
+                      <Target className="w-5 h-5 text-orange-700" />
+                    </div>
+                    <h3 className="font-semibold text-orange-900">标的信息</h3>
+                  </div>
+                  <div className="text-2xl font-bold text-orange-900 mb-1">
+                    {etf_info?.code || '未知'}
+                  </div>
+                  <p className="text-orange-700 text-sm">
+                    {etf_info?.name || '未知标的'}
+                  </p>
+                </div>
+
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="p-2 bg-blue-200 rounded-lg">
@@ -297,7 +312,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
                     <div className="p-2 bg-green-200 rounded-lg">
                       <TrendingUp className="w-5 h-5 text-green-700" />
                     </div>
-                    <h3 className="font-semibold text-green-900">价格区间</h3>
+                    <h3 className="font-semibold text-green-900">网格价格区间</h3>
                   </div>
                   <div className="text-2xl font-bold text-green-900 mb-1">
                     ¥{(grid_strategy?.price_range?.lower || 0).toFixed(3)} - ¥{(grid_strategy?.price_range?.upper || 0).toFixed(3)}

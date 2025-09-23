@@ -8,7 +8,6 @@ const ParameterForm = ({ onAnalysis, loading }) => {
   const [etfCode, setEtfCode] = usePersistedState('etfCode', '510300');
   const [totalCapital, setTotalCapital] = usePersistedState('totalCapital', '100000');
   const [gridType, setGridType] = usePersistedState('gridType', '等比');
-  const [frequencyPreference, setFrequencyPreference] = usePersistedState('frequencyPreference', '中频');
   const [riskPreference, setRiskPreference] = usePersistedState('riskPreference', '稳健');
 
   // 状态管理
@@ -99,7 +98,6 @@ const ParameterForm = ({ onAnalysis, loading }) => {
         etfCode,
         totalCapital: parseFloat(totalCapital),
         gridType,
-        frequencyPreference,
         riskPreference
       });
     }
@@ -308,41 +306,6 @@ const ParameterForm = ({ onAnalysis, loading }) => {
                   value={option.value}
                   checked={gridType === option.value}
                   onChange={(e) => setGridType(e.target.value)}
-                  className="sr-only"
-                />
-                <div className="font-medium text-gray-900">{option.label}</div>
-                <div className="text-sm text-gray-600">{option.desc}</div>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* 交易频率偏好 */}
-        <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
-            <BarChart3 className="w-4 h-4" />
-            交易频率偏好
-          </label>
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { value: '低频', label: '低频交易', desc: '20-30个网格', color: 'green' },
-              { value: '中频', label: '中频交易', desc: '40-60个网格', color: 'blue' },
-              { value: '高频', label: '高频交易', desc: '80-100个网格', color: 'orange' }
-            ].map(option => (
-              <label
-                key={option.value}
-                className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                  frequencyPreference === option.value
-                    ? `border-${option.color}-300 bg-${option.color}-50`
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="frequencyPreference"
-                  value={option.value}
-                  checked={frequencyPreference === option.value}
-                  onChange={(e) => setFrequencyPreference(e.target.value)}
                   className="sr-only"
                 />
                 <div className="font-medium text-gray-900">{option.label}</div>

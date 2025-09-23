@@ -97,7 +97,7 @@ def analyze_etf_strategy():
             }), 400
         
         # 验证必需参数
-        required_fields = ['etfCode', 'totalCapital', 'gridType', 'frequencyPreference', 'riskPreference']
+        required_fields = ['etfCode', 'totalCapital', 'gridType', 'riskPreference']
         for field in required_fields:
             if field not in data:
                 return jsonify({
@@ -127,13 +127,6 @@ def analyze_etf_strategy():
                 'error': '网格类型只能是"等差"或"等比"'
             }), 400
         
-        frequency_preference = data['frequencyPreference']
-        if frequency_preference not in ['低频', '中频', '高频']:
-            return jsonify({
-                'success': False,
-                'error': '交易频率只能是"低频"、"中频"或"高频"'
-            }), 400
-        
         risk_preference = data['riskPreference']
         if risk_preference not in ['保守', '稳健', '激进']:
             return jsonify({
@@ -142,14 +135,13 @@ def analyze_etf_strategy():
             }), 400
         
         logger.info(f"开始分析ETF策略: {etf_code}, 资金{total_capital}, "
-                   f"{grid_type}网格, {frequency_preference}, {risk_preference}")
+                   f"{grid_type}网格, {risk_preference}")
         
         # 执行分析
         analysis_result = etf_service.analyze_etf_strategy(
             etf_code=etf_code,
             total_capital=total_capital,
             grid_type=grid_type,
-            frequency_preference=frequency_preference,
             risk_preference=risk_preference
         )
         

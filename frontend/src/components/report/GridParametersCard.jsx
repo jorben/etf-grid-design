@@ -22,7 +22,6 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
     grid_config,
     fund_allocation,
     risk_preference,
-    frequency_preference,
     calculation_method
   } = gridStrategy;
 
@@ -55,7 +54,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <Target className="w-4 h-4 text-purple-600" />
@@ -67,20 +66,11 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
 
           <div className="bg-white p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <BarChart3 className="w-4 h-4 text-blue-600" />
-              <span className="text-sm font-medium text-gray-700">交易频率</span>
-            </div>
-            <div className="text-lg font-bold text-gray-900">{frequency_preference}</div>
-            <div className="text-xs text-gray-600">{grid_config.count}个网格</div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
               <Hash className="w-4 h-4 text-green-600" />
               <span className="text-sm font-medium text-gray-700">网格类型</span>
             </div>
             <div className="text-lg font-bold text-gray-900">{grid_config.type}</div>
-            <div className="text-xs text-gray-600">推荐配置</div>
+            <div className="text-xs text-gray-600">{grid_config.count}个网格</div>
           </div>
 
           <div className="bg-white p-4 rounded-lg">
@@ -172,7 +162,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
             </div>
             <div className="text-xl font-bold text-gray-900">{grid_config.count}个</div>
             <div className="text-xs text-gray-600">
-              {frequency_preference}交易设置
+              基于ATR算法计算
             </div>
           </div>
 
