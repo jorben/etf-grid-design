@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import ParameterForm from './components/ParameterForm';
 import AnalysisReport from './components/AnalysisReport';
 import { analyzeETF } from './services/api';
-import { Zap, BarChart3, Target, TrendingUp, Github, ThermometerSun } from 'lucide-react';
+import { Waypoints, Cpu, Target, TrendingUp, Github, ThermometerSun } from 'lucide-react';
 import './App.css';
 
 function App() {
@@ -68,7 +68,7 @@ function App() {
               {/* Logo和标题 */}
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg">
-                  <Zap className="w-6 h-6 text-white" />
+                  <Waypoints className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-gray-900">ETFer.Top</h1>
@@ -115,7 +115,7 @@ function App() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                       <div className="text-center p-6 bg-blue-50 rounded-lg">
                         <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <BarChart3 className="w-6 h-6 text-blue-700" />
+                          <Cpu className="w-6 h-6 text-blue-700" />
                         </div>
                         <h3 className="font-semibold text-gray-900 mb-2">ATR算法核心</h3>
                         <p className="text-sm text-gray-600">

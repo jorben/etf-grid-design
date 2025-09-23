@@ -123,29 +123,32 @@ const ParameterForm = ({ onAnalysis, loading }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* ETF标的选择 */}
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
-            <Search className="w-4 h-4" />
-            ETF标的选择
-          </label>
-          
-          {/* 热门ETF快速选择 */}
-          <div className="mb-3">
-            <p className="text-xs text-gray-500 mb-2">热门ETF：</p>
-            <div className="flex flex-wrap gap-2">
-              {popularETFs.filter(etf => ['510300', '510500', '159919', '159915', '512880'].includes(etf.code)).map(etf => (
-                <button
-                  key={etf.code}
-                  type="button"
-                  onClick={() => selectPopularETF(etf.code)}
-                  className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                    etfCode === etf.code
-                      ? 'bg-blue-100 border-blue-300 text-blue-700'
-                      : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  {etf.code} {etf.name}
-                </button>
-              ))}
+          {/* 标题和热门ETF - 响应式布局 */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <Search className="w-4 h-4" />
+              ETF标的选择
+            </label>
+            
+            {/* 热门ETF - 在小屏幕上换行，大屏幕上靠右对齐 */}
+            <div className="flex items-center">
+              <span className="text-xs text-gray-500 mr-2">热门ETF:</span>
+              <div className="flex flex-wrap gap-2">
+                {popularETFs.filter(etf => ['510300', '510500', '159919', '159915', '512880'].includes(etf.code)).map(etf => (
+                  <button
+                    key={etf.code}
+                    type="button"
+                    onClick={() => selectPopularETF(etf.code)}
+                    className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                      etfCode === etf.code
+                        ? 'bg-blue-100 border-blue-300 text-blue-700'
+                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    {etf.code} {etf.name}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -183,29 +186,32 @@ const ParameterForm = ({ onAnalysis, loading }) => {
 
         {/* 总投资资金量 */}
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
-            <DollarSign className="w-4 h-4" />
-            总投资资金量
-          </label>
-          
-          {/* 预设资金快速选择 */}
-          <div className="mb-3">
-            <p className="text-xs text-gray-500 mb-2">常用金额：</p>
-            <div className="flex flex-wrap gap-2">
-              {capitalPresets.filter(preset => preset.popular).map(preset => (
-                <button
-                  key={preset.value}
-                  type="button"
-                  onClick={() => selectCapitalPreset(preset.value)}
-                  className={`px-2 py-1 text-xs rounded-full border transition-colors ${
-                    totalCapital === preset.value.toString()
-                      ? 'bg-blue-100 border-blue-300 text-blue-700'
-                      : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  {preset.label}
-                </button>
-              ))}
+          {/* 标题和常用金额 - 响应式布局 */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <DollarSign className="w-4 h-4" />
+              总投资资金量
+            </label>
+            
+            {/* 常用金额 - 在小屏幕上换行，大屏幕上靠右对齐 */}
+            <div className="flex items-center">
+              <span className="text-xs text-gray-500 mr-2">常用金额:</span>
+              <div className="flex flex-wrap gap-2">
+                {capitalPresets.filter(preset => preset.popular).map(preset => (
+                  <button
+                    key={preset.value}
+                    type="button"
+                    onClick={() => selectCapitalPreset(preset.value)}
+                    className={`px-2 py-1 text-xs rounded-full border transition-colors ${
+                      totalCapital === preset.value.toString()
+                        ? 'bg-blue-100 border-blue-300 text-blue-700'
+                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
