@@ -146,7 +146,7 @@ const StrategyRationaleCard = ({ strategyRationale, adjustmentSuggestions }) => 
             {Object.entries(profit_basis).map(([key, value]) => {
               const keyNames = {
                 historical_performance: '历史表现',
-                trading_frequency: '交易频率',
+                trading_frequency: '交易统计',
                 win_rate: '胜率分析',
                 risk_control: '风险控制'
               };

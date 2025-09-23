@@ -86,7 +86,6 @@ class GridStrategy:
             atr_ratio: ATR比率
             current_price: 当前价格
             risk_preference: 风险偏好
-            frequency_preference: 交易频率偏好
             
         Returns:
             (step_size, step_ratio)
@@ -396,9 +395,8 @@ class GridStrategy:
             return 100
     
     def calculate_grid_parameters(self, df: pd.DataFrame, total_capital: float,
-                                grid_type: str, frequency_preference: str,
-                                risk_preference: str, atr_analysis: Dict,
-                                market_indicators: Dict) -> Dict:
+                                grid_type: str, risk_preference: str, 
+                                atr_analysis: Dict, market_indicators: Dict) -> Dict:
         """
         计算完整的网格策略参数（基于ATR智能步长）
         
@@ -406,7 +404,6 @@ class GridStrategy:
             df: 历史数据
             total_capital: 总投资资金
             grid_type: 网格类型
-            frequency_preference: 频率偏好
             risk_preference: 风险偏好
             atr_analysis: ATR分析结果
             market_indicators: 市场指标
@@ -485,14 +482,13 @@ class GridStrategy:
                 'price_levels': [round(p, 3) for p in price_levels],
                 'fund_allocation': fund_allocation,
                 'risk_preference': risk_preference,
-                'frequency_preference': frequency_preference,
                 'atr_based': True,
                 'atr_score': atr_score,
                 'atr_description': atr_description,
                 'calculation_method': 'ATR智能步长算法',
                 'calculation_logic': {
                     'step1': f'ATR比率: {atr_ratio:.1%}',
-                    'step2': f'基于ATR计算最优步长: {step_size:.3f} ({step_ratio:.1%})',
+                    'step2': f'基于ATR和风险偏好计算最优步长: {step_size:.3f} ({step_ratio:.1%})',
                     'step3': f'基于步长计算网格数量: {grid_count}个',
                     'step4': f'调整价格区间: [{price_lower:.3f}, {price_upper:.3f}]',
                     'step5': f'生成{len(price_levels)}个价格水平'
