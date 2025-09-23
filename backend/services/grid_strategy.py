@@ -275,7 +275,8 @@ class GridStrategy:
             if price_levels and single_trade_quantity > 0:
                 # 只计算买入网格（价格低于基准价格的网格）
                 reference_price = base_price if base_price is not None else sum(price_levels) / len(price_levels)
-                buy_levels = [p for p in price_levels[:-1] if p <= reference_price]
+                buy_levels = [p for p in price_levels[:-1] if p < reference_price]
+                logger.info(f"计算买入网格，基准价格: {reference_price:.3f}, 买入网格: {len(buy_levels)}")
                 
                 for i, price in enumerate(price_levels[:-1]):
                     # 使用统一的单笔数量
@@ -426,7 +427,7 @@ class GridStrategy:
             # 使用相同的计算公式，但加入安全系数
             # 公式：网格金额 ÷ 买入网格数量 × 2 ÷ 平均买入价格 × 安全系数
             safety_factor = 0.9  # 90%的资金利用率，保留10%安全边际
-            safe_theoretical_shares = (available_grid_amount / buy_grid_count * 2 / avg_buy_price) * safety_factor
+            safe_theoretical_shares = (available_grid_amount / buy_grid_count / avg_buy_price) * safety_factor
             
             # 向下取整到100股的整数倍
             safe_shares_per_100 = int(safe_theoretical_shares / 100)
