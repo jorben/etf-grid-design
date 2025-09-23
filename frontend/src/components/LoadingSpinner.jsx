@@ -5,7 +5,7 @@ const LoadingSpinner = ({ message = "正在分析中...", progress = 0, showProg
   const steps = [
     { icon: BarChart3, text: "获取ETF数据", color: "text-blue-600" },
     { icon: Target, text: "计算ATR指标", color: "text-green-600" },
-    { icon: TrendingUp, text: "评估适合度", color: "text-purple-600" },
+    { icon: TrendingUp, text: "评估适宜度", color: "text-purple-600" },
     { icon: Zap, text: "生成策略参数", color: "text-orange-600" }
   ];
 

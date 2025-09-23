@@ -399,14 +399,14 @@ class FrequencyCalculator:
             
             recommendations = {}
             
-            # 为每种频次类型评估适合度
+            # 为每种频次类型评估适宜度
             for freq_type, target_triggers in self.target_daily_frequencies.items():
                 # 计算理论可达成的触发次数
                 theoretical_triggers = self._predict_daily_triggers(
                     0.01, avg_amplitude, volume_factor, 0.7  # 使用标准参数
                 )
                 
-                # 计算适合度评分
+                # 计算适宜度评分
                 suitability_score = min(1.0, theoretical_triggers / target_triggers)
                 
                 # 风险评估

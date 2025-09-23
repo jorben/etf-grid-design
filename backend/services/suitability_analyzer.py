@@ -1,5 +1,5 @@
 """
-标的适合度评估模块
+标的适宜度评估模块
 实现4维度量化评分体系（总分100分）
 """
 
@@ -12,7 +12,7 @@ from .atr_engine import ATREngine, calculate_volatility, calculate_adx
 logger = logging.getLogger(__name__)
 
 class SuitabilityAnalyzer:
-    """标的适合度评估器"""
+    """标的适宜度评估器"""
     
     def __init__(self):
         """初始化评估器"""
@@ -266,7 +266,7 @@ class SuitabilityAnalyzer:
     
     def comprehensive_evaluation(self, df: pd.DataFrame, etf_info: Dict) -> Dict:
         """
-        综合适合度评估
+        综合适宜度评估
         
         Args:
             df: 历史数据DataFrame
@@ -355,7 +355,7 @@ class SuitabilityAnalyzer:
             }
             
         except Exception as e:
-            logger.error(f"综合适合度评估失败: {str(e)}")
+            logger.error(f"综合适宜度评估失败: {str(e)}")
             raise
     
     def _get_error_result(self, max_score: int, eval_type: str) -> Dict:
@@ -370,7 +370,7 @@ class SuitabilityAnalyzer:
 
 def get_suitability_summary(evaluation: Dict) -> str:
     """
-    获取适合度评估摘要文本
+    获取适宜度评估摘要文本
     
     Args:
         evaluation: 评估结果
@@ -389,7 +389,7 @@ def get_suitability_summary(evaluation: Dict) -> str:
         liq_score = evaluation['evaluations']['liquidity']['score']
         
         summary = f"""
-标的适合度评估结果 (总分{total_score}/100分)
+标的适宜度评估结果 (总分{total_score}/100分)
 
 • 振幅评估: {amp_score}/35分 - {evaluation['evaluations']['amplitude']['description']}
 • 波动率评估: {vol_score}/30分 - {evaluation['evaluations']['volatility']['description']}
@@ -403,5 +403,5 @@ def get_suitability_summary(evaluation: Dict) -> str:
         return summary
         
     except Exception as e:
-        logger.error(f"生成适合度摘要失败: {str(e)}")
-        return "适合度评估摘要生成失败"
+        logger.error(f"生成适宜度摘要失败: {str(e)}")
+        return "适宜度评估摘要生成失败"

@@ -172,7 +172,7 @@ class ETFAnalysisService:
             # 2. 获取历史数据（1年）
             df = self.get_historical_data(etf_code, days=365)
             
-            # 3. 执行适合度评估
+            # 3. 执性适宜度评估
             suitability_result = self.suitability_analyzer.comprehensive_evaluation(df, etf_info)
             
             # 4. 计算网格策略参数
@@ -243,7 +243,7 @@ class ETFAnalysisService:
                 }
             }
             
-            logger.info(f"ETF策略分析完成: {etf_code}, 适合度评分{suitability_result['total_score']}")
+            logger.info(f"ETF策略分析完成: {etf_code}, 适宜度评分{suitability_result['total_score']}")
             return complete_report
             
         except Exception as e:
@@ -257,7 +257,7 @@ class ETFAnalysisService:
         生成策略分析依据
         
         Args:
-            suitability_result: 适合度评估结果
+            suitability_result: 适宜度评估结果
             grid_params: 网格参数
             backtest_result: 回测结果
             risk_preference: 风险偏好
@@ -315,7 +315,7 @@ class ETFAnalysisService:
         生成调整建议
         
         Args:
-            suitability_result: 适合度评估结果
+            suitability_result: 适宜度评估结果
             grid_params: 网格参数
             backtest_result: 回测结果
             
@@ -404,7 +404,7 @@ ETF网格交易策略分析报告: {etf_info['code']} {etf_info['name']}
 ├── 市场表现: 成交量{etf_info['volume']:.0f}万手，成交额{etf_info['amount']:.0f}万元
 └── 数据质量: {analysis_result['data_quality']['freshness']}，{analysis_result['data_quality']['completeness']}
 
-第二部分：标的适合度评估 (总分{suitability['total_score']}/100分)
+第二部分：标的适宜度评估 (总分{suitability['total_score']}/100分)
 ├── 振幅评估: {suitability['evaluations']['amplitude']['score']}/35分 - {suitability['evaluations']['amplitude']['description']}
 ├── 波动率评估: {suitability['evaluations']['volatility']['score']}/30分 - {suitability['evaluations']['volatility']['description']}
 ├── 市场特征评估: {suitability['evaluations']['market_characteristics']['score']}/25分 - {suitability['evaluations']['market_characteristics']['description']}

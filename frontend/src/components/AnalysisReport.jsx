@@ -142,14 +142,14 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
     );
   }
 
-  // 获取适合度等级颜色
+  // 获取适宜度等级颜色
   const getSuitabilityColor = (score) => {
     if (score >= 70) return 'text-green-600 bg-green-100';
     if (score >= 60) return 'text-yellow-600 bg-yellow-100';
     return 'text-red-600 bg-red-100';
   };
 
-  // 获取适合度图标
+  // 获取适宜度图标
   const getSuitabilityIcon = (score) => {
     if (score >= 70) return <CheckCircle className="w-5 h-5" />;
     if (score >= 60) return <AlertTriangle className="w-5 h-5" />;
@@ -158,7 +158,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
 
   const tabs = [
     { id: 'overview', label: '概览', icon: <Eye className="w-4 h-4" /> },
-    { id: 'suitability', label: '适合度评估', icon: <Target className="w-4 h-4" /> },
+    { id: 'suitability', label: '适宜度评估', icon: <Target className="w-4 h-4" /> },
     { id: 'strategy', label: '网格策略', icon: <Grid3X3 className="w-4 h-4" /> },
     { id: 'backtest', label: '回测结果', icon: <BarChart3 className="w-4 h-4" /> },
 
@@ -223,7 +223,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
               {getSuitabilityIcon(suitability_evaluation?.total_score || 0)}
               {suitability_evaluation?.conclusion || '未知'}
             </div>
-            <div className="text-xs text-gray-500">适合度评分</div>
+            <div className="text-xs text-gray-500">适宜度评分</div>
           </div>
           <div className="text-center">
             <div className="text-lg font-semibold text-gray-900">
@@ -278,7 +278,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
                     <div className="p-2 bg-blue-200 rounded-lg">
                       <Target className="w-5 h-5 text-blue-700" />
                     </div>
-                    <h3 className="font-semibold text-blue-900">适合度评估</h3>
+                    <h3 className="font-semibold text-blue-900">适宜度评估</h3>
                   </div>
                   <div className="text-2xl font-bold text-blue-900 mb-1">
                     {suitability_evaluation?.total_score || 0}/100分
@@ -362,7 +362,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
             </div>
           )}
 
-          {/* 适合度评估标签页 */}
+          {/* 适宜度评估标签页 */}
           {activeTab === 'suitability' && (
             <SuitabilityCard 
               evaluation={suitability_evaluation}
