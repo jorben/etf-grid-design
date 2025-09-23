@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, TrendingUp, DollarSign, Settings, Shield, BarChart3, Grid3X3 } from 'lucide-react';
 import { usePersistedState } from '../hooks/usePersistedState';
+import ETFInfoSkeleton from './ETFInfoSkeleton';
 
 const ParameterForm = ({ onAnalysis, loading }) => {
   // 使用持久化状态
@@ -14,6 +15,7 @@ const ParameterForm = ({ onAnalysis, loading }) => {
   const [popularETFs, setPopularETFs] = useState([]);
   const [capitalPresets, setCapitalPresets] = useState([]);
   const [etfInfo, setEtfInfo] = useState(null);
+  const [etfLoading, setEtfLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   // 获取热门ETF列表
@@ -45,6 +47,9 @@ const ParameterForm = ({ onAnalysis, loading }) => {
   // ETF代码变化时获取基础信息
   useEffect(() => {
     if (etfCode && etfCode.length === 6) {
+      setEtfLoading(true);
+      setEtfInfo(null);
+      
       fetch(`/api/etf/basic-info/${etfCode}`)
         .then(res => res.json())
         .then(data => {
@@ -59,9 +64,13 @@ const ParameterForm = ({ onAnalysis, loading }) => {
         .catch(err => {
           setEtfInfo(null);
           setErrors(prev => ({ ...prev, etfCode: '获取ETF信息失败' }));
+        })
+        .finally(() => {
+          setEtfLoading(false);
         });
     } else {
       setEtfInfo(null);
+      setEtfLoading(false);
     }
   }, [etfCode]);
 
@@ -163,24 +172,31 @@ const ParameterForm = ({ onAnalysis, loading }) => {
               }`}
               maxLength={6}
             />
-            {etfInfo && (
-              <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-green-600" />
-                  <span className="font-medium text-green-800">{etfInfo.name}</span>
-                  <span className="text-sm text-green-600">
-                    ¥{etfInfo.current_price?.toFixed(3)} 
-                    <span className={etfInfo.change_pct >= 0 ? 'text-red-600' : 'text-green-600'}>
-                      ({etfInfo.change_pct >= 0 ? '+' : ''}{etfInfo.change_pct?.toFixed(2)}%)
+            
+            {/* ETF信息区域 - 固定高度避免跳动 */}
+            <div className="mt-2" style={{ minHeight: '80px' }}>
+              {etfLoading && <ETFInfoSkeleton />}
+              
+              {!etfLoading && etfInfo && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-blue-600" />
+                    <span className="font-medium text-blue-800">{etfInfo.name}</span>
+                    <span className="text-sm text-blue-600">
+                      ¥{etfInfo.current_price?.toFixed(3)} 
+                      <span className={etfInfo.change_pct >= 0 ? 'text-red-600' : 'text-green-600'}>
+                        ({etfInfo.change_pct >= 0 ? '+' : ''}{etfInfo.change_pct?.toFixed(2)}%)
+                      </span>
                     </span>
-                  </span>
+                  </div>
+                  <p className="text-xs text-blue-600 mt-1">{etfInfo.management_company}</p>
                 </div>
-                <p className="text-xs text-green-600 mt-1">{etfInfo.management_company}</p>
-              </div>
-            )}
-            {errors.etfCode && (
-              <p className="mt-1 text-sm text-red-600">{errors.etfCode}</p>
-            )}
+              )}
+              
+              {!etfLoading && errors.etfCode && (
+                <p className="mt-1 text-sm text-red-600">{errors.etfCode}</p>
+              )}
+            </div>
           </div>
         </div>
 
