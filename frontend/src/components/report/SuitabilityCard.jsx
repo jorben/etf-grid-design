@@ -18,7 +18,14 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
 
   const { evaluations, total_score, conclusion, recommendation, has_fatal_flaw, fatal_flaws } = evaluation;
 
-  // 获取评分颜色
+  // 获取适宜度等级颜色 - 与 AnalysisReport 保持一致
+  const getSuitabilityColor = (score) => {
+    if (score >= 70) return 'text-green-600 bg-green-100';
+    if (score >= 60) return 'text-yellow-600 bg-yellow-100';
+    return 'text-red-600 bg-red-100';
+  };
+
+  // 获取维度评分颜色
   const getScoreColor = (score, maxScore) => {
     const percentage = score / maxScore;
     if (percentage >= 0.8) return 'text-green-600 bg-green-100';
@@ -26,7 +33,14 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
     return 'text-red-600 bg-red-100';
   };
 
-  // 获取评分图标
+  // 获取评分图标 - 与 AnalysisReport 保持一致
+  const getSuitabilityIcon = (score) => {
+    if (score >= 70) return <CheckCircle className="w-5 h-5" />;
+    if (score >= 60) return <AlertTriangle className="w-5 h-5" />;
+    return <XCircle className="w-5 h-5" />;
+  };
+
+  // 获取维度评分图标
   const getScoreIcon = (score, maxScore) => {
     const percentage = score / maxScore;
     if (percentage >= 0.8) return <CheckCircle className="w-5 h-5" />;
@@ -76,14 +90,14 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
               <Target className="w-6 h-6 text-blue-700" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-blue-900">标的适宜度评估</h3>
-              <p className="text-blue-700">4维度量化评分体系，总分100分</p>
+              <h3 className="text-xl font-bold text-blue-900">标的网格交易适宜度评估</h3>
+              <p className="text-blue-700">从4个维度量化评分体系，总分100分</p>
             </div>
           </div>
           <div className="text-right">
             <div className="text-3xl font-bold text-blue-900">{total_score}/100</div>
-            <div className={`px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-1 ${getScoreColor(total_score, 100)}`}>
-              {getScoreIcon(total_score, 100)}
+            <div className={`px-2 py-1 rounded-full text-sm inline-flex items-center gap-1 ${getSuitabilityColor(total_score)}`}>
+              {getSuitabilityIcon(total_score)}
               {conclusion}
             </div>
           </div>
@@ -105,9 +119,9 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
             <div className="flex items-start gap-2">
               <XCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-medium text-red-800 mb-1">致命缺陷警告</p>
+                <p className="font-medium text-red-800 mb-1">严重缺陷警告</p>
                 <p className="text-red-700">
-                  检测到致命缺陷：{fatal_flaws.join('、')}。强烈不建议进行网格交易。
+                  检测到严重缺陷：{fatal_flaws.join('、')}。强烈不建议进行网格交易。
                 </p>
               </div>
             </div>
