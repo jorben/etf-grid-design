@@ -13,9 +13,9 @@ import {
   Grid3X3,
   PieChart,
   Database,
-  Share2,
   ThermometerSun,
-  Eye
+  Eye,
+  Share2
 } from 'lucide-react';
 import SuitabilityCard from './report/SuitabilityCard';
 import GridParametersCard from './report/GridParametersCard';
@@ -24,14 +24,14 @@ import StrategyRationaleCard from './report/StrategyRationaleCard';
 
 import LoadingSpinner from './LoadingSpinner';
 
-const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
+const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareButton = false }) => {
   const [activeTab, setActiveTab] = useState('overview');
 
-  // 分享功能处理函数
+  // 分享功能
   const handleShare = async () => {
     const shareData = {
-      title: 'ETF网格设计工具 - 智能交易策略分析',
-      text: '使用这个工具来设计和分析ETF投资网格策略，基于ATR算法的专业分析系统',
+      title: `${data?.etf_info?.name || 'ETF'} - 网格交易策略分析报告`,
+      text: `查看 ${data?.etf_info?.name || 'ETF'} 的智能网格交易策略分析结果`,
       url: window.location.href,
     };
 
@@ -41,7 +41,6 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
         await navigator.share(shareData);
         return;
       } catch (error) {
-        // 如果用户取消分享或其他错误，继续执行备用方案
         console.log('分享取消或失败，使用备用方案:', error);
       }
     }
@@ -50,7 +49,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(window.location.href);
-        alert('链接已复制到剪贴板！');
+        alert('分析报告链接已复制到剪贴板！');
       } else {
         // 更老的浏览器备用方案
         const textArea = document.createElement('textarea');
@@ -64,10 +63,9 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
         
         try {
           document.execCommand('copy');
-          alert('链接已复制到剪贴板！');
+          alert('分析报告链接已复制到剪贴板！');
         } catch (err) {
           console.error('复制失败:', err);
-          // 最后的备用方案：显示链接让用户手动复制
           prompt('请手动复制以下链接:', window.location.href);
         } finally {
           document.body.removeChild(textArea);
@@ -75,10 +73,10 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
       }
     } catch (error) {
       console.error('复制到剪贴板失败:', error);
-      // 最后的备用方案：显示链接让用户手动复制
       prompt('请手动复制以下链接:', window.location.href);
     }
   };
+
 
   // 显示加载状态
   if (loading) {
@@ -216,77 +214,6 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
 
   return (
     <div className="space-y-6">
-      {/* 报告头部 */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onBackToInput}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              ← 返回设置
-            </button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                ETF网格交易策略分析报告
-              </h1>
-              <p className="text-gray-600">
-                {etf_info?.code} {etf_info?.name} - {new Date().toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={handleShare}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Share2 className="w-4 h-4" />
-              分享
-            </button>
-          </div>
-        </div>
-
-        {/* ETF基础信息 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">
-              ¥{etf_info?.current_price?.toFixed(3)}
-            </div>
-            <div className={`text-sm ${etf_info?.change_pct >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-              {etf_info?.change_pct >= 0 ? '+' : ''}{etf_info?.change_pct?.toFixed(2)}%
-            </div>
-            <div className="text-xs text-gray-500">当前价格</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-semibold text-gray-900">
-              {suitability_evaluation?.total_score || 0}/100
-            </div>
-            <div className={`text-sm px-2 py-1 rounded-full inline-flex items-center gap-1 ${getSuitabilityColor(suitability_evaluation?.total_score || 0)}`}>
-              {getSuitabilityIcon(suitability_evaluation?.total_score || 0)}
-              {suitability_evaluation?.conclusion || '未知'}
-            </div>
-            <div className="text-xs text-gray-500">适宜度评分</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-semibold text-gray-900">
-              {grid_strategy?.grid_config?.count || 0}个
-            </div>
-            <div className="text-sm text-gray-600">
-              {grid_strategy?.grid_config?.type || '未知'}网格
-            </div>
-            <div className="text-xs text-gray-500">网格配置</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-semibold text-gray-900">
-              {backtest_result?.performance?.annual_return >= 0 ? '+' : ''}{((backtest_result?.performance?.annual_return || 0) * 100).toFixed(1)}%
-            </div>
-            <div className="text-sm text-gray-600">
-              预期年化收益
-            </div>
-            <div className="text-xs text-gray-500">基于历史回测</div>
-          </div>
-        </div>
-      </div>
 
       {/* 标签页导航 */}
       <div className="bg-white rounded-xl shadow-lg">

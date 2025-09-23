@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import ParameterForm from './components/ParameterForm';
 import AnalysisReport from './components/AnalysisReport';
+import AnalysisPage from './components/AnalysisPage';
+import AnalysisHistory from './components/AnalysisHistory';
 import { analyzeETF } from './services/api';
-import { Waypoints, Cpu, Target, TrendingUp, Github, ThermometerSun } from 'lucide-react';
+import { generateAnalysisURL } from './utils/urlParams';
+import { Waypoints, Cpu, Target, TrendingUp, Github, ThermometerSun, Share2 } from 'lucide-react';
 import './App.css';
 
 function App() {
@@ -12,8 +16,15 @@ function App() {
   const [currentStep, setCurrentStep] = useState('input'); // 'input' | 'analysis'
   const parameterFormRef = useRef(null);
 
-  // 处理分析请求
+  // 处理分析请求 - 跳转到分析页面
   const handleAnalysis = async (parameters) => {
+    // 生成分析页面URL并跳转
+    const analysisUrl = generateAnalysisURL(parameters.etfCode, parameters);
+    window.location.href = analysisUrl;
+  };
+
+  // 原有的分析处理逻辑（用于首页展示）
+  const handleAnalysisInPlace = async (parameters) => {
     setLoading(true);
     setCurrentStep('analysis');
     
@@ -44,8 +55,61 @@ function App() {
   };
 
   // 重新分析
-  const handleReAnalysis = (parameters) => {
-    handleAnalysis(parameters);
+  const handleReAnalysisInPlace = (parameters) => {
+    handleAnalysisInPlace(parameters);
+  };
+
+  // 分享功能处理函数
+  const handleShare = async () => {
+    const shareData = {
+      title: 'ETF网格设计工具 - 智能交易策略分析',
+      text: '使用这个工具来设计和分析ETF投资网格策略，基于ATR算法的专业分析系统',
+      url: window.location.href,
+    };
+
+    // 优先使用Web Share API
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (error) {
+        // 如果用户取消分享或其他错误，继续执行备用方案
+        console.log('分享取消或失败，使用备用方案:', error);
+      }
+    }
+
+    // 备用方案：复制链接到剪贴板
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('链接已复制到剪贴板！');
+      } else {
+        // 更老的浏览器备用方案
+        const textArea = document.createElement('textarea');
+        textArea.value = window.location.href;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          document.execCommand('copy');
+          alert('链接已复制到剪贴板！');
+        } catch (err) {
+          console.error('复制失败:', err);
+          // 最后的备用方案：显示链接让用户手动复制
+          prompt('请手动复制以下链接:', window.location.href);
+        } finally {
+          document.body.removeChild(textArea);
+        }
+      }
+    } catch (error) {
+      console.error('复制到剪贴板失败:', error);
+      // 最后的备用方案：显示链接让用户手动复制
+      prompt('请手动复制以下链接:', window.location.href);
+    }
   };
 
   // 滚动到策略参数设置
@@ -59,8 +123,9 @@ function App() {
   };
 
   return (
-    <Router>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <HelmetProvider>
+      <Router>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
         {/* 顶部导航 */}
         <header className="bg-white shadow-sm border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -87,100 +152,118 @@ function App() {
                   <Github className="w-4 h-4" />
                   <span className="text-sm">GitHub</span>
                 </a>
+              
+                <button 
+                  onClick={handleShare}
+                  className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Share2 className="w-4 h-4" />
+                  分享
+                </button>
+                
               </div>
             </div>
           </div>
         </header>
 
-        {/* 主要内容区域 */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Routes>
-            <Route path="/" element={
-              <div className="space-y-8">
-                {/* 系统介绍 */}
-                {currentStep === 'input' && (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                    <div className="text-center mb-8">
-                      
-                      <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                        智能ETF网格交易策略分析
-                      </h2>
-                      <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                        基于ATR算法的专业网格交易策略设计系统，通过分析ETF历史数据，
-                        结合您的投资偏好，自动计算最适合的网格交易参数，并提供详细的策略分析和收益预测。
-                      </p>
-                    </div>
-
-                    {/* 核心特性 */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                      <div className="text-center p-6 bg-blue-50 rounded-lg">
-                        <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Cpu className="w-6 h-6 text-blue-700" />
-                        </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">ATR算法核心</h3>
-                        <p className="text-sm text-gray-600">
-                          采用平均真实波幅算法，动态适应市场波动，考虑跳空因素，比传统方法更精确
+          {/* 主要内容区域 */}
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <Routes>
+              <Route path="/" element={
+                <div className="space-y-8">
+                  {/* 系统介绍 */}
+                  {currentStep === 'input' && (
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                      <div className="text-center mb-8">
+                        
+                        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                          智能ETF网格交易策略分析
+                        </h2>
+                        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                          基于ATR算法的专业网格交易策略设计系统，通过分析ETF历史数据，
+                          结合您的投资偏好，自动计算最适合的网格交易参数，并提供详细的策略分析和收益预测。
                         </p>
                       </div>
 
-                      <div className="text-center p-6 bg-green-50 rounded-lg">
-                        <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <ThermometerSun className="w-6 h-6 text-green-700" />
+                      {/* 核心特性 */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div className="text-center p-6 bg-blue-50 rounded-lg">
+                          <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Cpu className="w-6 h-6 text-blue-700" />
+                          </div>
+                          <h3 className="font-semibold text-gray-900 mb-2">ATR算法核心</h3>
+                          <p className="text-sm text-gray-600">
+                            采用平均真实波幅算法，动态适应市场波动，考虑跳空因素，比传统方法更精确
+                          </p>
                         </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">标的适宜度评估</h3>
-                        <p className="text-sm text-gray-600">
-                          振幅、波动率、市场特征、流动性四个维度量化评分，科学评估标的适宜度
-                        </p>
+
+                        <div className="text-center p-6 bg-green-50 rounded-lg">
+                          <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <ThermometerSun className="w-6 h-6 text-green-700" />
+                          </div>
+                          <h3 className="font-semibold text-gray-900 mb-2">标的适宜度评估</h3>
+                          <p className="text-sm text-gray-600">
+                            振幅、波动率、市场特征、流动性四个维度量化评分，科学评估标的适宜度
+                          </p>
+                        </div>
+
+                        <div className="text-center p-6 bg-purple-50 rounded-lg">
+                          <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <TrendingUp className="w-6 h-6 text-purple-700" />
+                          </div>
+                          <h3 className="font-semibold text-gray-900 mb-2">智能化策略</h3>
+                          <p className="text-sm text-gray-600">
+                            智能网格参数计算、资金分配优化、历史回测分析，提供完整策略方案
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="text-center p-6 bg-purple-50 rounded-lg">
-                        <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <TrendingUp className="w-6 h-6 text-purple-700" />
-                        </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">智能化策略</h3>
-                        <p className="text-sm text-gray-600">
-                          智能网格参数计算、资金分配优化、历史回测分析，提供完整策略方案
-                        </p>
+                      {/* 开始分析按钮 */}
+                      <div className="text-center">
+                        <button
+                          onClick={scrollToParameterForm}
+                          className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+                        >
+                          <Target className="w-5 h-5" />
+                          选择标的，即刻分析
+                        </button>
                       </div>
                     </div>
+                  )}
 
-                    {/* 开始分析按钮 */}
-                    <div className="text-center">
-                      <button
-                        onClick={scrollToParameterForm}
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
-                      >
-                        <Target className="w-5 h-5" />
-                        选择标的，即刻分析
-                      </button>
+                  {/* 参数输入表单 */}
+                  {currentStep === 'input' && (
+                    <div ref={parameterFormRef}>
+                      <ParameterForm 
+                        onAnalysis={handleAnalysis}
+                        loading={loading}
+                      />
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* 参数输入表单 */}
-                {currentStep === 'input' && (
-                  <div ref={parameterFormRef}>
-                    <ParameterForm 
-                      onAnalysis={handleAnalysis}
+                  {/* 分析历史 */}
+                  {currentStep === 'input' && (
+                    <AnalysisHistory className="mt-8" />
+                  )}
+
+                  {/* 分析报告 */}
+                  {currentStep === 'analysis' && (
+                    <AnalysisReport
+                      data={analysisData}
                       loading={loading}
+                      onBackToInput={handleBackToInput}
+                      onReAnalysis={handleReAnalysisInPlace}
                     />
-                  </div>
-                )}
-
-                {/* 分析报告 */}
-                {currentStep === 'analysis' && (
-                  <AnalysisReport
-                    data={analysisData}
-                    loading={loading}
-                    onBackToInput={handleBackToInput}
-                    onReAnalysis={handleReAnalysis}
-                  />
-                )}
-              </div>
-            } />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
+                  )}
+                </div>
+              } />
+              
+              {/* 分析页面路由 */}
+              <Route path="/analysis/:etfCode" element={<AnalysisPage />} />
+              
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
 
         {/* 底部信息 */}
         <footer className="bg-white border-t border-gray-200 mt-16">
@@ -226,9 +309,10 @@ function App() {
               </p>
             </div>
           </div>
-        </footer>
-      </div>
-    </Router>
+          </footer>
+        </div>
+      </Router>
+    </HelmetProvider>
   );
 }
 
