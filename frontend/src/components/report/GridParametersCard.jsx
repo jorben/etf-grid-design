@@ -180,7 +180,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <Hash className="w-4 h-4 text-gray-600" />
@@ -239,18 +239,19 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
             </div>
           </div>
 
-        </div>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <DollarSign className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">预估单笔收益</span>
+            </div>
+            <div className="text-xl font-bold text-gray-900">
+              {formatAmount(fund_allocation.expected_profit_per_trade)}
+            </div>
+            <div className="text-xs text-gray-600">
+              按网格间距和单笔数量计算
+            </div>
+          </div>
 
-        {/* 预期收益信息 */}
-        <div className="mt-4 p-4 bg-green-50 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <DollarSign className="w-4 h-4 text-green-600" />
-            <span className="font-medium text-green-900">预期收益估算</span>
-          </div>
-          <div className="text-sm text-green-800">
-            <p>预期单笔收益: {formatAmount(fund_allocation.expected_profit_per_trade)}</p>
-            <p className="mt-1">基于平均网格间距和单笔数量计算</p>
-          </div>
         </div>
 
         {/* 单笔数量风险提示 */}
@@ -292,14 +293,14 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
       </div>
 
       {/* 网格价格水平 */}
-      {showDetailed && gridStrategy.price_levels && (
+      {gridStrategy.price_levels && (
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-indigo-100 rounded-lg">
               <BarChart3 className="w-5 h-5 text-indigo-600" />
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900">网格价格水平</h4>
+              <h4 className="font-semibold text-gray-900">网格买卖点位</h4>
               <p className="text-sm text-gray-600">详细的买卖价格点位设置</p>
             </div>
           </div>
@@ -319,7 +320,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
                 >
                   <div className="font-medium">¥{price.toFixed(3)}</div>
                   <div className="text-xs opacity-75">
-                    {price < current_price ? '买入' : price > current_price ? '卖出' : '当前'}
+                    {price < current_price ? '买入' : price > current_price ? '卖出' : '基准'}
                   </div>
                 </div>
               ))}
