@@ -84,7 +84,9 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
     <div className="space-y-6">
       {/* 总体评分 */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
+        
         <div className="flex items-center justify-between mb-4">
+          
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-200 rounded-lg">
               <Target className="w-6 h-6 text-blue-700" />
@@ -262,7 +264,7 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
               <BarChart3 className="w-4 h-4 text-purple-600" />
               <span className="font-medium text-gray-900">分析范围</span>
             </div>
-            <div className="text-sm text-gray-900 font-medium">
+            <div className="text-sm px-2 py-1 rounded-full inline-block bg-green-100 text-green-800">
               {dataQuality.analysis_days}天
             </div>
             <p className="text-xs text-gray-600 mt-1">历史数据分析期间</p>
