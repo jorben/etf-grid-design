@@ -12,7 +12,7 @@ import {
   Percent,
   Grid3X3,
   PieChart,
-  LineChart,
+
   Download,
   Share2,
   Eye,
@@ -22,7 +22,7 @@ import SuitabilityCard from './report/SuitabilityCard';
 import GridParametersCard from './report/GridParametersCard';
 import BacktestResultCard from './report/BacktestResultCard';
 import StrategyRationaleCard from './report/StrategyRationaleCard';
-import PriceChart from './charts/PriceChart';
+
 import LoadingSpinner from './LoadingSpinner';
 
 const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
@@ -161,7 +161,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
     { id: 'suitability', label: '适合度评估', icon: <Target className="w-4 h-4" /> },
     { id: 'strategy', label: '网格策略', icon: <Grid3X3 className="w-4 h-4" /> },
     { id: 'backtest', label: '回测结果', icon: <BarChart3 className="w-4 h-4" /> },
-    { id: 'chart', label: '价格图表', icon: <LineChart className="w-4 h-4" /> }
+
   ];
 
   return (
@@ -390,14 +390,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
             />
           )}
 
-          {/* 价格图表标签页 */}
-          {activeTab === 'chart' && (
-            <PriceChart 
-              etfInfo={etf_info}
-              gridStrategy={grid_strategy}
-              backtestResult={backtest_result}
-            />
-          )}
+
         </div>
       </div>
 
