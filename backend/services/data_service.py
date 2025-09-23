@@ -37,25 +37,7 @@ class DataService:
         
         # 初始化缓存（TTL=1小时）
         self.cache = TTLCache(maxsize=1000, ttl=3600)
-        
-        # 热门ETF列表
-        self.popular_etfs = [
-            {'code': '510300', 'name': '沪深300ETF', 'type': '宽基指数'},
-            {'code': '510500', 'name': '中证500ETF', 'type': '宽基指数'},
-            {'code': '159919', 'name': '沪深300ETF', 'type': '宽基指数'},
-            {'code': '159915', 'name': '创业板ETF', 'type': '宽基指数'},
-            {'code': '512100', 'name': '中证1000ETF', 'type': '宽基指数'},
-            {'code': '515050', 'name': '5G ETF', 'type': '行业主题'},
-            {'code': '512880', 'name': '证券ETF', 'type': '行业主题'},
-            {'code': '512170', 'name': '医疗ETF', 'type': '行业主题'},
-            {'code': '515790', 'name': '光伏ETF', 'type': '行业主题'},
-            {'code': '516160', 'name': '新能源ETF', 'type': '行业主题'},
-            {'code': '159941', 'name': '纳斯达克100ETF', 'type': '海外指数'},
-            {'code': '513100', 'name': '纳斯达克ETF', 'type': '海外指数'},
-            {'code': '518880', 'name': '黄金ETF', 'type': '商品'},
-            {'code': '159934', 'name': '黄金ETF', 'type': '商品'},
-            {'code': '511010', 'name': '国债ETF', 'type': '债券'}
-        ]
+
     
     def get_fund_basic(self, code: str) -> Dict:
         """获取基金基础信息"""
@@ -146,35 +128,7 @@ class DataService:
         except Exception as e:
             logger.error(f"获取日线数据失败 {code}: {str(e)}")
             return pd.DataFrame()
-    
-    def get_popular_etfs(self) -> List[Dict]:
-        """获取热门ETF列表"""
-        return self.popular_etfs
-    
-    def search_etf(self, keyword: str) -> List[Dict]:
-        """搜索ETF"""
-        try:
-            # 使用Tushare搜索
-            df = self.pro.fund_basic(market='E')  # ETF基金
-            if df.empty:
-                return []
-            
-            # 按名称或代码搜索
-            mask = df['name'].str.contains(keyword, na=False) | df['ts_code'].str.contains(keyword, na=False)
-            results = df[mask].head(10)
-            
-            return [
-                {
-                    'code': row['ts_code'][:6],
-                    'name': row['name'],
-                    'type': row.get('fund_type', 'ETF')
-                }
-                for _, row in results.iterrows()
-            ]
-            
-        except Exception as e:
-            logger.error(f"搜索ETF失败: {str(e)}")
-            return []
+
     
     def _convert_to_ts_code(self, code: str) -> str:
         """将6位ETF代码转换为Tushare格式"""
