@@ -77,31 +77,87 @@ class GridStrategy:
             logger.error(f"底仓比例计算失败: {str(e)}")
             return 0.25  # 默认25%
     
-    def calculate_grid_count(self, frequency_preference: str) -> int:
+    def calculate_optimal_step_size(self, atr_ratio: float, current_price: float, 
+                                   risk_preference: str) -> Tuple[float, float]:
         """
-        根据交易频率偏好计算网格数量
+        基于ATR计算最优步长
         
         Args:
+            atr_ratio: ATR比率
+            current_price: 当前价格
+            risk_preference: 风险偏好
             frequency_preference: 交易频率偏好
+            
+        Returns:
+            (step_size, step_ratio)
+        """
+        try:
+            # ATR 基础步长系数（根据风险偏好）
+            risk_multipliers = {
+                '保守': 1.0,   # 1.0倍ATR作为步长，步长较大，交易频次较低
+                '稳健': 0.8,   # 0.8倍ATR作为步长，平衡交易频次
+                '激进': 0.6    # 0.6倍ATR作为步长，步长较小，交易频次较高
+            }
+            
+            risk_multiplier = risk_multipliers.get(risk_preference, 1)
+            
+            # 计算基于ATR的步长
+            atr_value = atr_ratio * current_price
+            optimal_step_size = atr_value * risk_multiplier
+            optimal_step_ratio = optimal_step_size / current_price
+            
+            # 确保步长在合理范围内（0.5% - 5%）
+            min_step_ratio = 0.005  # 0.2%
+            max_step_ratio = 0.05   # 5%
+            optimal_step_ratio = max(min_step_ratio, min(max_step_ratio, optimal_step_ratio))
+            optimal_step_size = optimal_step_ratio * current_price
+            
+            logger.info(f"ATR步长计算: ATR比率{atr_ratio:.1%}, 风险系数{risk_multiplier}, "
+                       f"最优步长{optimal_step_size:.3f}({optimal_step_ratio:.1%})")
+            
+            return optimal_step_size, optimal_step_ratio
+            
+        except Exception as e:
+            logger.error(f"ATR步长计算失败: {str(e)}")
+            # 返回默认步长（1%）
+            default_step_ratio = 0.01
+            return current_price * default_step_ratio, default_step_ratio
+    
+    def calculate_grid_count_from_step(self, price_lower: float, price_upper: float, 
+                                      step_size: float, grid_type: str) -> int:
+        """
+        基于步长计算网格数量
+        
+        Args:
+            price_lower: 价格下边界
+            price_upper: 价格上边界
+            step_size: 网格步长
+            grid_type: 网格类型
             
         Returns:
             网格数量
         """
         try:
-            frequency_mapping = {
-                '低频': np.random.randint(20, 31),   # 20-30个网格
-                '中频': np.random.randint(40, 61),   # 40-60个网格
-                '高频': np.random.randint(80, 101)   # 80-100个网格
-            }
+            if grid_type == '等差':
+                # 等差网格：网格数量 = 价格区间 / 步长
+                grid_count = int((price_upper - price_lower) / step_size)
+            else:
+                # 等比网格：基于步长比例计算
+                avg_price = (price_lower + price_upper) / 2
+                step_ratio = step_size / avg_price
+                grid_count = int(np.log(price_upper / price_lower) / np.log(1 + step_ratio))
             
-            grid_count = frequency_mapping.get(frequency_preference, 50)
-            logger.info(f"网格数量: {grid_count}个 (频率偏好: {frequency_preference})")
+            # 限制网格数量在合理范围内（10-150个）
+            grid_count = max(10, min(150, grid_count))
+            
+            logger.info(f"基于步长计算网格数量: {grid_type}网格, 步长{step_size:.3f}, 数量{grid_count}个")
             
             return grid_count
             
         except Exception as e:
-            logger.error(f"网格数量计算失败: {str(e)}")
+            logger.error(f"基于步长计算网格数量失败: {str(e)}")
             return 50  # 默认50个
+    
     
     def calculate_price_levels(self, price_lower: float, price_upper: float, 
                              grid_count: int, grid_type: str) -> List[float]:
@@ -344,7 +400,7 @@ class GridStrategy:
                                 risk_preference: str, atr_analysis: Dict,
                                 market_indicators: Dict) -> Dict:
         """
-        计算完整的网格策略参数
+        计算完整的网格策略参数（基于ATR智能步长）
         
         Args:
             df: 历史数据
@@ -362,45 +418,56 @@ class GridStrategy:
             current_price = float(df.iloc[-1]['close'])
             atr_ratio = atr_analysis['current_atr_ratio']
             
-            # 1. 计算价格区间
+            # 1. 计算价格区间（基于ATR和风险偏好）
             price_lower, price_upper = self.atr_engine.calculate_price_range(
                 current_price, atr_ratio, risk_preference
             )
             
-            # 2. 计算网格数量
-            grid_count = self.calculate_grid_count(frequency_preference)
+            # 2. 基于ATR计算最优步长（核心改进）
+            step_size, step_ratio = self.calculate_optimal_step_size(
+                atr_ratio, current_price, risk_preference
+            )
             
-            # 3. 计算价格水平
+            # 3. 基于步长计算网格数量（而不是先定义数量）
+            grid_count = self.calculate_grid_count_from_step(
+                price_lower, price_upper, step_size, grid_type
+            )
+            
+            # 4. 根据实际步长和网格数量重新调整价格区间（确保一致性）
+            if grid_type == '等差':
+                # 等差网格：确保价格区间与步长*数量一致
+                total_range = step_size * grid_count
+                price_center = current_price
+                price_lower = price_center - total_range / 2
+                price_upper = price_center + total_range / 2
+            else:
+                # 等比网格：基于步长比例调整
+                total_ratio = step_ratio * grid_count
+                price_lower = current_price * (1 - total_ratio / 2)
+                price_upper = current_price * (1 + total_ratio / 2)
+            
+            # 5. 计算价格水平
             price_levels = self.calculate_price_levels(
                 price_lower, price_upper, grid_count, grid_type
             )
             
-            # 4. 计算底仓比例
+            # 6. 计算底仓比例
             base_position_ratio = self.calculate_base_position_ratio(
                 atr_ratio, risk_preference, 
                 market_indicators['adx_value'], 
                 market_indicators['volatility']
             )
             
-            # 5. 计算资金分配
+            # 7. 计算资金分配
             fund_allocation = self.calculate_fund_allocation(
                 total_capital, base_position_ratio, grid_count, price_levels
             )
             
-            # 6. 计算网格步长信息
-            if len(price_levels) > 1:
-                if grid_type == '等差':
-                    step_size = (price_upper - price_lower) / grid_count
-                    step_ratio = step_size / current_price
-                else:
-                    step_ratio = (price_upper / price_lower) ** (1 / grid_count) - 1
-                    step_size = current_price * step_ratio
-            else:
-                step_size = 0
-                step_ratio = 0
-            
-            # 7. 计算价格区间比例
+            # 8. 计算价格区间比例
             price_range_ratio = (price_upper - price_lower) / current_price
+            
+            # 9. ATR评分
+            atr_score, atr_description = self.atr_engine.get_atr_score(atr_ratio)
             
             result = {
                 'current_price': current_price,
@@ -420,11 +487,20 @@ class GridStrategy:
                 'risk_preference': risk_preference,
                 'frequency_preference': frequency_preference,
                 'atr_based': True,
-                'calculation_method': 'ATR算法 + 风险偏好调整'
+                'atr_score': atr_score,
+                'atr_description': atr_description,
+                'calculation_method': 'ATR智能步长算法',
+                'calculation_logic': {
+                    'step1': f'ATR比率: {atr_ratio:.1%}',
+                    'step2': f'基于ATR计算最优步长: {step_size:.3f} ({step_ratio:.1%})',
+                    'step3': f'基于步长计算网格数量: {grid_count}个',
+                    'step4': f'调整价格区间: [{price_lower:.3f}, {price_upper:.3f}]',
+                    'step5': f'生成{len(price_levels)}个价格水平'
+                }
             }
             
-            logger.info(f"网格策略参数计算完成: 区间[{price_lower:.3f}, {price_upper:.3f}], "
-                       f"{grid_count}个网格, {grid_type}")
+            logger.info(f"ATR智能网格策略计算完成: ATR步长{step_size:.3f}({step_ratio:.1%}), "
+                       f"{grid_count}个{grid_type}网格, 区间[{price_lower:.3f}, {price_upper:.3f}]")
             
             return result
             
