@@ -153,9 +153,7 @@ def analyze_etf_strategy():
             risk_preference=risk_preference
         )
         
-        # 生成报告摘要
-        report_summary = etf_service.generate_report_summary(analysis_result)
-        analysis_result['report_summary'] = report_summary
+
         
         logger.info(f"ETF策略分析完成: {etf_code}, "
                    f"适宜度评分{analysis_result['suitability_evaluation']['total_score']}")

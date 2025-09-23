@@ -15,8 +15,7 @@ import {
 
   Download,
   Share2,
-  Eye,
-  EyeOff
+  Eye
 } from 'lucide-react';
 import SuitabilityCard from './report/SuitabilityCard';
 import GridParametersCard from './report/GridParametersCard';
@@ -27,7 +26,6 @@ import LoadingSpinner from './LoadingSpinner';
 
 const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [showDetailedReport, setShowDetailedReport] = useState(false);
 
   // 显示加载状态
   if (loading) {
@@ -71,7 +69,6 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
     backtest_result,
     strategy_rationale,
     adjustment_suggestions,
-    report_summary,
     input_parameters
   } = data;
 
@@ -186,13 +183,6 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowDetailedReport(!showDetailedReport)}
-              className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
-            >
-              {showDetailedReport ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              {showDetailedReport ? '简化视图' : '详细报告'}
-            </button>
             <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
               <Share2 className="w-4 h-4" />
               分享
@@ -367,7 +357,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
             <SuitabilityCard 
               evaluation={suitability_evaluation}
               dataQuality={data_quality}
-              showDetailed={showDetailedReport}
+              showDetailed={true}
             />
           )}
 
@@ -376,7 +366,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
             <GridParametersCard 
               gridStrategy={grid_strategy}
               inputParameters={input_parameters}
-              showDetailed={showDetailedReport}
+              showDetailed={true}
             />
           )}
 
@@ -386,7 +376,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
               backtestResult={backtest_result}
               strategyRationale={strategy_rationale}
               adjustmentSuggestions={adjustment_suggestions}
-              showDetailed={showDetailedReport}
+              showDetailed={true}
             />
           )}
 
@@ -394,20 +384,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
         </div>
       </div>
 
-      {/* 详细报告文本 */}
-      {showDetailedReport && (
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <Download className="w-5 h-5" />
-            完整策略报告
-          </h3>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono">
-              {report_summary}
-            </pre>
-          </div>
-        </div>
-      )}
+
 
       {/* 免责声明 */}
       <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
