@@ -132,18 +132,17 @@ const ParameterForm = ({ onAnalysis, loading }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* ETF标的选择 */}
         <div>
-          {/* 标题和热门ETF - 响应式布局 */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-3">
+          <div className="flex justify-between items-center mb-3">
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
               <Search className="w-4 h-4" />
               ETF标的选择
             </label>
             
-            {/* 热门ETF - 在小屏幕上换行，大屏幕上靠右对齐 */}
+            {/* 热门ETF - 靠右对齐 */}
             <div className="flex items-center">
-              <span className="text-xs text-gray-500 mr-2">热门ETF:</span>
+              <span className="text-xs text-gray-500 mr-2">热门ETF：</span>
               <div className="flex flex-wrap gap-2">
-                {['510300', '510500', '159915', '588000', '512480', '159819', '159742', '159941'].map(code => {
+                {['510300', '510500', '159915', '588000', '512480', '159819'].map(code => {
                   const etf = popularETFs.find(e => e.code === code);
                   return (
                     <button
