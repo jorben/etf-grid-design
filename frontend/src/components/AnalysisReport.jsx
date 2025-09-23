@@ -13,7 +13,6 @@ import {
   Grid3X3,
   PieChart,
   Database,
-  Download,
   Share2,
   ThermometerSun,
   Eye
@@ -188,10 +187,6 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
               <Share2 className="w-4 h-4" />
               分享
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <Download className="w-4 h-4" />
-              导出PDF
-            </button>
           </div>
         </div>
 
@@ -282,7 +277,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
                     <div className="p-2 bg-orange-200 rounded-lg">
                       <Target className="w-5 h-5 text-orange-700" />
                     </div>
-                    <h3 className="font-semibold text-orange-900">标的信息</h3>
+                    <h3 className="font-semibold text-orange-900">所选标的</h3>
                   </div>
                   <div className="text-2xl font-bold text-orange-900 mb-1">
                     {etf_info?.code || '未知'}
@@ -366,16 +361,18 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-white p-4 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Calendar className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium text-gray-900">数据时效性</span>
-                    </div>
-                    <div className={`text-sm px-2 py-1 rounded-full inline-block ${
-                      data_quality?.freshness === '优秀' ? 'bg-green-100 text-green-800' :
-                      data_quality?.freshness === '良好' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {data_quality?.freshness || '未知'}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-blue-600" />
+                        <span className="font-medium text-gray-900">数据时效性</span>
+                      </div>
+                      <div className={`text-sm px-2 py-1 rounded-full ${
+                        data_quality?.freshness === '优秀' ? 'bg-green-100 text-green-800' :
+                        data_quality?.freshness === '良好' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {data_quality?.freshness || '未知'}
+                      </div>
                     </div>
                     <p className="text-xs text-gray-600 mt-1">{data_quality?.freshness_desc || '暂无描述'}</p>
                     {data_quality?.latest_date && (
@@ -386,16 +383,18 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
                   </div>
 
                   <div className="bg-white p-4 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                      <span className="font-medium text-gray-900">数据完整性</span>
-                    </div>
-                    <div className={`text-sm px-2 py-1 rounded-full inline-block ${
-                      data_quality?.completeness === '优秀' ? 'bg-green-100 text-green-800' :
-                      data_quality?.completeness === '良好' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {data_quality?.completeness || '未知'}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <span className="font-medium text-gray-900">数据完整性</span>
+                      </div>
+                      <div className={`text-sm px-2 py-1 rounded-full ${
+                        data_quality?.completeness === '优秀' ? 'bg-green-100 text-green-800' :
+                        data_quality?.completeness === '良好' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {data_quality?.completeness || '未知'}
+                      </div>
                     </div>
                     <p className="text-xs text-gray-600 mt-1">{data_quality?.completeness_desc || '暂无描述'}</p>
                     {data_quality?.total_records && (
@@ -406,12 +405,14 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
                   </div>
 
                   <div className="bg-white p-4 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <BarChart3 className="w-4 h-4 text-purple-600" />
-                      <span className="font-medium text-gray-900">分析范围</span>
-                    </div>
-                    <div className="text-sm px-2 py-1 rounded-full inline-block bg-green-100 text-green-800">
-                      {data_quality?.analysis_days || 0}天
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <BarChart3 className="w-4 h-4 text-purple-600" />
+                        <span className="font-medium text-gray-900">分析范围</span>
+                      </div>
+                      <div className="text-sm px-2 py-1 rounded-full bg-green-100 text-green-800">
+                        {data_quality?.analysis_days || 0}天
+                      </div>
                     </div>
                     <p className="text-xs text-gray-600 mt-1">历史数据分析期间</p>
                     {data_quality?.start_date && (
