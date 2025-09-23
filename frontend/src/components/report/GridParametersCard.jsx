@@ -42,48 +42,74 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
 
   return (
     <div className="space-y-6">
-      {/* 策略概览 */}
-      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-lg border border-purple-200">
+
+      {/* 资金分配策略 */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-purple-200 rounded-lg">
-            <Grid3X3 className="w-6 h-6 text-purple-700" />
+          <div className="p-2 bg-orange-100 rounded-lg">
+            <PieChart className="w-5 h-5 text-orange-600" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-purple-900">为您定制的网格策略</h3>
-            <p className="text-purple-700">基于ATR算法的智能参数计算</p>
+            <h4 className="font-semibold text-gray-900">智能资金分配</h4>
+            <p className="text-sm text-gray-600">底仓与网格资金的优化配置</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Target className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-medium text-gray-700">风险偏好</span>
-            </div>
-            <div className="text-lg font-bold text-gray-900">{risk_preference}</div>
-            <div className="text-xs text-gray-600">投资风格</div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Hash className="w-4 h-4 text-green-600" />
-              <span className="text-sm font-medium text-gray-700">网格类型</span>
-            </div>
-            <div className="text-lg font-bold text-gray-900">{grid_config.type}</div>
-            <div className="text-xs text-gray-600">{grid_config.count}个网格</div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <DollarSign className="w-4 h-4 text-orange-600" />
-              <span className="text-sm font-medium text-gray-700">总投资</span>
-            </div>
-            <div className="text-lg font-bold text-gray-900">
+        {/* 资金分配概览 */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+          
+          <div className="text-center p-4 bg-orange-50 rounded-lg">
+            <div className="text-2xl font-bold text-orange-600 mb-1">
               {formatAmount(inputParameters?.total_capital || inputParameters?.totalCapital || 0)}
             </div>
-            <div className="text-xs text-gray-600">投资资金</div>
+            <div className="text-sm text-orange-700 font-medium">投资资金</div>
+            <div className="text-xs text-gray-600 mt-1">
+              总投资资金量
+            </div>
+          </div>
+
+          <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600 mb-1">
+              {formatAmount(fund_allocation.base_position_amount)}
+            </div>
+            <div className="text-sm text-blue-700 font-medium">底仓资金</div>
+            <div className="text-xs text-gray-600 mt-1">
+              {formatPercent(fund_allocation.base_position_ratio)} 风险缓冲
+            </div>
+          </div>
+
+          <div className="text-center p-4 bg-green-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-600 mb-1">
+              {formatAmount(fund_allocation.grid_trading_amount)}
+            </div>
+            <div className="text-sm text-green-700 font-medium">网格资金</div>
+            <div className="text-xs text-gray-600 mt-1">
+              用于网格交易
+            </div>
+          </div>
+
+          
+          <div className="text-center p-4 bg-rose-50 rounded-lg">
+            <div className="text-2xl font-bold text-rose-600 mb-1">
+              {formatAmount(fund_allocation.reserve_amount)}
+            </div>
+            <div className="text-sm text-rose-700 font-medium">预留资金</div>
+            <div className="text-xs text-gray-600 mt-1">
+              预留5%保障流动性
+            </div>
+          </div>
+
+          <div className="text-center p-4 bg-purple-50 rounded-lg">
+            <div className="text-2xl font-bold text-purple-600 mb-1">
+              {formatPercent(fund_allocation.utilization_rate)}
+            </div>
+            <div className="text-sm text-purple-700 font-medium">资金利用率</div>
+            <div className="text-xs text-gray-600 mt-1">
+              实际投入比例
+            </div>
           </div>
         </div>
+
       </div>
 
       {/* 价格区间设置 */}
@@ -214,120 +240,6 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
           </div>
 
         </div>
-      </div>
-
-      {/* 资金分配策略 */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-orange-100 rounded-lg">
-            <PieChart className="w-5 h-5 text-orange-600" />
-          </div>
-          <div>
-            <h4 className="font-semibold text-gray-900">智能资金分配</h4>
-            <p className="text-sm text-gray-600">底仓与网格资金的优化配置</p>
-          </div>
-        </div>
-
-        {/* 资金分配概览 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600 mb-1">
-              {formatAmount(fund_allocation.base_position_amount)}
-            </div>
-            <div className="text-sm text-blue-700 font-medium">底仓资金</div>
-            <div className="text-xs text-gray-600 mt-1">
-              {formatPercent(fund_allocation.base_position_ratio)} 风险缓冲
-            </div>
-          </div>
-
-          <div className="text-center p-4 bg-green-50 rounded-lg">
-            <div className="text-2xl font-bold text-green-600 mb-1">
-              {formatAmount(fund_allocation.grid_trading_amount)}
-            </div>
-            <div className="text-sm text-green-700 font-medium">网格资金</div>
-            <div className="text-xs text-gray-600 mt-1">
-              用于网格交易
-            </div>
-          </div>
-
-          <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600 mb-1">
-              {formatPercent(fund_allocation.utilization_rate)}
-            </div>
-            <div className="text-sm text-purple-700 font-medium">资金利用率</div>
-            <div className="text-xs text-gray-600 mt-1">
-              实际投入比例
-            </div>
-          </div>
-        </div>
-
-        {/* 资金分配详情 */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h5 className="font-medium text-gray-900 mb-3">资金分配明细</h5>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
-            <div>
-              <span className="text-gray-600">总投资资金:</span>
-              <div className="font-medium text-gray-900">
-                {formatAmount(inputParameters?.total_capital || inputParameters?.totalCapital || 0)}
-              </div>
-            </div>
-            <div>
-              <span className="text-gray-600">底仓资金:</span>
-              <div className="font-medium text-gray-900">
-                {formatAmount(fund_allocation.base_position_amount)}
-              </div>
-            </div>
-            <div>
-              <span className="text-gray-600">网格资金:</span>
-              <div className="font-medium text-gray-900">
-                {formatAmount(fund_allocation.grid_trading_amount)}
-              </div>
-            </div>
-            <div>
-              <span className="text-gray-600">预留资金:</span>
-              <div className="font-medium text-gray-900">
-                {formatAmount(fund_allocation.reserve_amount)}
-              </div>
-            </div>
-          </div>
-          
-          {/* 单笔数量计算说明 */}
-          {fund_allocation.single_trade_quantity && (
-            <div className="border-t border-gray-200 pt-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Calculator className="w-4 h-4 text-blue-600" />
-                <span className="font-medium text-gray-900">单笔数量计算</span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-600">单笔数量:</span>
-                  <div className="font-medium text-blue-900">
-                    {fund_allocation.single_trade_quantity}股
-                  </div>
-                  <div className="text-xs text-gray-500">公式：网格金额÷网格数×2÷标的价格</div>
-                </div>
-                <div>
-                  <span className="text-gray-600">买入网格资金:</span>
-                  <div className="font-medium text-gray-900">
-                    {formatAmount(fund_allocation.buy_grid_fund || 0)}
-                  </div>
-                  <div className="text-xs text-gray-500">极端情况资金需求</div>
-                </div>
-                <div>
-                  <span className="text-gray-600">资金安全比例:</span>
-                  <div className={`font-medium ${
-                    fund_allocation.extreme_case_safe ? 'text-green-700' : 'text-red-700'
-                  }`}>
-                    {formatPercent(fund_allocation.buy_grid_safety_ratio || 0)}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {fund_allocation.extreme_case_safe ? '安全范围内' : '需要调整'}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* 预期收益信息 */}
         <div className="mt-4 p-4 bg-green-50 rounded-lg">
@@ -372,7 +284,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
                 }
               </p>
               <p className="mt-1">
-                <strong>风险控制：</strong>已预留{formatPercent(0.1)}安全边际，保障资金流动性
+                <strong>风险控制：</strong>已预留5%安全边际，保障资金流动性
               </p>
             </div>
           </div>

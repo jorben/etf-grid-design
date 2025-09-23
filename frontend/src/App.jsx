@@ -59,59 +59,6 @@ function App() {
     handleAnalysisInPlace(parameters);
   };
 
-  // 分享功能处理函数
-  const handleShare = async () => {
-    const shareData = {
-      title: 'ETF网格设计工具 - 智能交易策略分析',
-      text: '使用这个工具来设计和分析ETF投资网格策略，基于ATR算法的专业分析系统',
-      url: window.location.href,
-    };
-
-    // 优先使用Web Share API
-    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-      try {
-        await navigator.share(shareData);
-        return;
-      } catch (error) {
-        // 如果用户取消分享或其他错误，继续执行备用方案
-        console.log('分享取消或失败，使用备用方案:', error);
-      }
-    }
-
-    // 备用方案：复制链接到剪贴板
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(window.location.href);
-        alert('链接已复制到剪贴板！');
-      } else {
-        // 更老的浏览器备用方案
-        const textArea = document.createElement('textarea');
-        textArea.value = window.location.href;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
-        try {
-          document.execCommand('copy');
-          alert('链接已复制到剪贴板！');
-        } catch (err) {
-          console.error('复制失败:', err);
-          // 最后的备用方案：显示链接让用户手动复制
-          prompt('请手动复制以下链接:', window.location.href);
-        } finally {
-          document.body.removeChild(textArea);
-        }
-      }
-    } catch (error) {
-      console.error('复制到剪贴板失败:', error);
-      // 最后的备用方案：显示链接让用户手动复制
-      prompt('请手动复制以下链接:', window.location.href);
-    }
-  };
-
   // 滚动到策略参数设置
   const scrollToParameterForm = () => {
     if (parameterFormRef.current) {
@@ -152,14 +99,6 @@ function App() {
                   <Github className="w-4 h-4" />
                   <span className="text-sm">GitHub</span>
                 </a>
-              
-                <button 
-                  onClick={handleShare}
-                  className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Share2 className="w-4 h-4" />
-                  分享
-                </button>
                 
               </div>
             </div>
