@@ -143,20 +143,23 @@ const ParameterForm = ({ onAnalysis, loading }) => {
             <div className="flex items-center">
               <span className="text-xs text-gray-500 mr-2">热门ETF:</span>
               <div className="flex flex-wrap gap-2">
-                {popularETFs.filter(etf => ['510300', '510500', '159919', '159915', '512880'].includes(etf.code)).map(etf => (
-                  <button
-                    key={etf.code}
-                    type="button"
-                    onClick={() => selectPopularETF(etf.code)}
-                    className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                      etfCode === etf.code
-                        ? 'bg-blue-100 border-blue-300 text-blue-700'
-                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    {etf.code} {etf.name}
-                  </button>
-                ))}
+                {['510300', '510500', '159915', '588000', '512480', '159819', '159742', '159941'].map(code => {
+                  const etf = popularETFs.find(e => e.code === code);
+                  return (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => selectPopularETF(code)}
+                      className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                        etfCode === code
+                          ? 'bg-blue-100 border-blue-300 text-blue-700'
+                          : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      {code} {etf?.name || ''}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
