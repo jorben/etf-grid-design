@@ -35,9 +35,9 @@ class GridStrategy:
         try:
             # 基础比例（根据风险偏好）
             base_ratios = {
-                '保守': 0.35,  # 35%底仓，65%网格
-                '稳健': 0.25,  # 25%底仓，75%网格
-                '激进': 0.15   # 15%底仓，85%网格
+                '保守': 0.30,  # 35%底仓，65%网格
+                '稳健': 0.20,  # 25%底仓，75%网格
+                '激进': 0.10   # 15%底仓，85%网格
             }
             
             base_ratio = base_ratios.get(risk_preference, 0.25)
@@ -65,8 +65,8 @@ class GridStrategy:
             final_ratio = (base_ratio + atr_adjustment + 
                           trend_adjustment + volatility_adjustment)
             
-            # 限制在10%-50%之间
-            final_ratio = max(0.1, min(0.5, final_ratio))
+            # 限制在10%-70%之间
+            final_ratio = max(0.1, min(0.7, final_ratio))
             
             logger.info(f"底仓比例计算: 基础{base_ratio:.1%} + ATR调整{atr_adjustment:.1%} + "
                        f"趋势调整{trend_adjustment:.1%} + 波动率调整{volatility_adjustment:.1%} = {final_ratio:.1%}")
@@ -159,38 +159,73 @@ class GridStrategy:
             reserve_amount = total_capital * 0.05
             available_grid_amount = grid_trading_amount - reserve_amount
             
-            # 4. 每格资金分配（考虑价格权重）
+            # 4. 计算单笔数量（基于网格资金平均分配）
+            single_trade_quantity = self._calculate_single_trade_quantity(
+                available_grid_amount, grid_count, price_levels
+            )
+            
+            # 5. 每格资金分配（使用统一的单笔数量）
             grid_funds = []
-            if price_levels:
-                # 价格越低权重越高（买入更多份额）
-                weights = [1/price for price in price_levels[:-1]]  # 排除最高价格点
-                total_weight = sum(weights)
+            total_required_fund = 0
+            
+            if price_levels and single_trade_quantity > 0:
+                # 只计算买入网格（价格低于当前价格的网格）
+                current_price = sum(price_levels) / len(price_levels)  # 使用平均价格作为参考
+                buy_levels = [p for p in price_levels[:-1] if p <= current_price]
                 
                 for i, price in enumerate(price_levels[:-1]):
-                    weight = weights[i] / total_weight
-                    grid_fund = available_grid_amount * weight
-                    shares = int(grid_fund / price)  # 向下取整
+                    # 使用统一的单笔数量
+                    shares = single_trade_quantity
                     actual_fund = shares * price
+                    total_required_fund += actual_fund
                     
                     grid_funds.append({
                         'level': i + 1,
                         'price': round(price, 3),
-                        'allocated_fund': round(grid_fund, 2),
+                        'allocated_fund': round(actual_fund, 2),
                         'shares': shares,
                         'actual_fund': round(actual_fund, 2),
-                        'weight': round(weight, 4)
+                        'is_buy_level': price <= current_price
                     })
+                
+                # 验证极端情况：所有买入网格成交时的资金需求
+                buy_grid_total_fund = sum(gf['actual_fund'] for gf in grid_funds if gf['is_buy_level'])
+                
+                # 如果买入网格总资金超出可用资金，重新计算单笔数量
+                if buy_grid_total_fund > available_grid_amount:
+                    logger.warning(f"买入网格总资金{buy_grid_total_fund:.0f}超出可用资金{available_grid_amount:.0f}，重新计算单笔数量")
+                    single_trade_quantity = self._recalculate_safe_quantity(
+                        available_grid_amount, buy_levels
+                    )
+                    
+                    # 重新计算网格资金分配
+                    grid_funds = []
+                    for i, price in enumerate(price_levels[:-1]):
+                        shares = single_trade_quantity
+                        actual_fund = shares * price
+                        
+                        grid_funds.append({
+                            'level': i + 1,
+                            'price': round(price, 3),
+                            'allocated_fund': round(actual_fund, 2),
+                            'shares': shares,
+                            'actual_fund': round(actual_fund, 2),
+                            'is_buy_level': price <= current_price
+                        })
             
-            # 5. 计算资金利用率
+            # 6. 计算资金利用率
             total_actual_fund = sum(gf['actual_fund'] for gf in grid_funds)
             utilization_rate = total_actual_fund / total_capital
             
-            # 6. 计算预期单笔收益（基于平均网格间距）
+            # 7. 计算买入网格资金占用（极端情况验证）
+            buy_grid_fund = sum(gf['actual_fund'] for gf in grid_funds if gf.get('is_buy_level', False))
+            buy_grid_safety_ratio = buy_grid_fund / available_grid_amount if available_grid_amount > 0 else 0
+            
+            # 8. 计算预期单笔收益（基于平均网格间距）
             if len(price_levels) > 1:
                 avg_price = sum(price_levels) / len(price_levels)
                 avg_step = (price_levels[-1] - price_levels[0]) / len(price_levels)
-                avg_shares = total_actual_fund / avg_price
-                expected_profit_per_trade = avg_shares * avg_step
+                expected_profit_per_trade = single_trade_quantity * avg_step
             else:
                 expected_profit_per_trade = 0
             
@@ -203,17 +238,106 @@ class GridStrategy:
                 'utilization_rate': round(utilization_rate, 4),
                 'expected_profit_per_trade': round(expected_profit_per_trade, 2),
                 'grid_count': len(grid_funds),
-                'base_position_ratio': base_position_ratio
+                'base_position_ratio': base_position_ratio,
+                # 新增单笔数量相关字段
+                'single_trade_quantity': single_trade_quantity,
+                'buy_grid_fund': round(buy_grid_fund, 2),
+                'buy_grid_safety_ratio': round(buy_grid_safety_ratio, 4),
+                'extreme_case_safe': buy_grid_safety_ratio <= 1.0
             }
             
             logger.info(f"资金分配完成: 底仓{base_position_amount:.0f}, "
-                       f"网格{available_grid_amount:.0f}, 利用率{utilization_rate:.1%}")
+                       f"网格{available_grid_amount:.0f}, 单笔数量{single_trade_quantity}股, "
+                       f"买入网格资金{buy_grid_fund:.0f}, 安全比例{buy_grid_safety_ratio:.1%}")
             
             return result
             
         except Exception as e:
             logger.error(f"资金分配计算失败: {str(e)}")
             raise
+    
+    def _calculate_single_trade_quantity(self, available_grid_amount: float, 
+                                       grid_count: int, price_levels: List[float]) -> int:
+        """
+        计算单笔交易数量（基于网格资金平均分配）
+        
+        公式：单笔数量 = 网格金额 ÷ 网格数量 × 2 ÷ 标的价格，结果100整数倍向下取整
+        
+        Args:
+            available_grid_amount: 可用网格资金
+            grid_count: 网格数量
+            price_levels: 价格水平列表
+            
+        Returns:
+            单笔交易数量（100股的整数倍）
+        """
+        try:
+            if not price_levels or grid_count <= 0:
+                return 100  # 默认最小交易单位
+            
+            # 计算平均价格（作为标的价格）
+            avg_price = sum(price_levels) / len(price_levels)
+            
+            # 正确的计算公式：网格金额 ÷ 网格数量 × 2 ÷ 标的价格
+            # 乘以2是因为只需考虑单边网格（买入网格）
+            theoretical_shares = available_grid_amount / grid_count * 2 / avg_price
+            
+            # 向下取整到100股的整数倍
+            shares_per_100 = int(theoretical_shares / 100)
+            single_trade_quantity = max(1, shares_per_100) * 100  # 至少100股
+            
+            logger.debug(f"单笔数量计算: 网格资金{available_grid_amount:.0f}, "
+                        f"网格数{grid_count}, 标的价格{avg_price:.3f}, "
+                        f"理论股数{theoretical_shares:.0f}, 单笔数量{single_trade_quantity}股")
+            
+            return single_trade_quantity
+            
+        except Exception as e:
+            logger.error(f"计算单笔数量失败: {str(e)}")
+            return 100  # 返回默认值
+    
+    def _recalculate_safe_quantity(self, available_grid_amount: float, 
+                                 buy_levels: List[float]) -> int:
+        """
+        重新计算安全的单笔数量（确保极端情况下资金充足）
+        
+        使用相同的计算公式：网格金额 ÷ 网格数量 × 2 ÷ 标的价格
+        但针对极端情况进行安全调整
+        
+        Args:
+            available_grid_amount: 可用网格资金
+            buy_levels: 买入价格水平列表
+            
+        Returns:
+            安全的单笔交易数量
+        """
+        try:
+            if not buy_levels:
+                return 100
+            
+            # 计算买入网格的平均价格
+            avg_buy_price = sum(buy_levels) / len(buy_levels)
+            buy_grid_count = len(buy_levels)
+            
+            # 使用相同的计算公式，但加入安全系数
+            # 公式：网格金额 ÷ 买入网格数量 × 2 ÷ 平均买入价格 × 安全系数
+            safety_factor = 0.9  # 90%的资金利用率，保留10%安全边际
+            safe_theoretical_shares = (available_grid_amount / buy_grid_count * 2 / avg_buy_price) * safety_factor
+            
+            # 向下取整到100股的整数倍
+            safe_shares_per_100 = int(safe_theoretical_shares / 100)
+            safe_quantity = max(1, safe_shares_per_100) * 100
+            
+            logger.info(f"重新计算安全单笔数量: 买入网格数{buy_grid_count}, "
+                       f"平均买入价格{avg_buy_price:.3f}, "
+                       f"安全理论股数{safe_theoretical_shares:.0f}, "
+                       f"最终安全数量{safe_quantity}股")
+            
+            return safe_quantity
+            
+        except Exception as e:
+            logger.error(f"重新计算安全数量失败: {str(e)}")
+            return 100
     
     def calculate_grid_parameters(self, df: pd.DataFrame, total_capital: float,
                                 grid_type: str, frequency_preference: str,

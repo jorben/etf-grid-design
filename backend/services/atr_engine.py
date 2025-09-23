@@ -144,8 +144,8 @@ class ATREngine:
             # 风险系数映射
             risk_multipliers = {
                 '保守': 1.5,
-                '稳健': 2.0,
-                '激进': 2.5
+                '稳健': 3.0,
+                '激进': 4.5
             }
             
             multiplier = risk_multipliers.get(risk_preference, 2.0)

@@ -109,11 +109,11 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 bg-red-50 rounded-lg">
-            <div className="text-2xl font-bold text-red-600 mb-1">
+          <div className="text-center p-4 bg-green-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-600 mb-1">
               ¥{price_range.lower.toFixed(3)}
             </div>
-            <div className="text-sm text-red-700 font-medium">下边界</div>
+            <div className="text-sm text-green-700 font-medium">下边界</div>
             <div className="text-xs text-gray-600 mt-1">
               买入区间下限
             </div>
@@ -129,11 +129,11 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
             </div>
           </div>
 
-          <div className="text-center p-4 bg-green-50 rounded-lg">
-            <div className="text-2xl font-bold text-green-600 mb-1">
+          <div className="text-center p-4 bg-red-50 rounded-lg">
+            <div className="text-2xl font-bold text-red-600 mb-1">
               ¥{price_range.upper.toFixed(3)}
             </div>
-            <div className="text-sm text-green-700 font-medium">上边界</div>
+            <div className="text-sm text-red-700 font-medium">上边界</div>
             <div className="text-xs text-gray-600 mt-1">
               卖出区间上限
             </div>
@@ -200,14 +200,17 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
 
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <Percent className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">价格覆盖</span>
+              <Calculator className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">单笔数量</span>
             </div>
-            <div className="text-xl font-bold text-gray-900">{formatPercent(price_range.ratio)}</div>
+            <div className="text-xl font-bold text-gray-900">
+              {fund_allocation.single_trade_quantity || 0}股
+            </div>
             <div className="text-xs text-gray-600">
-              总价格区间比例
+              100股整数倍
             </div>
           </div>
+
         </div>
       </div>
 
@@ -259,7 +262,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
         {/* 资金分配详情 */}
         <div className="bg-gray-50 p-4 rounded-lg">
           <h5 className="font-medium text-gray-900 mb-3">资金分配明细</h5>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
             <div>
               <span className="text-gray-600">总投资资金:</span>
               <div className="font-medium text-gray-900">
@@ -285,6 +288,43 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
               </div>
             </div>
           </div>
+          
+          {/* 单笔数量计算说明 */}
+          {fund_allocation.single_trade_quantity && (
+            <div className="border-t border-gray-200 pt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Calculator className="w-4 h-4 text-blue-600" />
+                <span className="font-medium text-gray-900">单笔数量计算</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">单笔数量:</span>
+                  <div className="font-medium text-blue-900">
+                    {fund_allocation.single_trade_quantity}股
+                  </div>
+                  <div className="text-xs text-gray-500">公式：网格金额÷网格数×2÷标的价格</div>
+                </div>
+                <div>
+                  <span className="text-gray-600">买入网格资金:</span>
+                  <div className="font-medium text-gray-900">
+                    {formatAmount(fund_allocation.buy_grid_fund || 0)}
+                  </div>
+                  <div className="text-xs text-gray-500">极端情况资金需求</div>
+                </div>
+                <div>
+                  <span className="text-gray-600">资金安全比例:</span>
+                  <div className={`font-medium ${
+                    fund_allocation.extreme_case_safe ? 'text-green-700' : 'text-red-700'
+                  }`}>
+                    {formatPercent(fund_allocation.buy_grid_safety_ratio || 0)}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {fund_allocation.extreme_case_safe ? '安全范围内' : '需要调整'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 预期收益信息 */}
@@ -295,9 +335,46 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
           </div>
           <div className="text-sm text-green-800">
             <p>预期单笔收益: {formatAmount(fund_allocation.expected_profit_per_trade)}</p>
-            <p className="mt-1">基于平均网格间距和资金配置计算</p>
+            <p className="mt-1">基于平均网格间距和单笔数量计算</p>
           </div>
         </div>
+
+        {/* 单笔数量风险提示 */}
+        {fund_allocation.single_trade_quantity && (
+          <div className={`mt-4 p-4 rounded-lg ${
+            fund_allocation.extreme_case_safe 
+              ? 'bg-blue-50 border border-blue-200' 
+              : 'bg-yellow-50 border border-yellow-200'
+          }`}>
+            <div className="flex items-center gap-2 mb-2">
+              <Info className={`w-4 h-4 ${
+                fund_allocation.extreme_case_safe ? 'text-blue-600' : 'text-yellow-600'
+              }`} />
+              <span className={`font-medium ${
+                fund_allocation.extreme_case_safe ? 'text-blue-900' : 'text-yellow-900'
+              }`}>
+                单笔数量风险评估
+              </span>
+            </div>
+            <div className={`text-sm ${
+              fund_allocation.extreme_case_safe ? 'text-blue-800' : 'text-yellow-800'
+            }`}>
+              <p>
+                <strong>计算公式：</strong>（网格金额 ÷ 网格数量 × 2 ÷ 标的价格）向下取整到100股整数倍
+              </p>
+              <p className="mt-1">
+                <strong>极端情况验证：</strong>
+                {fund_allocation.extreme_case_safe 
+                  ? '单边下跌时所有买入网格成交，资金需求在安全范围内'
+                  : '单边下跌时资金可能不足，建议降低单笔数量或增加网格资金'
+                }
+              </p>
+              <p className="mt-1">
+                <strong>风险控制：</strong>已预留{formatPercent(0.1)}安全边际，保障资金流动性
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 网格价格水平 */}
