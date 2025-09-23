@@ -306,28 +306,78 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
           </div>
 
           <div className="max-h-64 overflow-y-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-              {gridStrategy.price_levels.slice(0, 24).map((price, index) => (
-                <div 
-                  key={index}
-                  className={`p-2 text-center rounded text-sm ${
-                    price < current_price 
-                      ? 'bg-red-50 text-red-700 border border-red-200' 
-                      : price > current_price
-                      ? 'bg-green-50 text-green-700 border border-green-200'
-                      : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
-                  }`}
-                >
-                  <div className="font-medium">¥{price.toFixed(3)}</div>
-                  <div className="text-xs opacity-75">
-                    {price < current_price ? '买入' : price > current_price ? '卖出' : '基准'}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+              {(() => {
+                const maxDisplay = 21;
+                const priceLevels = gridStrategy.price_levels;
+                
+                // 如果网格点总数不超过25个，直接显示全部
+                if (priceLevels.length <= maxDisplay) {
+                  return priceLevels.map((price, index) => (
+                    <div 
+                      key={index}
+                      className={`p-2 text-center rounded text-sm ${
+                        price < current_price 
+                          ? 'bg-red-50 text-red-700 border border-red-200' 
+                          : price > current_price
+                          ? 'bg-green-50 text-green-700 border border-green-200'
+                          : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+                      }`}
+                    >
+                      <div className="font-medium">¥{price.toFixed(3)}</div>
+                      <div className="text-xs opacity-75">
+                        {price < current_price ? '买入' : price > current_price ? '卖出' : '基准'}
+                      </div>
+                    </div>
+                  ));
+                }
+                
+                // 找到当前价格在数组中的位置（最接近的价格点）
+                let centerIndex = 0;
+                let minDiff = Math.abs(priceLevels[0] - current_price);
+                
+                for (let i = 1; i < priceLevels.length; i++) {
+                  const diff = Math.abs(priceLevels[i] - current_price);
+                  if (diff < minDiff) {
+                    minDiff = diff;
+                    centerIndex = i;
+                  }
+                }
+                
+                // 计算显示范围，以中心点向两边扩展
+                const halfDisplay = Math.floor(maxDisplay / 2);
+                let startIndex = Math.max(0, centerIndex - halfDisplay);
+                let endIndex = Math.min(priceLevels.length, startIndex + maxDisplay);
+                
+                // 如果末尾不够，向前调整起始位置
+                if (endIndex - startIndex < maxDisplay) {
+                  startIndex = Math.max(0, endIndex - maxDisplay);
+                }
+                
+                const displayLevels = priceLevels.slice(startIndex, endIndex);
+                
+                return displayLevels.map((price, index) => (
+                  <div 
+                    key={startIndex + index}
+                    className={`p-2 text-center rounded text-sm ${
+                      price < current_price 
+                        ? 'bg-red-50 text-red-700 border border-red-200' 
+                        : price > current_price
+                        ? 'bg-green-50 text-green-700 border border-green-200'
+                        : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+                    }`}
+                  >
+                    <div className="font-medium">¥{price.toFixed(3)}</div>
+                    <div className="text-xs opacity-75">
+                      {price < current_price ? '买入' : price > current_price ? '卖出' : '基准'}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ));
+              })()}
             </div>
-            {gridStrategy.price_levels.length > 24 && (
+            {gridStrategy.price_levels.length > 21 && (
               <div className="text-center mt-3 text-sm text-gray-500">
-                显示前24个价格水平，共{gridStrategy.price_levels.length}个网格点
+                显示以当前价格为中心的20个价格水平，共{gridStrategy.price_levels.length-1}个网格点
               </div>
             )}
           </div>
