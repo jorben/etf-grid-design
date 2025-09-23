@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Search, TrendingUp, DollarSign, Settings, Zap, Shield, BarChart3, Grid3X3 } from 'lucide-react';
+import { Search, TrendingUp, DollarSign, Settings, Shield, BarChart3, Grid3X3 } from 'lucide-react';
 import { usePersistedState } from '../hooks/usePersistedState';
 
 const ParameterForm = ({ onAnalysis, loading }) => {
   // 使用持久化状态
-  const [etfCode, setEtfCode] = usePersistedState('etfCode', '');
-  const [totalCapital, setTotalCapital] = usePersistedState('totalCapital', '');
+  const [etfCode, setEtfCode] = usePersistedState('etfCode', '510300');
+  const [totalCapital, setTotalCapital] = usePersistedState('totalCapital', '100000');
   const [gridType, setGridType] = usePersistedState('gridType', '等比');
   const [frequencyPreference, setFrequencyPreference] = usePersistedState('frequencyPreference', '中频');
   const [riskPreference, setRiskPreference] = usePersistedState('riskPreference', '稳健');
 
   // 状态管理
   const [popularETFs, setPopularETFs] = useState([]);
-  const [presetConfigs, setPresetConfigs] = useState([]);
   const [capitalPresets, setCapitalPresets] = useState([]);
   const [etfInfo, setEtfInfo] = useState(null);
   const [errors, setErrors] = useState({});
-  const [showPresets, setShowPresets] = useState(false);
 
   // 获取热门ETF列表
   useEffect(() => {
@@ -30,17 +28,7 @@ const ParameterForm = ({ onAnalysis, loading }) => {
       .catch(err => console.error('获取热门ETF失败:', err));
   }, []);
 
-  // 获取预设配置
-  useEffect(() => {
-    fetch('/api/preset-configs')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setPresetConfigs(data.data);
-        }
-      })
-      .catch(err => console.error('获取预设配置失败:', err));
-  }, []);
+
 
   // 获取资金预设
   useEffect(() => {
@@ -108,13 +96,7 @@ const ParameterForm = ({ onAnalysis, loading }) => {
     }
   };
 
-  // 应用预设配置
-  const applyPresetConfig = (config) => {
-    setGridType(config.gridType);
-    setFrequencyPreference(config.frequencyPreference);
-    setRiskPreference(config.riskPreference);
-    setShowPresets(false);
-  };
+
 
   // 选择热门ETF
   const selectPopularETF = (code) => {
@@ -148,7 +130,7 @@ const ParameterForm = ({ onAnalysis, loading }) => {
           
           {/* 热门ETF快速选择 */}
           <div className="mb-3">
-            <p className="text-xs text-gray-500 mb-2">热门ETF快速选择：</p>
+            <p className="text-xs text-gray-500 mb-2">热门ETF：</p>
             <div className="flex flex-wrap gap-2">
               {popularETFs.filter(etf => ['510300', '510500', '159919', '159915', '512880'].includes(etf.code)).map(etf => (
                 <button
@@ -209,13 +191,13 @@ const ParameterForm = ({ onAnalysis, loading }) => {
           {/* 预设资金快速选择 */}
           <div className="mb-3">
             <p className="text-xs text-gray-500 mb-2">常用金额：</p>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="flex flex-wrap gap-2">
               {capitalPresets.filter(preset => preset.popular).map(preset => (
                 <button
                   key={preset.value}
                   type="button"
                   onClick={() => selectCapitalPreset(preset.value)}
-                  className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                  className={`px-2 py-1 text-xs rounded-full border transition-colors ${
                     totalCapital === preset.value.toString()
                       ? 'bg-blue-100 border-blue-300 text-blue-700'
                       : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
@@ -249,44 +231,7 @@ const ParameterForm = ({ onAnalysis, loading }) => {
           </div>
         </div>
 
-        {/* 预设方案选择 */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <Zap className="w-4 h-4" />
-              快速配置方案
-            </label>
-            <button
-              type="button"
-              onClick={() => setShowPresets(!showPresets)}
-              className="text-sm text-blue-600 hover:text-blue-700"
-            >
-              {showPresets ? '收起' : '展开'}
-            </button>
-          </div>
-          
-          {showPresets && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-              {presetConfigs.map(config => (
-                <div
-                  key={config.id}
-                  className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer transition-colors"
-                  onClick={() => applyPresetConfig(config.config)}
-                >
-                  <h4 className="font-medium text-gray-900 mb-1">{config.name}</h4>
-                  <p className="text-xs text-gray-600 mb-2">{config.description}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {config.features.map(feature => (
-                      <span key={feature} className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">
-                        {feature}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+
 
         {/* 网格间距类型 */}
         <div>
@@ -296,8 +241,8 @@ const ParameterForm = ({ onAnalysis, loading }) => {
           </label>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { value: '等差', label: '等差网格', desc: '价格间距相等，适合新手' },
-              { value: '等比', label: '等比网格', desc: '比例间距相等，推荐使用' }
+              { value: '等比', label: '等比网格', desc: '比例间距相等，推荐使用' },
+              { value: '等差', label: '等差网格', desc: '价格间距相等，适合新手' }
             ].map(option => (
               <label
                 key={option.value}
