@@ -231,7 +231,33 @@ const ParameterForm = ({ onAnalysis, loading }) => {
           </div>
         </div>
 
+        {/* 开始分析按钮 */}
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                正在分析策略...
+              </div>
+            ) : (
+              '开始分析策略'
+            )}
+          </button>
+        </div>
 
+        {/* 分隔线 */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white text-gray-500">更多设置</span>
+          </div>
+        </div>
 
         {/* 网格间距类型 */}
         <div>
@@ -337,23 +363,7 @@ const ParameterForm = ({ onAnalysis, loading }) => {
           </div>
         </div>
 
-        {/* 提交按钮 */}
-        <div className="pt-4">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {loading ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                正在分析策略...
-              </div>
-            ) : (
-              '开始分析策略'
-            )}
-          </button>
-        </div>
+
       </form>
     </div>
   );
