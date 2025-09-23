@@ -12,7 +12,7 @@ import {
   Percent,
   Grid3X3,
   PieChart,
-
+  Database,
   Download,
   Share2,
   Eye
@@ -300,12 +300,97 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
                     </div>
                     <h3 className="font-semibold text-purple-900">网格步长</h3>
                   </div>
-                  <div className="text-2xl font-bold text-purple-900 mb-1">
-                    ¥{(grid_strategy?.grid_config?.step_size || 0).toFixed(3)}
+                  {/* 根据网格类型动态展示重点 */}
+                  {grid_strategy?.grid_config?.type === '等比' ? (
+                    <>
+                      <div className="text-2xl font-bold text-purple-900 mb-1">
+                        {((grid_strategy?.grid_config?.step_ratio || 0) * 100).toFixed(2)}%
+                      </div>
+                      <p className="text-purple-700 text-sm">
+                        步长比例 · ¥{(grid_strategy?.grid_config?.step_size || 0).toFixed(3)}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-2xl font-bold text-purple-900 mb-1">
+                        ¥{(grid_strategy?.grid_config?.step_size || 0).toFixed(3)}
+                      </div>
+                      <p className="text-purple-700 text-sm">
+                        步长价格 · {((grid_strategy?.grid_config?.step_ratio || 0) * 100).toFixed(2)}%
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* 数据质量评估 */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-gray-200 rounded-lg">
+                    <Database className="w-5 h-5 text-gray-700" />
                   </div>
-                  <p className="text-purple-700 text-sm">
-                    {((grid_strategy?.grid_config?.step_ratio || 0) * 100).toFixed(2)}% 步长比例
-                  </p>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">数据质量评估</h4>
+                    <p className="text-sm text-gray-600">分析数据的时效性和完整性</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white p-4 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calendar className="w-4 h-4 text-blue-600" />
+                      <span className="font-medium text-gray-900">数据时效性</span>
+                    </div>
+                    <div className={`text-sm px-2 py-1 rounded-full inline-block ${
+                      data_quality?.freshness === '优秀' ? 'bg-green-100 text-green-800' :
+                      data_quality?.freshness === '良好' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {data_quality?.freshness || '未知'}
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1">{data_quality?.freshness_desc || '暂无描述'}</p>
+                    {data_quality?.latest_date && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        最新数据: {data_quality.latest_date}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="bg-white p-4 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span className="font-medium text-gray-900">数据完整性</span>
+                    </div>
+                    <div className={`text-sm px-2 py-1 rounded-full inline-block ${
+                      data_quality?.completeness === '优秀' ? 'bg-green-100 text-green-800' :
+                      data_quality?.completeness === '良好' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {data_quality?.completeness || '未知'}
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1">{data_quality?.completeness_desc || '暂无描述'}</p>
+                    {data_quality?.total_records && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        数据记录: {data_quality.total_records}条
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="bg-white p-4 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <BarChart3 className="w-4 h-4 text-purple-600" />
+                      <span className="font-medium text-gray-900">分析范围</span>
+                    </div>
+                    <div className="text-sm px-2 py-1 rounded-full inline-block bg-green-100 text-green-800">
+                      {data_quality?.analysis_days || 0}天
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1">历史数据分析期间</p>
+                    {data_quality?.start_date && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        {data_quality.start_date} 至 {data_quality.latest_date}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
