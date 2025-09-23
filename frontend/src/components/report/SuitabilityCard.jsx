@@ -83,31 +83,65 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
   return (
     <div className="space-y-6">
       {/* 总体评分 */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
-        
-        <div className="flex items-center justify-between mb-4">
-          
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-200 rounded-lg">
-              <Target className="w-6 h-6 text-blue-700" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-blue-900">标的网格交易适宜度评估</h3>
-              <p className="text-blue-700">从4个维度量化评分体系，总分100分</p>
-            </div>
+      <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-lg border border-orange-200">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-orange-200 rounded-lg">
+            <Target className="w-6 h-6 text-orange-700" />
           </div>
-          <div className="text-right">
-            <div className="text-3xl font-bold text-blue-900">{total_score}/100</div>
-            <div className={`px-2 py-1 rounded-full text-sm inline-flex items-center gap-1 ${getSuitabilityColor(total_score)}`}>
+          <div>
+            <h3 className="text-xl font-bold text-orange-900">标的网格交易适宜度评估</h3>
+            <p className="text-orange-700">从4个维度量化评分体系，总分100分</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Target className="w-4 h-4 text-orange-600" />
+              <span className="text-sm font-medium text-gray-700">适宜度得分</span>
+            </div>
+            <div className="text-lg font-bold text-gray-900">{total_score}/100</div>
+            <div className="text-xs text-gray-600">综合评分</div>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="w-4 h-4 text-green-600" />
+              <span className="text-sm font-medium text-gray-700">适宜度等级</span>
+            </div>
+            <div className={`text-lg font-bold inline-flex items-center gap-1 ${getSuitabilityColor(total_score).replace('bg-', 'text-').replace('-100', '-600')}`}>
               {getSuitabilityIcon(total_score)}
               {conclusion}
             </div>
+            <div className="text-xs text-gray-600">评估结论</div>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <BarChart3 className="w-4 h-4 text-blue-600" />
+              <span className="text-sm font-medium text-gray-700">评估维度</span>
+            </div>
+            <div className="text-lg font-bold text-gray-900">4个</div>
+            <div className="text-xs text-gray-600">振幅·波动·特征·流动</div>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Activity className="w-4 h-4 text-purple-600" />
+              <span className="text-sm font-medium text-gray-700">风险状态</span>
+            </div>
+            <div className={`text-lg font-bold ${has_fatal_flaw ? 'text-red-600' : 'text-green-600'}`}>
+              {has_fatal_flaw ? '有风险' : '正常'}
+            </div>
+            <div className="text-xs text-gray-600">
+              {has_fatal_flaw ? '存在致命缺陷' : '无致命缺陷'}
+            </div>
           </div>
         </div>
-        
-        <div className="bg-white p-4 rounded-lg">
+
+        <div className="mt-4 bg-white p-4 rounded-lg">
           <div className="flex items-start gap-2">
-            <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <Info className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-medium text-gray-900 mb-1">综合结论</p>
               <p className="text-gray-700">{recommendation}</p>

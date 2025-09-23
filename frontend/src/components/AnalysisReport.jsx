@@ -281,30 +281,30 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
                 <div className="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-lg">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="p-2 bg-green-200 rounded-lg">
-                      <DollarSign className="w-5 h-5 text-green-700" />
+                      <TrendingUp className="w-5 h-5 text-green-700" />
                     </div>
-                    <h3 className="font-semibold text-green-900">预期收益</h3>
+                    <h3 className="font-semibold text-green-900">价格区间</h3>
                   </div>
                   <div className="text-2xl font-bold text-green-900 mb-1">
-                    {((backtest_result?.performance?.annual_return || 0) * 100).toFixed(1)}%
+                    ¥{(grid_strategy?.price_range?.lower || 0).toFixed(3)} - ¥{(grid_strategy?.price_range?.upper || 0).toFixed(3)}
                   </div>
                   <p className="text-green-700 text-sm">
-                    年化收益率（基于回测）
+                    网格交易价格范围
                   </p>
                 </div>
 
                 <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-6 rounded-lg">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="p-2 bg-purple-200 rounded-lg">
-                      <Grid3X3 className="w-5 h-5 text-purple-700" />
+                      <BarChart3 className="w-5 h-5 text-purple-700" />
                     </div>
-                    <h3 className="font-semibold text-purple-900">网格配置</h3>
+                    <h3 className="font-semibold text-purple-900">网格步长</h3>
                   </div>
                   <div className="text-2xl font-bold text-purple-900 mb-1">
-                    {grid_strategy?.grid_config?.count || 0}个
+                    ¥{(grid_strategy?.grid_config?.step_size || 0).toFixed(3)}
                   </div>
                   <p className="text-purple-700 text-sm">
-                    {grid_strategy?.grid_config?.type || '未知'}网格，{grid_strategy?.frequency_preference || '未知'}
+                    {((grid_strategy?.grid_config?.step_ratio || 0) * 100).toFixed(2)}% 步长比例
                   </p>
                 </div>
               </div>
