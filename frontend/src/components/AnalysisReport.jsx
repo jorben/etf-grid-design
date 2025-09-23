@@ -15,6 +15,7 @@ import {
   Database,
   Download,
   Share2,
+  ThermometerSun,
   Eye
 } from 'lucide-react';
 import SuitabilityCard from './report/SuitabilityCard';
@@ -155,7 +156,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
 
   const tabs = [
     { id: 'overview', label: '概览', icon: <Eye className="w-4 h-4" /> },
-    { id: 'suitability', label: '适宜度评估', icon: <Target className="w-4 h-4" /> },
+    { id: 'suitability', label: '适宜度评估', icon: <ThermometerSun className="w-4 h-4" /> },
     { id: 'strategy', label: '网格策略', icon: <Grid3X3 className="w-4 h-4" /> },
     { id: 'backtest', label: '回测结果', icon: <BarChart3 className="w-4 h-4" /> },
 
@@ -261,12 +262,25 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
           {/* 概览标签页 */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
+              {/* 风险提示 */}
+              {suitability_evaluation?.has_fatal_flaw && (
+                <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 text-red-800 font-medium mb-2">
+                    <AlertTriangle className="w-5 h-5" />
+                    重要风险提示
+                  </div>
+                  <p className="text-red-700 text-sm">
+                    该标的存在致命缺陷：{suitability_evaluation?.fatal_flaws?.join('、') || '未知风险'}，不建议进行网格交易。
+                  </p>
+                </div>
+              )}
+              
               {/* 核心指标卡片 */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="p-2 bg-blue-200 rounded-lg">
-                      <Target className="w-5 h-5 text-blue-700" />
+                      <ThermometerSun className="w-5 h-5 text-blue-700" />
                     </div>
                     <h3 className="font-semibold text-blue-900">适宜度评估</h3>
                   </div>
@@ -395,15 +409,15 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
               </div>
 
               {/* 快速摘要 */}
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <div className="bg-blue-50 border border-blue-200 p-6 rounded-lg">
+                <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
                   <Info className="w-5 h-5" />
                   策略摘要
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-medium text-gray-800 mb-2">投资配置</h4>
-                    <ul className="space-y-1 text-sm text-gray-600">
+                    <h4 className="font-medium text-blue-800 mb-2">投资配置</h4>
+                    <ul className="space-y-1 text-sm text-blue-600">
                       <li>• 总投资资金：¥{(input_parameters?.total_capital || 0).toLocaleString()}</li>
                       <li>• 底仓资金：¥{(grid_strategy?.fund_allocation?.base_position_amount || 0).toLocaleString()}</li>
                       <li>• 网格资金：¥{(grid_strategy?.fund_allocation?.grid_trading_amount || 0).toLocaleString()}</li>
@@ -411,8 +425,8 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-800 mb-2">策略特征</h4>
-                    <ul className="space-y-1 text-sm text-gray-600">
+                    <h4 className="font-medium text-blue-800 mb-2">策略特征</h4>
+                    <ul className="space-y-1 text-sm text-blue-600">
                       <li>• 价格区间：¥{(grid_strategy?.price_range?.lower || 0).toFixed(3)} - ¥{(grid_strategy?.price_range?.upper || 0).toFixed(3)}</li>
                       <li>• 网格步长：¥{(grid_strategy?.grid_config?.step_size || 0).toFixed(3)} ({((grid_strategy?.grid_config?.step_ratio || 0) * 100).toFixed(2)}%)</li>
                       <li>• 预期月交易：{(backtest_result?.trading_stats?.expected_monthly_trades || 0).toFixed(1)}次</li>
@@ -422,18 +436,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis }) => {
                 </div>
               </div>
 
-              {/* 风险提示 */}
-              {suitability_evaluation?.has_fatal_flaw && (
-                <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 text-red-800 font-medium mb-2">
-                    <AlertTriangle className="w-5 h-5" />
-                    重要风险提示
-                  </div>
-                  <p className="text-red-700 text-sm">
-                    该标的存在致命缺陷：{suitability_evaluation?.fatal_flaws?.join('、') || '未知风险'}，不建议进行网格交易。
-                  </p>
-                </div>
-              )}
+              
             </div>
           )}
 

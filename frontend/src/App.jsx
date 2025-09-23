@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ParameterForm from './components/ParameterForm';
 import AnalysisReport from './components/AnalysisReport';
 import { analyzeETF } from './services/api';
-import { Zap, BarChart3, Target, TrendingUp, Github, ExternalLink } from 'lucide-react';
+import { Zap, BarChart3, Target, TrendingUp, Github, ThermometerSun } from 'lucide-react';
 import './App.css';
 
 function App() {
   const [analysisData, setAnalysisData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState('input'); // 'input' | 'analysis'
+  const parameterFormRef = useRef(null);
 
   // 处理分析请求
   const handleAnalysis = async (parameters) => {
@@ -45,6 +46,16 @@ function App() {
   // 重新分析
   const handleReAnalysis = (parameters) => {
     handleAnalysis(parameters);
+  };
+
+  // 滚动到策略参数设置
+  const scrollToParameterForm = () => {
+    if (parameterFormRef.current) {
+      parameterFormRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   };
 
   return (
@@ -114,7 +125,7 @@ function App() {
 
                       <div className="text-center p-6 bg-green-50 rounded-lg">
                         <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Target className="w-6 h-6 text-green-700" />
+                          <ThermometerSun className="w-6 h-6 text-green-700" />
                         </div>
                         <h3 className="font-semibold text-gray-900 mb-2">标的适宜度评估</h3>
                         <p className="text-sm text-gray-600">
@@ -132,15 +143,28 @@ function App() {
                         </p>
                       </div>
                     </div>
+
+                    {/* 开始分析按钮 */}
+                    <div className="text-center">
+                      <button
+                        onClick={scrollToParameterForm}
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+                      >
+                        <Target className="w-5 h-5" />
+                        选择标的，即刻分析
+                      </button>
+                    </div>
                   </div>
                 )}
 
                 {/* 参数输入表单 */}
                 {currentStep === 'input' && (
-                  <ParameterForm 
-                    onAnalysis={handleAnalysis}
-                    loading={loading}
-                  />
+                  <div ref={parameterFormRef}>
+                    <ParameterForm 
+                      onAnalysis={handleAnalysis}
+                      loading={loading}
+                    />
+                  </div>
                 )}
 
                 {/* 分析报告 */}
@@ -198,7 +222,7 @@ function App() {
 
             <div className="border-t border-gray-200 mt-8 pt-8 text-center">
               <p className="text-sm text-gray-500">
-                © 2024 ETF网格交易策略分析系统. 本系统仅供学习和研究使用，不构成投资建议。
+                &copy; 2024 ETFer.Top 本系统仅供学习和研究使用，不构成投资建议。
               </p>
             </div>
           </div>

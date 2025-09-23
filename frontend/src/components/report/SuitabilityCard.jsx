@@ -10,7 +10,8 @@ import {
   XCircle,
   Info,
   Calendar,
-  Database
+  Database,
+  ThermometerSun
 } from 'lucide-react';
 
 const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
@@ -86,18 +87,18 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
       <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-lg border border-orange-200">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 bg-orange-200 rounded-lg">
-            <Target className="w-6 h-6 text-orange-700" />
+            <ThermometerSun className="w-6 h-6 text-orange-700" />
           </div>
           <div>
             <h3 className="text-xl font-bold text-orange-900">标的网格交易适宜度评估</h3>
-            <p className="text-orange-700">从4个维度量化评分体系，总分100分</p>
+            <p className="text-orange-700">从四个维度量化评分体系，总分100分</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <Target className="w-4 h-4 text-orange-600" />
+              <ThermometerSun className="w-4 h-4 text-orange-600" />
               <span className="text-sm font-medium text-gray-700">适宜度得分</span>
             </div>
             <div className="text-lg font-bold text-gray-900">{total_score}/100</div>
@@ -134,11 +135,11 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
               {has_fatal_flaw ? '有风险' : '正常'}
             </div>
             <div className="text-xs text-gray-600">
-              {has_fatal_flaw ? '存在致命缺陷' : '无致命缺陷'}
+              {has_fatal_flaw ? '存在严重缺陷' : '无严重缺陷'}
             </div>
           </div>
         </div>
-
+        
         <div className="mt-4 bg-white p-4 rounded-lg">
           <div className="flex items-start gap-2">
             <Info className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
@@ -148,21 +149,6 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
             </div>
           </div>
         </div>
-
-        {/* 致命缺陷警告 */}
-        {has_fatal_flaw && (
-          <div className="mt-4 bg-red-50 border border-red-200 p-4 rounded-lg">
-            <div className="flex items-start gap-2">
-              <XCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-medium text-red-800 mb-1">严重缺陷警告</p>
-                <p className="text-red-700">
-                  检测到严重缺陷：{fatal_flaws.join('、')}。强烈不建议进行网格交易。
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* 各维度详细评分 */}
@@ -185,7 +171,7 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
                   <div className="text-xl font-bold text-gray-900">
                     {eval_data.score}/{dimension.maxScore}
                   </div>
-                  <div className={`text-xs px-2 py-1 rounded-full ${getScoreColor(eval_data.score, dimension.maxScore)}`}>
+                  <div className={`text-xs px-2 py-1 text-center rounded-full ${getScoreColor(eval_data.score, dimension.maxScore)}`}>
                     {eval_data.level}
                   </div>
                 </div>
@@ -216,25 +202,6 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
                 )}
               </div>
 
-              {/* 详细信息 */}
-              {showDetailed && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="text-xs text-gray-500 space-y-1">
-                    {dimension.key === 'amplitude' && eval_data.atr_pct && (
-                      <p>ATR比率: {eval_data.atr_pct.toFixed(2)}%</p>
-                    )}
-                    {dimension.key === 'volatility' && eval_data.volatility_pct && (
-                      <p>年化波动率: {eval_data.volatility_pct.toFixed(1)}%</p>
-                    )}
-                    {dimension.key === 'market_characteristics' && eval_data.adx_value && (
-                      <p>ADX指数: {eval_data.adx_value.toFixed(1)} ({eval_data.market_type})</p>
-                    )}
-                    {dimension.key === 'liquidity' && eval_data.avg_amount && (
-                      <p>日均成交额: {eval_data.avg_amount.toFixed(0)}万元</p>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}
