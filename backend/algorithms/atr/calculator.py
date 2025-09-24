@@ -1,26 +1,47 @@
 """
-ATR（平均真实波幅）算法引擎
-核心算法模块，实现ATR计算和相关分析功能
+ATR计算器 - 纯算法实现
+从服务层抽离的ATR核心算法模块
 """
 
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Tuple, Optional
+from typing import Tuple
 import logging
 
 logger = logging.getLogger(__name__)
 
-class ATREngine:
-    """ATR算法引擎"""
+class ATRCalculator:
+    """ATR计算器 - 纯算法实现"""
     
     def __init__(self, period: int = 14):
         """
-        初始化ATR引擎
+        初始化ATR计算器
         
         Args:
             period: ATR计算周期，默认14天
         """
         self.period = period
+    
+    def _validate_data(self, df: pd.DataFrame) -> None:
+        """验证输入数据质量"""
+        required_columns = ['date', 'open', 'high', 'low', 'close']
+        for col in required_columns:
+            if col not in df.columns:
+                raise KeyError(f"缺少必要列: {col}")
+        
+        if df.empty:
+            raise ValueError("数据为空")
+        
+        # 检查价格数据合理性
+        if (df['high'] < df['low']).any():
+            raise ValueError("最高价低于最低价")
+        
+        if (df['high'] <= 0).any() or (df['low'] <= 0).any() or (df['close'] <= 0).any():
+            raise ValueError("价格数据包含非正值")
+        
+        # 检查缺失值
+        if df[required_columns].isnull().any().any():
+            raise ValueError("数据包含缺失值")
     
     def calculate_true_range(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -34,6 +55,9 @@ class ATREngine:
             添加了TR列的DataFrame
         """
         try:
+            # 验证数据质量
+            self._validate_data(df)
+            
             # 确保数据按日期排序
             df = df.sort_values('date')
             
@@ -63,18 +87,21 @@ class ATREngine:
         计算ATR（平均真实波幅）
         
         Args:
-            df: 包含TR数据的DataFrame
+            df: 包含OHLC数据的DataFrame
             
         Returns:
             添加了ATR相关指标的DataFrame
         """
         try:
+            # 先计算真实波幅
+            df = self.calculate_true_range(df)
+            
             # 计算ATR（真实波幅的移动平均）
-            df['atr'] = df['tr'].rolling(window=self.period, min_periods=1).mean()
+            df['ATR'] = df['tr'].rolling(window=self.period, min_periods=1).mean()
             
             # 计算ATR比率（标准化处理）
             df['close_avg'] = df['close'].rolling(window=self.period, min_periods=1).mean()
-            df['atr_ratio'] = df['atr'] / df['close_avg']
+            df['atr_ratio'] = df['ATR'] / df['close_avg']
             
             # 计算ATR百分比（更直观的表示）
             df['atr_pct'] = df['atr_ratio'] * 100
@@ -86,109 +113,7 @@ class ATREngine:
             logger.error(f"计算ATR失败: {str(e)}")
             raise
     
-    def get_atr_analysis(self, df: pd.DataFrame) -> Dict:
-        """
-        获取ATR分析结果
-        
-        Args:
-            df: 包含ATR数据的DataFrame
-            
-        Returns:
-            ATR分析结果字典
-        """
-        try:
-            # 获取最新的ATR数据
-            latest_data = df.iloc[-1]
-            
-            # 计算统计指标
-            atr_stats = {
-                'current_atr': float(latest_data['atr']),
-                'current_atr_ratio': float(latest_data['atr_ratio']),
-                'current_atr_pct': float(latest_data['atr_pct']),
-                'avg_atr_ratio': float(df['atr_ratio'].mean()),
-                'max_atr_ratio': float(df['atr_ratio'].max()),
-                'min_atr_ratio': float(df['atr_ratio'].min()),
-                'atr_volatility': float(df['atr_ratio'].std()),
-                'current_price': float(latest_data['close']),
-                'period': self.period
-            }
-            
-            # ATR趋势分析
-            recent_atr = df['atr_ratio'].tail(30).mean()  # 最近30天平均
-            historical_atr = df['atr_ratio'].head(-30).mean()  # 历史平均
-            
-            atr_stats['atr_trend'] = 'increasing' if recent_atr > historical_atr else 'decreasing'
-            atr_stats['trend_strength'] = abs(recent_atr - historical_atr) / historical_atr
-            
-            logger.info(f"ATR分析完成，当前ATR比率: {atr_stats['current_atr_pct']:.2f}%")
-            return atr_stats
-            
-        except Exception as e:
-            logger.error(f"ATR分析失败: {str(e)}")
-            raise
-    
-    def calculate_price_range(self, current_price: float, atr_ratio: float, 
-                            risk_preference: str) -> Tuple[float, float]:
-        """
-        基于ATR计算价格区间
-        
-        Args:
-            current_price: 当前价格
-            atr_ratio: ATR比率
-            risk_preference: 风险偏好 ('保守', '稳健', '激进')
-            
-        Returns:
-            (下边界, 上边界) 价格区间
-        """
-        try:
-            # 风险系数映射
-            risk_multipliers = {
-                '保守': 3,
-                '稳健': 4,
-                '激进': 5,
-            }
-            
-            multiplier = risk_multipliers.get(risk_preference, 4)
-            
-            # 计算价格区间比例
-            price_range_ratio = atr_ratio * multiplier
-            
-            # 计算上下边界
-            price_lower = current_price * (1 - price_range_ratio)
-            price_upper = current_price * (1 + price_range_ratio)
-            
-            logger.info(f"价格区间计算完成: [{price_lower:.3f}, {price_upper:.3f}]")
-            return price_lower, price_upper
-            
-        except Exception as e:
-            logger.error(f"价格区间计算失败: {str(e)}")
-            raise
-    
-    def get_atr_score(self, atr_ratio: float) -> Tuple[int, str]:
-        """
-        基于ATR比率计算振幅评分
-        
-        Args:
-            atr_ratio: ATR比率
-            
-        Returns:
-            (评分, 评级说明)
-        """
-        try:
-            atr_pct = atr_ratio * 100
-            
-            if atr_pct >= 2.0:
-                return 35, "振幅充足，交易机会丰富"
-            elif atr_pct >= 1.5:
-                return 25, "振幅适中，基本适合"
-            else:
-                return 0, "振幅不足，不推荐"
-                
-        except Exception as e:
-            logger.error(f"ATR评分计算失败: {str(e)}")
-            return 0, "计算错误"
-    
-    def process_data(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
+    def process_data(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         完整的ATR数据处理流程
         
@@ -196,7 +121,7 @@ class ATREngine:
             df: 原始OHLC数据
             
         Returns:
-            (处理后的DataFrame, ATR分析结果)
+            处理后的DataFrame
         """
         try:
             # 1. 计算真实波幅
@@ -205,11 +130,8 @@ class ATREngine:
             # 2. 计算ATR
             df = self.calculate_atr(df)
             
-            # 3. 获取分析结果
-            analysis = self.get_atr_analysis(df)
-            
             logger.info("ATR数据处理完成")
-            return df, analysis
+            return df
             
         except Exception as e:
             logger.error(f"ATR数据处理失败: {str(e)}")

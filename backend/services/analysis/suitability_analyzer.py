@@ -1,22 +1,29 @@
 """
 标的适宜度评估模块
 实现4维度量化评分体系（总分100分）
+重构后的服务层，使用算法模块进行计算
 """
 
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Tuple
 import logging
-from .atr_engine import ATREngine, calculate_volatility, calculate_adx
+from algorithms.atr.analyzer import ATRAnalyzer
+from algorithms.atr.calculator import ATRCalculator, calculate_volatility, calculate_adx
 
 logger = logging.getLogger(__name__)
 
 class SuitabilityAnalyzer:
     """标的适宜度评估器"""
     
-    def __init__(self):
-        """初始化评估器"""
-        self.atr_engine = ATREngine()
+    def __init__(self, atr_analyzer: ATRAnalyzer = None):
+        """
+        初始化评估器
+        
+        Args:
+            atr_analyzer: ATR分析器实例
+        """
+        self.atr_analyzer = atr_analyzer or ATRAnalyzer(ATRCalculator())
         
     def evaluate_amplitude(self, atr_ratio: float) -> Dict:
         """
@@ -276,10 +283,11 @@ class SuitabilityAnalyzer:
             综合评估结果
         """
         try:
-            # 1. 处理ATR数据
-            df_processed, atr_analysis = self.atr_engine.process_data(df.copy())
+            # 1. 处理ATR数据（使用算法模块）
+            df_processed = self.atr_analyzer.calculator.process_data(df.copy())
+            atr_analysis = self.atr_analyzer.get_atr_analysis(df_processed)
             
-            # 2. 计算各项指标
+            # 2. 计算各项指标（使用算法模块）
             volatility = calculate_volatility(df_processed)
             adx_value = calculate_adx(df_processed)
             

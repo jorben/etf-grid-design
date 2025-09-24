@@ -1,32 +1,51 @@
 """
-ETF分析服务
-整合所有分析模块，提供完整的ETF网格交易策略分析
+ETF分析服务 - 业务流程协调
+重构后的服务层，专注于业务流程协调，算法逻辑已抽离到算法模块
 """
 
 import pandas as pd
-import numpy as np
 from typing import Dict, List, Optional
 import logging
 from datetime import datetime, timedelta
-import json
 
 from ..data.tushare_client import TushareClient
-from .atr_engine import ATREngine
+from algorithms.atr.analyzer import ATRAnalyzer
+from algorithms.atr.calculator import ATRCalculator
+from algorithms.grid.arithmetic_grid import ArithmeticGridCalculator
+from algorithms.grid.geometric_grid import GeometricGridCalculator
+from algorithms.grid.optimizer import GridOptimizer
 from .suitability_analyzer import SuitabilityAnalyzer
-from .grid_strategy import GridStrategy
 
 
 logger = logging.getLogger(__name__)
 
 class ETFAnalysisService:
-    """ETF分析服务主类"""
+    """ETF分析服务主类 - 专注于业务流程协调"""
     
-    def __init__(self):
-        """初始化分析服务"""
+    def __init__(self, 
+                 atr_analyzer: ATRAnalyzer = None,
+                 arithmetic_calculator: ArithmeticGridCalculator = None,
+                 geometric_calculator: GeometricGridCalculator = None,
+                 grid_optimizer: GridOptimizer = None,
+                 suitability_analyzer: SuitabilityAnalyzer = None):
+        """
+        初始化分析服务 - 使用依赖注入
+        
+        Args:
+            atr_analyzer: ATR分析器实例
+            arithmetic_calculator: 等差网格计算器实例
+            geometric_calculator: 等比网格计算器实例
+            grid_optimizer: 网格优化器实例
+            suitability_analyzer: 适宜度分析器实例
+        """
         self.tushare_client = TushareClient()
-        self.atr_engine = ATREngine()
-        self.suitability_analyzer = SuitabilityAnalyzer()
-        self.grid_strategy = GridStrategy()
+        
+        # 使用依赖注入或创建默认实例
+        self.atr_analyzer = atr_analyzer or ATRAnalyzer(ATRCalculator())
+        self.arithmetic_calculator = arithmetic_calculator or ArithmeticGridCalculator()
+        self.geometric_calculator = geometric_calculator or GeometricGridCalculator()
+        self.grid_optimizer = grid_optimizer or GridOptimizer()
+        self.suitability_analyzer = suitability_analyzer or SuitabilityAnalyzer()
         
         # 热门ETF列表
         self.popular_etfs = [
@@ -169,17 +188,18 @@ class ETFAnalysisService:
             # 3. 执性适宜度评估
             suitability_result = self.suitability_analyzer.comprehensive_evaluation(df, etf_info)
             
-            # 4. 计算网格策略参数
+            # 4. 计算网格策略参数（使用算法模块）
             atr_analysis = suitability_result['atr_analysis']
             market_indicators = suitability_result['market_indicators']
+            current_price = float(df.iloc[-1]['close'])
             
-            grid_params = self.grid_strategy.calculate_grid_parameters(
-                df=df,
+            grid_params = self._calculate_grid_parameters(
+                current_price=current_price,
+                atr_analysis=atr_analysis,
+                market_indicators=market_indicators,
                 total_capital=total_capital,
                 grid_type=grid_type,
-                risk_preference=risk_preference,
-                atr_analysis=atr_analysis,
-                market_indicators=market_indicators
+                risk_preference=risk_preference
             )
             
             # 5. 生成策略分析依据
@@ -340,3 +360,109 @@ class ETFAnalysisService:
         except Exception as e:
             logger.error(f"生成调整建议失败: {str(e)}")
             return {}
+    
+    def _calculate_grid_parameters(self, current_price: float, atr_analysis: Dict,
+                                 market_indicators: Dict, total_capital: float,
+                                 grid_type: str, risk_preference: str) -> Dict:
+        """
+        计算网格策略参数（使用算法模块）
+        
+        Args:
+            current_price: 当前价格
+            atr_analysis: ATR分析结果
+            market_indicators: 市场指标
+            total_capital: 总投资资金
+            grid_type: 网格类型
+            risk_preference: 风险偏好
+            
+        Returns:
+            网格策略参数
+        """
+        try:
+            atr_ratio = atr_analysis['current_atr_ratio']
+            
+            # 1. 计算价格区间（基于ATR和风险偏好）
+            price_lower, price_upper = self.atr_analyzer.calculate_price_range(
+                current_price, atr_ratio, risk_preference
+            )
+            
+            # 2. 基于ATR计算最优步长
+            step_size, step_ratio = self.grid_optimizer.calculate_optimal_step_size(
+                atr_ratio, current_price, risk_preference
+            )
+            
+            # 3. 基于步长计算网格数量
+            if grid_type == '等差':
+                grid_count = self.arithmetic_calculator.calculate_grid_count_from_step(
+                    price_lower, price_upper, step_size, current_price
+                )
+            else:  # 等比网格
+                grid_count = self.geometric_calculator.calculate_grid_count_from_step(
+                    price_lower, price_upper, step_size, current_price
+                )
+            
+            # 4. 计算价格水平
+            if grid_type == '等差':
+                price_levels = self.arithmetic_calculator.calculate_grid_levels(
+                    price_lower, price_upper, grid_count, current_price
+                )
+            else:  # 等比网格
+                price_levels = self.geometric_calculator.calculate_grid_levels(
+                    price_lower, price_upper, grid_count, current_price
+                )
+            
+            # 5. 计算底仓比例
+            base_position_ratio = self.grid_optimizer.calculate_base_position_ratio(
+                atr_ratio, risk_preference, 
+                market_indicators['adx_value'], 
+                market_indicators['volatility']
+            )
+            
+            # 6. 计算资金分配
+            fund_allocation = self.grid_optimizer.calculate_fund_allocation(
+                total_capital, base_position_ratio, grid_count, price_levels, current_price
+            )
+            
+            # 7. 计算价格区间比例
+            price_range_ratio = (price_upper - price_lower) / current_price
+            
+            # 8. ATR评分
+            atr_score, atr_description = self.atr_analyzer.get_atr_score(atr_ratio)
+            
+            result = {
+                'current_price': current_price,
+                'price_range': {
+                    'lower': round(price_lower, 3),
+                    'upper': round(price_upper, 3),
+                    'ratio': round(price_range_ratio, 4)
+                },
+                'grid_config': {
+                    'count': grid_count,
+                    'type': grid_type,
+                    'step_size': round(step_size, 3),
+                    'step_ratio': round(step_ratio, 4)
+                },
+                'price_levels': [round(p, 3) for p in price_levels],
+                'fund_allocation': fund_allocation,
+                'risk_preference': risk_preference,
+                'atr_based': True,
+                'atr_score': atr_score,
+                'atr_description': atr_description,
+                'calculation_method': 'ATR智能算法',
+                'calculation_logic': {
+                    'step1': f'ATR比率: {atr_ratio:.1%}',
+                    'step2': f'基于ATR和风险偏好计算最优步长: {step_size:.3f} ({step_ratio:.1%})',
+                    'step3': f'基于步长计算网格数量: {grid_count}个',
+                    'step4': f'调整价格区间: [{price_lower:.3f}, {price_upper:.3f}]',
+                    'step5': f'生成{len(price_levels)}个价格水平'
+                }
+            }
+            
+            logger.info(f"ATR智能网格策略计算完成: ATR步长{step_size:.3f}({step_ratio:.1%}), "
+                       f"{grid_count}个{grid_type}网格, 区间[{price_lower:.3f}, {price_upper:.3f}]")
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"网格策略参数计算失败: {str(e)}")
+            raise
