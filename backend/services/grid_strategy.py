@@ -417,8 +417,8 @@ class GridStrategy:
                     })
             
             # 6. 计算网格资金利用率
-            total_actual_fund = sum(gf['actual_fund'] for gf in grid_funds if gf['is_buy_level'])
-            utilization_rate = total_actual_fund / available_grid_amount
+            total_buy_grid_fund = sum(gf['actual_fund'] for gf in grid_funds if gf['is_buy_level'])
+            grid_fund_utilization_rate = total_buy_grid_fund / available_grid_amount
             
             # 7. 计算买入网格资金占用（极端情况验证）
             buy_grid_fund = sum(gf['actual_fund'] for gf in grid_funds if gf.get('is_buy_level', False))
@@ -437,8 +437,8 @@ class GridStrategy:
                 'grid_trading_amount': round(available_grid_amount, 2),
                 'reserve_amount': round(reserve_amount, 2),
                 'grid_funds': grid_funds,
-                'total_actual_fund': round(total_actual_fund, 2),
-                'utilization_rate': round(utilization_rate, 4),
+                'total_buy_grid_fund': round(total_buy_grid_fund, 2),
+                'grid_fund_utilization_rate': round(grid_fund_utilization_rate, 4),
                 'expected_profit_per_trade': round(expected_profit_per_trade, 2),
                 'grid_count': len(grid_funds),
                 'base_position_ratio': base_position_ratio,
@@ -451,7 +451,7 @@ class GridStrategy:
             
             logger.info(f"资金分配完成: 底仓{base_position_amount:.0f}, "
                        f"网格{available_grid_amount:.0f}, 单笔数量{single_trade_quantity}股, "
-                       f"买入网格资金{buy_grid_fund:.0f}, 安全比例{buy_grid_safety_ratio:.1%}")
+                       f"买入网格资金{buy_grid_fund:.0f}, 网格资金利用率{grid_fund_utilization_rate:.1%}")
             
             return result
             

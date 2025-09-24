@@ -101,11 +101,11 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
 
           <div className="text-center p-4 bg-purple-50 rounded-lg">
             <div className="text-2xl font-bold text-purple-600 mb-1">
-              {formatPercent(fund_allocation.utilization_rate)}
+              {formatPercent(fund_allocation.grid_fund_utilization_rate)}
             </div>
-            <div className="text-sm text-purple-700 font-medium">资金利用率</div>
+            <div className="text-sm text-purple-700 font-medium">网格资金利用率</div>
             <div className="text-xs text-gray-600 mt-1">
-              实际投入比例
+              最大买入时占比网格资金
             </div>
           </div>
         </div>
@@ -254,48 +254,10 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
 
         </div>
 
-        {/* 单笔数量风险提示 */}
-        {fund_allocation.single_trade_quantity && (
-          <div className={`mt-4 p-4 rounded-lg ${
-            fund_allocation.extreme_case_safe 
-              ? 'bg-blue-50 border border-blue-200' 
-              : 'bg-yellow-50 border border-yellow-200'
-          }`}>
-            <div className="flex items-center gap-2 mb-2">
-              <Info className={`w-4 h-4 ${
-                fund_allocation.extreme_case_safe ? 'text-blue-600' : 'text-yellow-600'
-              }`} />
-              <span className={`font-medium ${
-                fund_allocation.extreme_case_safe ? 'text-blue-900' : 'text-yellow-900'
-              }`}>
-                单笔数量风险评估
-              </span>
-            </div>
-            <div className={`text-sm ${
-              fund_allocation.extreme_case_safe ? 'text-blue-800' : 'text-yellow-800'
-            }`}>
-              <p>
-                <strong>计算公式：</strong>（网格金额 ÷ 网格数量 × 2 ÷ 标的价格）向下取整到100股整数倍
-              </p>
-              <p className="mt-1">
-                <strong>极端情况验证：</strong>
-                {fund_allocation.extreme_case_safe 
-                  ? '单边下跌时所有买入网格成交，资金需求在安全范围内'
-                  : '单边下跌时资金可能不足，建议降低单笔数量或增加网格资金'
-                }
-              </p>
-              <p className="mt-1">
-                <strong>风险控制：</strong>已预留5%安全边际，保障资金流动性
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* 网格价格水平 */}
-      {gridStrategy.price_levels && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="flex items-center gap-3 mb-4">
+        {/* 网格价格水平 */}
+        {gridStrategy.price_levels && (
+          <>
+          <div className="flex items-center gap-3 mb-4 mt-4">
             <div className="p-2 bg-indigo-100 rounded-lg">
               <BarChart3 className="w-5 h-5 text-indigo-600" />
             </div>
@@ -381,8 +343,9 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
               </div>
             )}
           </div>
-        </div>
-      )}
+          </>
+        )}
+      </div>
 
       {/* 策略优势说明 */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">

@@ -420,7 +420,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareB
                       <li>• 总投资资金：¥{(input_parameters?.total_capital || 0).toLocaleString()}</li>
                       <li>• 底仓资金：¥{(grid_strategy?.fund_allocation?.base_position_amount || 0).toLocaleString()}</li>
                       <li>• 网格资金：¥{(grid_strategy?.fund_allocation?.grid_trading_amount || 0).toLocaleString()}</li>
-                      <li>• 资金利用率：{((grid_strategy?.fund_allocation?.utilization_rate || 0) * 100).toFixed(1)}%</li>
+                      <li>• 网格资金利用率：{((grid_strategy?.fund_allocation?.grid_fund_utilization_rate || 0) * 100).toFixed(1)}%</li>
                     </ul>
                   </div>
                   <div>

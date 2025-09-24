@@ -367,10 +367,10 @@ class ETFAnalysisService:
                 )
             
             # 资金效率建议
-            utilization_rate = grid_params['fund_allocation']['utilization_rate']
-            if utilization_rate < 0.8:
+            grid_fund_utilization_rate = grid_params['fund_allocation']['grid_fund_utilization_rate']
+            if grid_fund_utilization_rate < 0.8:
                 suggestions['profit_enhancement'].append(
-                    f"资金利用率{utilization_rate:.1%}偏低，可考虑调整网格配置"
+                    f"网格资金利用率{grid_fund_utilization_rate:.1%}偏低，可考虑调整网格配置"
                 )
             
             return suggestions
