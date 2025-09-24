@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2025-09-24
+### :sparkles: New Features
+- [`3a4f2cd`](https://github.com/jorben/etf-grid-design/commit/3a4f2cdd7a187c51dc2922cb786d82ca23dd40c1) - add global watermark component with responsive design *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.1.0] - 2025-09-24
 ### :sparkles: New Features
 - [`6d98067`](https://github.com/jorben/etf-grid-design/commit/6d980673836476063c48c73eab401ec38c7f5b65) - add GitHub repository link to header navigation *(commit by [@jorben](https://github.com/jorben))*
@@ -77,3 +82,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.0.2]: https://github.com/jorben/etf-grid-design/compare/0.0.1...0.0.2
 [0.0.3]: https://github.com/jorben/etf-grid-design/compare/0.0.2...0.0.3
 [0.1.0]: https://github.com/jorben/etf-grid-design/compare/0.0.3...0.1.0
+[0.1.1]: https://github.com/jorben/etf-grid-design/compare/0.1.0...0.1.1
