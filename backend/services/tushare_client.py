@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class TushareClient:
     """Tushare数据客户端 - 使用增强缓存策略"""
     
-    def __init__(self, cache_dir: str = "cache"):
+    def __init__(self, cache_dir: str = "../cache"):
         """初始化Tushare客户端"""
         self.token = os.getenv('TUSHARE_TOKEN')
         if not self.token:

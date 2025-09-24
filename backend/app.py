@@ -5,7 +5,7 @@ ETF网格交易策略分析系统 - Flask应用
 
 import os
 import logging
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from datetime import datetime
 import traceback
@@ -26,12 +26,73 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# 创建Flask应用
-app = Flask(__name__)
+# 根据环境变量决定静态文件配置
+FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
+
+if FLASK_ENV == 'production':
+    # 生产环境：配置静态文件服务
+    app = Flask(__name__, 
+               static_folder='../static',
+               static_url_path='/static')
+    logger.info("生产环境模式：启用静态文件服务")
+else:
+    # 开发环境：不处理静态文件（前端独立运行）
+    app = Flask(__name__)
+    logger.info("开发环境模式：仅提供API服务")
+
 CORS(app)
 
 # 初始化服务
 etf_service = ETFAnalysisService()
+
+# 只在生产环境添加静态文件路由
+if FLASK_ENV == 'production':
+    @app.route('/')
+    def serve_index():
+        """服务前端主页"""
+        try:
+            return send_file('../static/index.html')
+        except FileNotFoundError:
+            logger.error("静态文件 index.html 不存在")
+            return jsonify({
+                'success': False,
+                'error': '前端文件未找到，请检查构建是否完成'
+            }), 404
+    
+    @app.route('/<path:path>')
+    def serve_static_files(path):
+        """服务静态文件，支持SPA路由"""
+        # 如果是API路由，跳过静态文件处理
+        if path.startswith('api/'):
+            return None
+        
+        # 定义前端路由路径（这些路径应该返回 index.html）
+        frontend_routes = ['analysis', 'dashboard', 'settings', 'help']
+        
+        # 检查是否是前端路由
+        if any(path.startswith(route) for route in frontend_routes):
+            try:
+                return send_file('../static/index.html')
+            except FileNotFoundError:
+                logger.error("静态文件 index.html 不存在")
+                return jsonify({
+                    'success': False,
+                    'error': '前端文件未找到'
+                }), 404
+        
+        # 尝试提供静态文件
+        try:
+            return send_from_directory('../static', path)
+        except FileNotFoundError:
+            # 文件不存在时返回index.html（支持其他前端路由）
+            try:
+                return send_file('../static/index.html')
+            except FileNotFoundError:
+                logger.error("静态文件 index.html 不存在")
+                return jsonify({
+                    'success': False,
+                    'error': '前端文件未找到'
+                }), 404
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -40,7 +101,8 @@ def health_check():
         'status': 'healthy',
         'timestamp': datetime.now().isoformat(),
         'service': 'ETF Grid Trading Analysis System',
-        'version': VERSION
+        'version': VERSION,
+        'environment': FLASK_ENV
     })
 
 @app.route('/api/version', methods=['GET'])
