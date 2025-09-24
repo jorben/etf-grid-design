@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2025-09-24
+### :sparkles: New Features
+- [`efd8940`](https://github.com/jorben/etf-grid-design/commit/efd894053b1ac3843ac49722229cb27263d4bef2) - restructure backend services and algorithms directories *(commit by [@jorben](https://github.com/jorben))*
+- [`4e8f5fa`](https://github.com/jorben/etf-grid-design/commit/4e8f5fa10a4c72d68d36966c017209f0d3e71e40) - **api**: add middleware and refactor application structure *(commit by [@jorben](https://github.com/jorben))*
+- [`5410cc4`](https://github.com/jorben/etf-grid-design/commit/5410cc471b747230ad0554b5c072f6e937e72be3) - extract ATR algorithms from service layer to dedicated module *(commit by [@jorben](https://github.com/jorben))*
+- [`079cac3`](https://github.com/jorben/etf-grid-design/commit/079cac3d2e742caa69402f90c1c33912c6e6a658) - add configuration management module and update documentation *(commit by [@jorben](https://github.com/jorben))*
+- [`f89d9ef`](https://github.com/jorben/etf-grid-design/commit/f89d9ef224ad1a4e8caf1e7ee5ffbd237a40327e) - add backend architecture documentation and update app configuration *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.1.1] - 2025-09-24
 ### :sparkles: New Features
 - [`3a4f2cd`](https://github.com/jorben/etf-grid-design/commit/3a4f2cdd7a187c51dc2922cb786d82ca23dd40c1) - add global watermark component with responsive design *(commit by [@jorben](https://github.com/jorben))*
@@ -83,3 +92,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.0.3]: https://github.com/jorben/etf-grid-design/compare/0.0.2...0.0.3
 [0.1.0]: https://github.com/jorben/etf-grid-design/compare/0.0.3...0.1.0
 [0.1.1]: https://github.com/jorben/etf-grid-design/compare/0.1.0...0.1.1
+[0.1.2]: https://github.com/jorben/etf-grid-design/compare/0.1.1...0.1.2
