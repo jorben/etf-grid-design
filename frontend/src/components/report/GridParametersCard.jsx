@@ -145,9 +145,9 @@ const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, 
             <div className="text-2xl font-bold text-gray-900 mb-1">
               ¥{current_price.toFixed(3)}
             </div>
-            <div className="text-sm text-gray-700 font-medium">当前价格</div>
+            <div className="text-sm text-gray-700 font-medium">基准价格</div>
             <div className="text-xs text-gray-600 mt-1">
-              参考基准价格
+              最近交易日收盘价
             </div>
           </div>
 

@@ -108,6 +108,13 @@ class ApiService {
   async healthCheck() {
     return this.get('/health');
   }
+
+  /**
+   * 获取系统版本号
+   */
+  async getVersion() {
+    return this.get('/version');
+  }
 }
 
 // 创建单例实例
@@ -121,5 +128,6 @@ export const validateETFCode = (etfCode) => apiService.validateETFCode(etfCode);
 export const getHistoricalData = (etfCode, startDate, endDate) => 
   apiService.getHistoricalData(etfCode, startDate, endDate);
 export const healthCheck = () => apiService.healthCheck();
+export const getVersion = () => apiService.getVersion();
 
 export default apiService;
