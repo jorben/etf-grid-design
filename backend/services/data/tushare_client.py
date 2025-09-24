@@ -4,7 +4,7 @@ import pandas as pd
 import logging
 from datetime import datetime, timedelta
 from typing import Optional, Dict, List
-from .enhanced_cache import EnhancedCache, TradingDateManager
+from .cache_service import EnhancedCache, TradingDateManager
 
 logger = logging.getLogger(__name__)
 

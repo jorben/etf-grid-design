@@ -10,7 +10,7 @@ import logging
 from datetime import datetime, timedelta
 import json
 
-from .tushare_client import TushareClient
+from ..data.tushare_client import TushareClient
 from .atr_engine import ATREngine
 from .suitability_analyzer import SuitabilityAnalyzer
 from .grid_strategy import GridStrategy
@@ -340,4 +340,3 @@ class ETFAnalysisService:
         except Exception as e:
             logger.error(f"生成调整建议失败: {str(e)}")
             return {}
-    

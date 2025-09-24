@@ -17,7 +17,7 @@ VERSION = "0.1.0"
 # 加载环境变量
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
-from services.etf_analysis_service import ETFAnalysisService
+from services.analysis.etf_analysis_service import ETFAnalysisService
 
 # 配置日志
 logging.basicConfig(
