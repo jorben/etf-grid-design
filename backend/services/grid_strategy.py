@@ -507,8 +507,8 @@ class GridStrategy:
             safety_ratio = total_required_fund / available_grid_amount
             
             # 6. 如果超出资金限制，进一步调整
-            if safety_ratio > 0.98:  # 保留2%安全边际
-                adjustment_factor = 0.98 / safety_ratio
+            if safety_ratio > 1:  
+                adjustment_factor = 1 / safety_ratio
                 adjusted_shares = int(single_trade_quantity * adjustment_factor / 100) * 100
                 single_trade_quantity = max(100, adjusted_shares)
                 
