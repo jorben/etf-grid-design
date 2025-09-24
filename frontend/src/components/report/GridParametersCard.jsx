@@ -156,14 +156,49 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Calculator className="w-4 h-4 text-blue-600" />
-            <span className="font-medium text-blue-900">区间计算说明</span>
+        {/* 价格区间比例可视化Bar */}
+        <div className="mt-6 mb-4">
+          <div className="relative h-12 rounded-lg overflow-hidden bg-gradient-to-r from-green-400 via-yellow-400 to-red-400">
+            {/* 当前价格位置指示器 */}
+            <div 
+              className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg"
+              style={{
+                left: `${((current_price - price_range.lower) / (price_range.upper - price_range.lower)) * 100}%`
+              }}
+            >
+              <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white rounded-full shadow-md"></div>
+              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white rounded-full shadow-md"></div>
+            </div>
+            
+            {/* 中央显示价格区间比例 */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-white bg-opacity-90 px-4 py-1 rounded-full shadow-sm">
+                <span className="text-sm font-bold text-gray-900">
+                  价格区间跨度: {formatPercent(price_range.ratio)}
+                </span>
+              </div>
+            </div>
+            
+            {/* 左侧标签 */}
+            <div className="absolute left-2 top-1/2 transform -translate-y-1/2">
+              <span className="text-xs font-medium text-white drop-shadow pl-2">
+                ¥{price_range.lower.toFixed(3)}
+              </span>
+            </div>
+            
+            {/* 右侧标签 */}
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+              <span className="text-xs font-medium text-white drop-shadow pr-2">
+                ¥{price_range.upper.toFixed(3)}
+              </span>
+            </div>
           </div>
-          <div className="text-sm text-blue-800">
-            <p>价格区间比例: {formatPercent(price_range.ratio)}</p>
-            <p className="mt-1">计算方法: {calculation_method}</p>
+          
+          {/* Bar下方说明 */}
+          <div className="flex justify-between items-center mt-2 text-xs text-gray-600">
+            <span>买入区间</span>
+            <span>基准位置</span>
+            <span>卖出区间</span>
           </div>
         </div>
       </div>
