@@ -10,10 +10,16 @@ import {
   Settings,
   Info,
   Percent,
-  Hash
+  Hash,
+  Lightbulb,
+  CheckCircle,
+  Zap,
+  Activity,
+  Shield,
+  AlertTriangle
 } from 'lucide-react';
 
-const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = false }) => {
+const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, adjustmentSuggestions, showDetailed = false }) => {
   if (!gridStrategy) return null;
 
   const {
@@ -240,7 +246,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
 
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-4 h-4 text-gray-600" />
+              <Activity className="w-4 h-4 text-gray-600" />
               <span className="text-sm font-medium text-gray-700">网格步长</span>
             </div>
             {/* 根据网格类型动态展示重点 */}
@@ -382,31 +388,128 @@ const GridParametersCard = ({ gridStrategy, inputParameters, showDetailed = fals
         )}
       </div>
 
-      {/* 策略优势说明 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Info className="w-5 h-5 text-blue-600" />
-          <h4 className="font-semibold text-blue-900">ATR算法优势</h4>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-800">
-          <div>
-            <h5 className="font-medium mb-2">算法特点</h5>
-            <ul className="space-y-1">
-              <li>• 考虑跳空因素，比传统振幅更准确</li>
-              <li>• 动态适应市场波动特征</li>
-              <li>• 避免静态统计方法的滞后性</li>
-            </ul>
+      {/* 策略分析依据 */}
+      {strategyRationale && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-indigo-100 rounded-lg">
+              <Lightbulb className="w-5 h-5 text-indigo-600" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900">策略分析依据</h4>
+              <p className="text-sm text-gray-600">参数选择逻辑和算法优势说明</p>
+            </div>
           </div>
-          <div>
-            <h5 className="font-medium mb-2">应用优势</h5>
-            <ul className="space-y-1">
-              <li>• 标准化处理，便于不同标的比较</li>
-              <li>• 能够捕捉市场波动模式变化</li>
-              <li>• 科学的风险偏好匹配机制</li>
-            </ul>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* ATR算法优势 */}
+            <div>
+              <h5 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                <Target className="w-4 h-4 text-blue-600" />
+                ATR算法优势
+              </h5>
+              <ul className="space-y-2 text-sm text-gray-700">
+                {strategyRationale.atr_advantages?.map((advantage, index) => (
+                  <li key={index} className="flex items-start gap-2 bg-gray-50 rounded p-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    {advantage}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* 参数选择逻辑 */}
+            <div>
+              <h5 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                <Info className="w-4 h-4 text-purple-600" />
+                参数选择逻辑
+              </h5>
+              <div className="space-y-2 text-sm text-gray-700">
+                {strategyRationale.parameter_logic && Object.entries(strategyRationale.parameter_logic).map(([key, value]) => (
+                  <div key={key} className="p-2 bg-gray-50 rounded">
+                    <span className="font-medium capitalize">{key.replace('_', ' ')}: </span>
+                    {value}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 市场环境分析 */}
+          {strategyRationale.market_environment && (
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+              <h5 className="font-medium text-blue-900 mb-2">市场环境分析</h5>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span className="text-blue-700 font-medium">波动率: </span>
+                  <span className="text-blue-800">{strategyRationale.market_environment.volatility}</span>
+                </div>
+                <div>
+                  <span className="text-blue-700 font-medium">趋势特征: </span>
+                  <span className="text-blue-800">{strategyRationale.market_environment.trend_characteristic}</span>
+                </div>
+                <div>
+                  <span className="text-blue-700 font-medium">流动性: </span>
+                  <span className="text-blue-800">{strategyRationale.market_environment.liquidity}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 调整建议 */}
+      {adjustmentSuggestions && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <Zap className="w-5 h-5 text-yellow-600" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900">策略调整建议</h4>
+              <p className="text-sm text-gray-600">市场环境变化时的优化方案</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {Object.entries(adjustmentSuggestions).map(([category, suggestions]) => {
+              if (!suggestions || suggestions.length === 0) return null;
+              
+              const categoryNames = {
+                market_environment_changes: '市场环境应对',
+                parameter_optimization: '参数优化',
+                risk_control: '风险控制',
+                profit_enhancement: '收益增强'
+              };
+
+              const categoryIcons = {
+                market_environment_changes: <Activity className="w-4 h-4" />,
+                parameter_optimization: <Target className="w-4 h-4" />,
+                risk_control: <Shield className="w-4 h-4" />,
+                profit_enhancement: <TrendingUp className="w-4 h-4" />
+              };
+
+              return (
+                <div key={category}>
+                  <h5 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    {categoryIcons[category]}
+                    {categoryNames[category]}
+                  </h5>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    {suggestions.map((suggestion, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                        {suggestion}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
         </div>
-      </div>
+      )}
+
     </div>
   );
 };
