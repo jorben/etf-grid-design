@@ -5,6 +5,7 @@ import ParameterForm from './components/ParameterForm';
 import AnalysisReport from './components/AnalysisReport';
 import AnalysisPage from './components/AnalysisPage';
 import AnalysisHistory from './components/AnalysisHistory';
+import Watermark from './components/Watermark';
 import { analyzeETF, getVersion } from './services/api';
 import { generateAnalysisURL } from './utils/urlParams';
 import { Waypoints, Cpu, Target, TrendingUp, Github, ThermometerSun, Share2 } from 'lucide-react';
@@ -91,6 +92,8 @@ function App() {
     <HelmetProvider>
       <Router>
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        {/* 全局水印 */}
+        <Watermark />
         {/* 顶部导航 */}
         <header className="bg-white shadow-sm border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
