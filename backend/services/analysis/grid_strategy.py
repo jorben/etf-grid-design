@@ -1,22 +1,42 @@
 """
-网格策略计算模块
-基于ATR算法的智能网格参数计算和资金分配
+网格策略服务 - 业务流程协调
+重构后的服务层，专注于业务流程协调，算法逻辑已抽离到算法模块
 """
 
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Tuple, Optional
 import logging
-from .atr_engine import ATREngine
+from algorithms.atr.analyzer import ATRAnalyzer
+from algorithms.atr.calculator import ATRCalculator
+from algorithms.grid.arithmetic_grid import ArithmeticGridCalculator
+from algorithms.grid.geometric_grid import GeometricGridCalculator
+from algorithms.grid.optimizer import GridOptimizer
 
 logger = logging.getLogger(__name__)
 
 class GridStrategy:
-    """网格策略计算器"""
+    """网格策略服务 - 专注于业务流程协调"""
     
-    def __init__(self):
-        """初始化策略计算器"""
-        self.atr_engine = ATREngine()
+    def __init__(self, 
+                 atr_analyzer: ATRAnalyzer = None,
+                 arithmetic_calculator: ArithmeticGridCalculator = None,
+                 geometric_calculator: GeometricGridCalculator = None,
+                 grid_optimizer: GridOptimizer = None):
+        """
+        初始化网格策略服务 - 使用依赖注入
+        
+        Args:
+            atr_analyzer: ATR分析器实例
+            arithmetic_calculator: 等差网格计算器实例
+            geometric_calculator: 等比网格计算器实例
+            grid_optimizer: 网格优化器实例
+        """
+        # 使用依赖注入或创建默认实例
+        self.atr_analyzer = atr_analyzer or ATRAnalyzer(ATRCalculator())
+        self.arithmetic_calculator = arithmetic_calculator or ArithmeticGridCalculator()
+        self.geometric_calculator = geometric_calculator or GeometricGridCalculator()
+        self.grid_optimizer = grid_optimizer or GridOptimizer()
     
     def calculate_base_position_ratio(self, atr_ratio: float, risk_preference: str, 
                                     adx_value: float, volatility: float) -> float:
@@ -603,42 +623,52 @@ class GridStrategy:
             atr_ratio = atr_analysis['current_atr_ratio']
             
             # 1. 计算价格区间（基于ATR和风险偏好）
-            price_lower, price_upper = self.atr_engine.calculate_price_range(
+            price_lower, price_upper = self.atr_analyzer.calculate_price_range(
                 current_price, atr_ratio, risk_preference
             )
             
             # 2. 基于ATR计算最优步长（核心改进）
-            step_size, step_ratio = self.calculate_optimal_step_size(
+            step_size, step_ratio = self.grid_optimizer.calculate_optimal_step_size(
                 atr_ratio, current_price, risk_preference
             )
             
             # 3. 基于步长计算网格数量（而不是先定义数量）
-            grid_count = self.calculate_grid_count_from_step(
-                price_lower, price_upper, step_size, grid_type, current_price
-            )
+            if grid_type == '等差':
+                grid_count = self.arithmetic_calculator.calculate_grid_count_from_step(
+                    price_lower, price_upper, step_size, current_price
+                )
+            else:  # 等比网格
+                grid_count = self.geometric_calculator.calculate_grid_count_from_step(
+                    price_lower, price_upper, step_size, current_price
+                )
             
             # 4. 计算价格水平（传入基准价格和步长确保精确计算）
-            price_levels = self.calculate_price_levels(
-                price_lower, price_upper, grid_count, grid_type, current_price, step_size
-            )
+            if grid_type == '等差':
+                price_levels = self.arithmetic_calculator.calculate_grid_levels(
+                    price_lower, price_upper, grid_count, current_price
+                )
+            else:  # 等比网格
+                price_levels = self.geometric_calculator.calculate_grid_levels(
+                    price_lower, price_upper, grid_count, current_price
+                )
             
             # 5. 计算底仓比例
-            base_position_ratio = self.calculate_base_position_ratio(
+            base_position_ratio = self.grid_optimizer.calculate_base_position_ratio(
                 atr_ratio, risk_preference, 
                 market_indicators['adx_value'], 
                 market_indicators['volatility']
             )
             
             # 6. 计算资金分配（传入基准价格）
-            fund_allocation = self.calculate_fund_allocation(
+            fund_allocation = self.grid_optimizer.calculate_fund_allocation(
                 total_capital, base_position_ratio, grid_count, price_levels, current_price
             )
             
             # 7. 计算价格区间比例
             price_range_ratio = (price_upper - price_lower) / current_price
             
-            # 9. ATR评分
-            atr_score, atr_description = self.atr_engine.get_atr_score(atr_ratio)
+            # 8. ATR评分
+            atr_score, atr_description = self.atr_analyzer.get_atr_score(atr_ratio)
             
             result = {
                 'current_price': current_price,
@@ -677,4 +707,3 @@ class GridStrategy:
         except Exception as e:
             logger.error(f"网格策略参数计算失败: {str(e)}")
             raise
-

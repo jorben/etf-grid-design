@@ -6,11 +6,21 @@ flask==3.1.2
     # via etf-grid-design (pyproject.toml)
 flask-cors==6.0.1
     # via etf-grid-design (pyproject.toml)
+gevent==25.9.1
+    # via etf-grid-design (pyproject.toml)
+gunicorn==23.0.0
+    # via etf-grid-design (pyproject.toml)
 matplotlib==3.10.6
     # via etf-grid-design (pyproject.toml)
 numpy==2.3.3
     # via etf-grid-design (pyproject.toml)
 pandas==2.3.2
+    # via etf-grid-design (pyproject.toml)
+psutil==6.1.1
+    # via etf-grid-design (pyproject.toml)
+pydantic==2.10.6
+    # via etf-grid-design (pyproject.toml)
+pydantic-settings==2.11.0
     # via etf-grid-design (pyproject.toml)
 python-dateutil==2.9.0.post0
     # via etf-grid-design (pyproject.toml)
@@ -28,7 +38,3 @@ tushare==1.4.24
     # via etf-grid-design (pyproject.toml)
 yfinance==0.2.66
     # via etf-grid-design (pyproject.toml)
-gunicorn==21.2.0
-    # via production deployment
-gevent==23.9.1
-    # via gunicorn worker class

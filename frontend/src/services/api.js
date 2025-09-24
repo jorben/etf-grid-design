@@ -3,9 +3,7 @@
  * 处理与后端的所有HTTP通信
  */
 
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? '/api' 
-  : 'http://localhost:5001/api';
+const API_BASE_URL = '/api';
 
 class ApiService {
   constructor() {

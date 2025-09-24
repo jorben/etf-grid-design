@@ -341,9 +341,9 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
           </label>
           <div className="grid grid-cols-3 gap-3">
             {[
-              { value: '保守', label: '保守型', desc: '风险较低，收益稳定', color: 'green' },
-              { value: '稳健', label: '稳健型', desc: '平衡风险收益', color: 'blue' },
-              { value: '激进', label: '激进型', desc: '追求高收益', color: 'red' }
+              { value: '保守', label: '保守型', desc: '耐心低频交易', color: 'green' },
+              { value: '稳健', label: '稳健型', desc: '平衡机会风险', color: 'blue' },
+              { value: '激进', label: '激进型', desc: '更多成交机会', color: 'red' }
             ].map(option => (
               <label
                 key={option.value}
