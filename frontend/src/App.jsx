@@ -5,7 +5,7 @@ import ParameterForm from './components/ParameterForm';
 import AnalysisReport from './components/AnalysisReport';
 import AnalysisPage from './components/AnalysisPage';
 import AnalysisHistory from './components/AnalysisHistory';
-import { analyzeETF } from './services/api';
+import { analyzeETF, getVersion } from './services/api';
 import { generateAnalysisURL } from './utils/urlParams';
 import { Waypoints, Cpu, Target, TrendingUp, Github, ThermometerSun, Share2 } from 'lucide-react';
 import './App.css';
@@ -14,7 +14,25 @@ function App() {
   const [analysisData, setAnalysisData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState('input'); // 'input' | 'analysis'
+  const [version, setVersion] = useState('v1.0.0'); // 默认版本号
   const parameterFormRef = useRef(null);
+
+  // 获取系统版本号
+  useEffect(() => {
+    const fetchVersion = async () => {
+      try {
+        const response = await getVersion();
+        if (response.success && response.data.version) {
+          setVersion(`v${response.data.version}`);
+        }
+      } catch (error) {
+        console.error('获取版本号失败:', error);
+        // 保持默认版本号
+      }
+    };
+
+    fetchVersion();
+  }, []);
 
   // 处理分析请求 - 跳转到分析页面
   const handleAnalysis = async (parameters) => {
@@ -237,7 +255,7 @@ function App() {
                   <li>• 数据源：Tushare金融数据</li>
                   <li>• 算法：ATR + ADX + 统计分析</li>
                   <li>• 更新频率：每日收盘后</li>
-                  <li>• 版本：v1.0.0</li>
+                  <li>• 版本：{version}</li>
                 </ul>
               </div>
             </div>

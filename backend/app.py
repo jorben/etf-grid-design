@@ -11,6 +11,9 @@ from datetime import datetime
 import traceback
 from dotenv import load_dotenv
 
+# 系统版本号
+VERSION = "0.1.0"
+
 # 加载环境变量
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
@@ -36,7 +39,19 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'timestamp': datetime.now().isoformat(),
-        'service': 'ETF Grid Trading Analysis System'
+        'service': 'ETF Grid Trading Analysis System',
+        'version': VERSION
+    })
+
+@app.route('/api/version', methods=['GET'])
+def get_version():
+    """获取系统版本号"""
+    return jsonify({
+        'success': True,
+        'data': {
+            'version': VERSION,
+            'timestamp': datetime.now().isoformat()
+        }
     })
 
 @app.route('/api/popular-etfs', methods=['GET'])
