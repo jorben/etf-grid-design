@@ -32,7 +32,7 @@ elif [ "$FLASK_ENV" = "production" ]; then
     # 检查Gunicorn配置文件
     if [ -f "/app/gunicorn.conf.py" ]; then
         echo "📋 使用Gunicorn配置文件启动..."
-        exec gunicorn --config /app/gunicorn.conf.py app_production:app
+        exec gunicorn --config /app/gunicorn.conf.py app:app
     else
         echo "📋 使用默认Gunicorn配置启动..."
         exec gunicorn \
@@ -48,9 +48,9 @@ elif [ "$FLASK_ENV" = "production" ]; then
             --access-logfile /app/logs/access.log \
             --error-logfile /app/logs/error.log \
             --log-level ${LOG_LEVEL:-info} \
-            app_production:app
+            app:app
     fi
 else
     echo "🔧 直接启动Flask应用..."
-    exec python backend/app_production.py
+    exec python backend/app.py
 fi
