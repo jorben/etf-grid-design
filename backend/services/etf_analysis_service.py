@@ -10,7 +10,7 @@ import logging
 from datetime import datetime, timedelta
 import json
 
-from .data_service import DataService
+from .tushare_client import TushareClient
 from .atr_engine import ATREngine
 from .suitability_analyzer import SuitabilityAnalyzer
 from .grid_strategy import GridStrategy
@@ -23,11 +23,10 @@ class ETFAnalysisService:
     
     def __init__(self):
         """初始化分析服务"""
-        self.data_service = DataService()
+        self.tushare_client = TushareClient()
         self.atr_engine = ATREngine()
         self.suitability_analyzer = SuitabilityAnalyzer()
         self.grid_strategy = GridStrategy()
-        self.cache = {}  # 简单内存缓存
         
         # 热门ETF列表
         self.popular_etfs = [
@@ -67,37 +66,35 @@ class ETFAnalysisService:
             ETF基础信息
         """
         try:
-            # 尝试从缓存获取
-            cache_key = f"etf_basic_{etf_code}"
-            if cache_key in self.cache:
-                logger.info(f"从缓存获取ETF基础信息: {etf_code}")
-                return self.cache[cache_key]
-            
-            # 获取基础信息
-            basic_info = self.data_service.get_fund_basic(etf_code)
+            # 获取基础信息（使用增强缓存）
+            basic_info = self.tushare_client.get_etf_basic_info(etf_code)
             if not basic_info:
                 raise ValueError(f"未找到ETF代码: {etf_code}")
             
-            # 获取实时行情
-            current_data = self.data_service.get_current_price(etf_code)
+            # 获取最新价格（使用增强缓存）
+            price_data = self.tushare_client.get_latest_price(etf_code)
+            if not price_data:
+                raise ValueError(f"未获取到ETF价格数据: {etf_code}")
+            
+            # 获取ETF名称（使用增强缓存）
+            etf_name = self.tushare_client.get_etf_name(etf_code)
             
             # 整合信息
             etf_info = {
                 'code': etf_code,
-                'name': basic_info.get('name', '未知'),
+                'name': etf_name or basic_info.get('name', '未知'),
                 'management_company': basic_info.get('management', '未知'),
-                'current_price': current_data.get('close', 0),
-                'change_pct': current_data.get('pct_chg', 0),
-                'volume': current_data.get('vol', 0),
-                'amount': current_data.get('amount', 0),
-                'setup_date': basic_info.get('setup_date', ''),
+                'current_price': price_data.get('current_price', 0),
+                'change_pct': price_data.get('pct_change', 0),
+                'volume': price_data.get('volume', 0),
+                'amount': price_data.get('amount', 0),
+                'setup_date': basic_info.get('found_date', ''),
                 'list_date': basic_info.get('list_date', ''),
-                'fund_type': basic_info.get('fund_type', 'ETF'),
-                'status': basic_info.get('status', 'L')
+                'fund_type': 'ETF',
+                'status': 'L',
+                'trade_date': price_data.get('trade_date', ''),
+                'data_age_days': price_data.get('data_age_days', 0)
             }
-            
-            # 缓存结果
-            self.cache[cache_key] = etf_info
             
             logger.info(f"获取ETF基础信息成功: {etf_code} - {etf_info['name']}")
             return etf_info
@@ -122,26 +119,21 @@ class ETFAnalysisService:
             end_date = datetime.now().strftime('%Y%m%d')
             start_date = (datetime.now() - timedelta(days=days)).strftime('%Y%m%d')
             
-            # 尝试从缓存获取
-            cache_key = f"etf_daily_{etf_code}_{start_date}_{end_date}"
-            if cache_key in self.cache:
-                logger.info(f"从缓存获取历史数据: {etf_code}")
-                return pd.DataFrame(self.cache[cache_key])
-            
-            # 获取历史数据
-            df = self.data_service.get_daily_data(etf_code, start_date, end_date)
+            # 获取历史数据（使用增强缓存）
+            df = self.tushare_client.get_etf_daily_data(etf_code, start_date, end_date)
             if df is None or len(df) == 0:
                 raise ValueError(f"未获取到历史数据: {etf_code}")
             
             # 数据清洗和验证
             df = df.dropna()
-            df = df.sort_values('date')
+            df = df.sort_values('trade_date')
+            
+            # 重命名列以匹配分析模块的期望格式
+            if 'trade_date' in df.columns:
+                df = df.rename(columns={'trade_date': 'date'})
             
             if len(df) < 30:
                 logger.warning(f"历史数据不足30天: {etf_code}, 实际{len(df)}天")
-            
-            # 缓存结果
-            self.cache[cache_key] = df.to_dict('records')
             
             logger.info(f"获取历史数据成功: {etf_code}, {len(df)}条记录")
             return df

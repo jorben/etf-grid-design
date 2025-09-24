@@ -288,7 +288,7 @@ class SuitabilityAnalyzer:
             avg_amount = df['amount'].mean() / 10  # 千元转换为万元
             
             # 成交量稳定性（变异系数）
-            volume_stability = df['volume'].std() / df['volume'].mean()  # 变异系数
+            volume_stability = df['vol'].std() / df['vol'].mean()  # 变异系数
             
             # 3. 各维度评估
             amplitude_eval = self.evaluate_amplitude(atr_analysis['current_atr_ratio'])

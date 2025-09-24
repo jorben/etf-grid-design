@@ -1,68 +1,45 @@
 """
 数据获取服务
 整合Tushare API，提供ETF数据获取功能
+注意：此服务已被TushareClient替代，保留用于向后兼容
 """
 
-import tushare as ts
 import pandas as pd
-import numpy as np
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
-import os
-from cachetools import TTLCache
+from typing import Dict
 import logging
+from .tushare_client import TushareClient
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class DataService:
-    """数据获取服务类"""
+    """数据获取服务类 - 兼容性包装器"""
     
     def __init__(self):
         """初始化数据服务"""
-        # 从环境变量获取Tushare token
-        self.token = os.getenv('TUSHARE_TOKEN')
-        
-        if not self.token or self.token == 'your_tushare_token_here':
-            raise ValueError("必须配置有效的TUSHARE_TOKEN环境变量才能使用本系统")
-        
-        try:
-            ts.set_token(self.token)
-            self.pro = ts.pro_api()
-            logger.info("Tushare API初始化成功")
-        except Exception as e:
-            logger.error(f"Tushare API初始化失败: {str(e)}")
-            raise RuntimeError(f"Tushare API初始化失败: {str(e)}")
-        
-        # 初始化缓存（TTL=1小时）
-        self.cache = TTLCache(maxsize=1000, ttl=3600)
+        logger.warning("DataService已被TushareClient替代，建议直接使用TushareClient")
+        self.tushare_client = TushareClient()
 
     
     def get_fund_basic(self, code: str) -> Dict:
-        """获取基金基础信息"""
-        ts_code = self._convert_to_ts_code(code)
-        cache_key = f"fund_basic_{ts_code}"
-        
-        if cache_key in self.cache:
-            return self.cache[cache_key]
-        
+        """获取基金基础信息 - 兼容性方法"""
         try:
-            fund_basic = self.pro.fund_basic(ts_code=ts_code)
-            if fund_basic.empty:
+            basic_info = self.tushare_client.get_etf_basic_info(code)
+            if not basic_info:
                 return None
             
-            info = fund_basic.iloc[0]
+            # 转换为旧格式以保持兼容性
             result = {
-                'name': info['name'],
-                'management': info['management'],
-                'setup_date': info.get('found_date', ''),
-                'list_date': info.get('list_date', ''),
-                'fund_type': info.get('fund_type', 'ETF'),
-                'status': info.get('status', 'L')
+                'name': basic_info.get('name', ''),
+                'management': basic_info.get('management', ''),
+                'setup_date': basic_info.get('found_date', ''),
+                'list_date': basic_info.get('list_date', ''),
+                'fund_type': 'ETF',
+                'status': 'L'
             }
             
-            self.cache[cache_key] = result
             return result
             
         except Exception as e:
@@ -70,24 +47,18 @@ class DataService:
             return None
     
     def get_current_price(self, code: str) -> Dict:
-        """获取当前价格信息"""
-        ts_code = self._convert_to_ts_code(code)
-        
+        """获取当前价格信息 - 兼容性方法"""
         try:
-            # 获取最近5个交易日的数据
-            end_date = datetime.now().strftime('%Y%m%d')
-            start_date = (datetime.now() - timedelta(days=10)).strftime('%Y%m%d')
-            
-            df = self.pro.fund_daily(ts_code=ts_code, start_date=start_date, end_date=end_date)
-            if df.empty:
+            price_data = self.tushare_client.get_latest_price(code)
+            if not price_data:
                 return {'close': 0, 'pct_chg': 0, 'vol': 0, 'amount': 0}
             
-            latest = df.iloc[0]
+            # 转换为旧格式以保持兼容性
             return {
-                'close': latest['close'],
-                'pct_chg': latest.get('pct_chg', 0),
-                'vol': latest.get('vol', 0),
-                'amount': latest.get('amount', 0)
+                'close': price_data.get('current_price', 0),
+                'pct_chg': price_data.get('pct_change', 0),
+                'vol': price_data.get('volume', 0),
+                'amount': price_data.get('amount', 0)
             }
             
         except Exception as e:
@@ -95,46 +66,20 @@ class DataService:
             return {'close': 0, 'pct_chg': 0, 'vol': 0, 'amount': 0}
     
     def get_daily_data(self, code: str, start_date: str, end_date: str) -> pd.DataFrame:
-        """获取日线数据"""
-        ts_code = self._convert_to_ts_code(code)
-        cache_key = f"daily_{ts_code}_{start_date}_{end_date}"
-        
-        if cache_key in self.cache:
-            return self.cache[cache_key]
-        
+        """获取日线数据 - 兼容性方法"""
         try:
-            df = self.pro.fund_daily(
-                ts_code=ts_code,
-                start_date=start_date,
-                end_date=end_date
-            )
-            
-            if df.empty:
+            df = self.tushare_client.get_etf_daily_data(code, start_date, end_date)
+            if df is None or df.empty:
                 return pd.DataFrame()
             
-            # 数据清洗和格式化
-            df = df.sort_values('trade_date').reset_index(drop=True)
-            df['trade_date'] = pd.to_datetime(df['trade_date'])
+            # 确保列名兼容性
+            if 'trade_date' in df.columns:
+                df = df.rename(columns={'trade_date': 'date'})
+            if 'vol' in df.columns:
+                df = df.rename(columns={'vol': 'volume'})
             
-            # 重命名列以匹配标准格式
-            df = df.rename(columns={
-                'trade_date': 'date',
-                'vol': 'volume'
-            })
-            
-            self.cache[cache_key] = df
             return df
             
         except Exception as e:
             logger.error(f"获取日线数据失败 {code}: {str(e)}")
             return pd.DataFrame()
-
-    
-    def _convert_to_ts_code(self, code: str) -> str:
-        """将6位ETF代码转换为Tushare格式"""
-        if code.startswith(('51', '58')):
-            return f"{code}.SH"
-        elif code.startswith(('15', '16')):
-            return f"{code}.SZ"
-        else:
-            return f"{code}.SH"
