@@ -167,7 +167,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, 
           <div className="relative h-12 rounded-lg overflow-hidden bg-gradient-to-r from-green-400 via-yellow-400 to-red-400">
             {/* 当前价格位置指示器 */}
             <div 
-              className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg"
+              className="absolute top-0 bottom-0 w-0.5 shadow-lg"
               style={{
                 left: `${((current_price - price_range.lower) / (price_range.upper - price_range.lower)) * 100}%`
               }}
@@ -178,9 +178,9 @@ const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, 
             
             {/* 中央显示价格区间比例 */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="bg-white bg-opacity-90 px-4 py-1 rounded-full shadow-sm">
-                <span className="text-sm font-bold text-gray-900">
-                  价格区间跨度: {formatPercent(price_range.ratio)}
+              <div className="bg-white bg-opacity-50 px-4 py-1 rounded-full shadow-sm">
+                <span className="text-sm text-gray-900">
+                  区间跨度 {formatPercent(price_range.ratio)}
                 </span>
               </div>
             </div>
@@ -201,10 +201,10 @@ const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, 
           </div>
           
           {/* Bar下方说明 */}
-          <div className="flex justify-between items-center mt-2 text-xs text-gray-600">
-            <span>买入区间</span>
+          <div className="flex justify-between items-center pl-2 pr-2 mt-2 text-xs text-gray-600">
+            <span>下边界</span>
             <span>基准位置</span>
-            <span>卖出区间</span>
+            <span>上边界</span>
           </div>
         </div>
       </div>
