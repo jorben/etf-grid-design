@@ -428,8 +428,8 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareB
                     <ul className="space-y-1 text-sm text-blue-600">
                       <li>• 价格区间：¥{(grid_strategy?.price_range?.lower || 0).toFixed(3)} - ¥{(grid_strategy?.price_range?.upper || 0).toFixed(3)}</li>
                       <li>• 网格步长：¥{(grid_strategy?.grid_config?.step_size || 0).toFixed(3)} ({((grid_strategy?.grid_config?.step_ratio || 0) * 100).toFixed(2)}%)</li>
-                      <li>• 预期月交易：{(backtest_result?.trading_stats?.expected_monthly_trades || 0).toFixed(1)}次</li>
-                      <li>• 预期月收益：¥{(backtest_result?.trading_stats?.expected_monthly_profit || 0).toFixed(0)}</li>
+                      <li>• 单笔股数：{(grid_strategy?.fund_allocation?.single_trade_quantity || 0)}股</li>
+                      <li>• 预估单笔收益：¥{(grid_strategy?.fund_allocation?.expected_profit_per_trade || 0).toFixed(2)}</li>
                     </ul>
                   </div>
                 </div>
@@ -453,6 +453,8 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareB
             <GridParametersCard 
               gridStrategy={grid_strategy}
               inputParameters={input_parameters}
+              strategyRationale={strategy_rationale}
+              adjustmentSuggestions={adjustment_suggestions}
               showDetailed={true}
             />
           )}

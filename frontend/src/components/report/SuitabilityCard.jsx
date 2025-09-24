@@ -84,21 +84,21 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
   return (
     <div className="space-y-6">
       {/* 总体评分 */}
-      <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-lg border border-orange-200">
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border border-green-200">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-orange-200 rounded-lg">
-            <ThermometerSun className="w-6 h-6 text-orange-700" />
+          <div className="p-2 bg-green-200 rounded-lg">
+            <ThermometerSun className="w-6 h-6 text-green-700" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-orange-900">标的网格交易适宜度评估</h3>
-            <p className="text-orange-700">从四个维度量化评分体系，总分100分</p>
+            <h3 className="text-xl font-bold text-green-900">标的网格交易适宜度评估</h3>
+            <p className="text-green-700">从四个维度量化评分体系，总分100分</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <ThermometerSun className="w-4 h-4 text-orange-600" />
+              <ThermometerSun className="w-4 h-4 text-green-600" />
               <span className="text-sm font-medium text-gray-700">适宜度得分</span>
             </div>
             <div className="text-lg font-bold text-gray-900">{total_score}/100</div>
@@ -142,7 +142,7 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
         
         <div className="mt-4 bg-white p-4 rounded-lg">
           <div className="flex items-start gap-2">
-            <Info className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+            <Info className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-medium text-gray-900 mb-1">综合结论</p>
               <p className="text-gray-700">{recommendation}</p>
@@ -237,8 +237,8 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
               <h5 className="font-medium text-blue-800 mb-2">市场特征评估 (25分)</h5>
               <ul className="space-y-1 text-blue-700">
                 <li>• ADX &lt; 20: 25分 (震荡市，适合网格)</li>
-                <li>• ADX 20-25: 18分 (弱趋势)</li>
-                <li>• ADX &gt; 25: 6分 (强趋势，不推荐)</li>
+                <li>• ADX 20-40: 18分 (弱趋势)</li>
+                <li>• ADX &gt; 40: 6分 (强趋势，不推荐)</li>
               </ul>
             </div>
             <div>
