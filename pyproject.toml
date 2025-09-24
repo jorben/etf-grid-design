@@ -20,11 +20,20 @@ dependencies = [
     "cachetools>=5.3.0",
     "python-dateutil>=2.8.0",
     "pytz>=2023.3",
+    # Stage 4 新增生产依赖
+    "pydantic>=2.10.6",
+    "pydantic-settings>=2.0.0",
+    "psutil>=6.1.1",
+    "gunicorn>=23.0.0",
+    "gevent>=25.9.1",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.4.0",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.1",
     "black>=23.0.0",
     "flake8>=6.0.0",
     "isort>=5.12.0"
@@ -54,7 +63,12 @@ target-version = ['py38']
 profile = "black"
 line_length = 88
 
-[dependency-groups]
-dev = [
-    "pytest>=8.4.2",
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+asyncio_mode = "auto"
+addopts = [
+    "--cov=backend",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+    "--verbose"
 ]

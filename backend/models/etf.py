@@ -80,8 +80,8 @@ class ETFAnalysisInput(BaseModel):
     """ETF分析输入参数模型"""
     etf_code: str = Field(..., description="ETF代码")
     total_capital: float = Field(..., gt=0, description="总投资资金")
-    grid_type: str = Field(..., regex="^(等差|等比)$", description="网格类型")
-    risk_preference: str = Field(..., regex="^(保守|稳健|激进)$", description="风险偏好")
+    grid_type: str = Field(..., pattern="^(等差|等比)$", description="网格类型")
+    risk_preference: str = Field(..., pattern="^(保守|稳健|激进)$", description="风险偏好")
     analysis_days: int = Field(default=365, ge=30, le=1000, description="分析天数")
 
 
@@ -118,7 +118,7 @@ class ETFSearchCriteria(BaseModel):
     min_dividend_yield: Optional[float] = Field(None, description="最小股息率")
     max_dividend_yield: Optional[float] = Field(None, description="最大股息率")
     sort_by: str = Field(default="volume", description="排序字段")
-    sort_order: str = Field(default="desc", regex="^(asc|desc)$", description="排序方向")
+    sort_order: str = Field(default="desc", pattern="^(asc|desc)$", description="排序方向")
 
 
 class ETFSearchResult(BaseModel):

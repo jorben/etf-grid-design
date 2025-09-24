@@ -3,7 +3,7 @@
 定义分析相关的数据结构和结果模型
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 from datetime import datetime
 from pydantic import BaseModel, Field
 from .etf import ETFBasicInfo
@@ -104,7 +104,7 @@ class GridStrategyParameters(BaseModel):
     current_price: float = Field(..., gt=0, description="当前价格")
     
     price_range: Dict[str, float] = Field(..., description="价格区间")
-    grid_config: Dict[str, any] = Field(..., description="网格配置")
+    grid_config: Dict[str, Any] = Field(..., description="网格配置")
     price_levels: List[float] = Field(..., description="价格水平")
     fund_allocation: GridFundAllocationResult = Field(..., description="资金分配")
     
@@ -122,7 +122,7 @@ class StrategyRationale(BaseModel):
     rationale_type: str = Field(..., description="逻辑类型")
     title: str = Field(..., description="标题")
     description: str = Field(..., description="描述")
-    supporting_data: Dict[str, any] = Field(..., description="支持数据")
+    supporting_data: Dict[str, Any] = Field(..., description="支持数据")
     confidence_level: str = Field(..., description="置信度")
 
 
@@ -175,4 +175,4 @@ class BacktestResult(BaseModel):
     win_rate: float = Field(..., description="胜率")
     profit_factor: float = Field(..., description="盈利因子")
     total_trades: int = Field(..., description="总交易次数")
-    backtest_details: Dict[str, any] = Field(..., description="回测详情")
+    backtest_details: Dict[str, Any] = Field(..., description="回测详情")
