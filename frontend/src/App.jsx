@@ -152,7 +152,7 @@ function App() {
                           </div>
                           <h3 className="font-semibold text-gray-900 mb-2">智能化策略</h3>
                           <p className="text-sm text-gray-600">
-                            智能网格参数计算、资金分配优化、历史回测分析，提供完整策略方案
+                            智能网格参数计算、资金分配优化、策略分析，提供完整策略方案
                           </p>
                         </div>
                       </div>
@@ -215,7 +215,7 @@ function App() {
                   <li>• 基于ATR算法的科学分析</li>
                   <li>• 4维度量化评分体系</li>
                   <li>• 智能网格参数计算</li>
-                  <li>• 历史回测与收益预测</li>
+                  <li>• 策略分析与收益预测</li>
                 </ul>
               </div>
 
