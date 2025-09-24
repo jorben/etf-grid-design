@@ -6,11 +6,11 @@ echo "🚀 启动ETF网格交易策略设计工具..."
 echo "=================================="
 
 # 检查后端是否已在运行
-if pgrep -f "python.*backend/app.py" > /dev/null; then
+if pgrep -f "python.*backend/run.py" > /dev/null; then
     echo "✅ 后端服务已在运行"
 else
     echo "📦 启动后端服务..."
-    uv run python backend/app.py &
+    uv run python backend/run.py &
     sleep 3
 fi
 

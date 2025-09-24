@@ -5,7 +5,7 @@ import ParameterForm from './components/ParameterForm';
 import AnalysisReport from './components/AnalysisReport';
 import AnalysisPage from './components/AnalysisPage';
 import AnalysisHistory from './components/AnalysisHistory';
-import { analyzeETF, getVersion } from './services/api';
+import { analyzeETF, getSystemInfo } from './services/api';
 import { generateAnalysisURL } from './utils/urlParams';
 import { Waypoints, Cpu, Target, TrendingUp, Github, ThermometerSun, Share2 } from 'lucide-react';
 import './App.css';
@@ -21,7 +21,7 @@ function App() {
   useEffect(() => {
     const fetchVersion = async () => {
       try {
-        const response = await getVersion();
+        const response = await getSystemInfo();
         if (response.success && response.data.version) {
           setVersion(`v${response.data.version}`);
         }

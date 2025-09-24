@@ -1,161 +1,234 @@
-# ETF网格交易策略设计工具
+# ETF网格策略分析系统
 
-一个基于日线数据和专业算法的ETF网格交易策略参数设计工具，帮助投资者科学制定网格交易策略。
+基于ATR技术指标的ETF网格交易策略分析系统，提供ETF适合性分析、网格策略计算和投资建议。
 
-## 🎯 功能特点
+## 功能特性
 
-- **智能分析**：基于tushare数据，分析ETF的历史价格波动特征
-- **策略设计**：根据用户设定的交易频率，自动生成最优网格参数
-- **适应性评估**：综合评估ETF对网格交易策略的适应性
-- **风险控制**：提供详细的风险评估和资金管理建议
-- **动态调整**：根据市场环境变化提供策略调整建议
-- **可视化展示**：直观展示价格区间、网格分布和预期收益
+- **ETF数据管理**: 支持热门ETF查询、基本信息获取、历史数据分析
+- **ATR技术分析**: 基于平均真实波幅(ATR)进行技术分析
+- **网格策略计算**: 智能计算网格交易参数和资金分配
+- **适合性分析**: 根据用户风险偏好进行ETF适合性评估
+- **批量分析**: 支持多ETF批量分析和比较
+- **缓存优化**: 文件缓存系统，提高数据访问效率
 
-## 🌟 页面展示
+## 技术架构
 
-![index](https://raw.githubusercontent.com/jorben/etf-grid-design/refs/heads/master/screenshot/etfer-index.png)
-
-## 🏗️ 技术架构
-
-### 后端
-
-- **框架**：Python + Flask
-- **数据**：tushare金融数据接口
-- **分析**：pandas + numpy 数据处理
-- **算法**：专业量化分析算法
-
-### 前端
-
-- **框架**：React + Vite
-- **UI**：Tailwind CSS 现代化设计
-- **图表**：Recharts 数据可视化
-- **图标**：Lucide React 图标库
-
-## 🚀 快速开始
-
-### 方式一：Docker部署（推荐）
-
-#### 环境要求
-
-- Docker
-- Docker Compose（可选）
-
-#### 一键部署
-
-```bash
-# 1. 克隆项目
-git clone https://github.com/jorben/etf-grid-design.git
-cd etf-grid-design
-
-# 2. 配置环境变量
-cp deploy/.env.production .env
-# 编辑.env文件，配置TUSHARE_TOKEN
-
-# 3. 一键部署
-docker-compose up -d
+### 后端架构
+```
+backend/
+├── app/
+│   ├── __init__.py
+│   ├── main.py                 # 应用入口
+│   ├── config/
+│   │   └── settings.py         # 配置管理
+│   ├── models/                 # 数据模型
+│   │   ├── etf_models.py
+│   │   ├── analysis_models.py
+│   │   └── strategy_models.py
+│   ├── core/                   # 核心算法
+│   │   ├── atr_engine.py
+│   │   ├── grid_calculator.py
+│   │   └── suitability_analyzer.py
+│   ├── services/               # 业务服务
+│   │   ├── etf_service.py
+│   │   ├── analysis_service.py
+│   │   └── file_cache_service.py
+│   ├── external/               # 外部接口
+│   │   └── tushare_client.py
+│   ├── api/                    # API路由
+│   │   ├── etf_routes.py
+│   │   ├── analysis_routes.py
+│   │   └── system_routes.py
+│   ├── middleware/             # 中间件
+│   │   ├── error_handler.py
+│   │   └── cors_handler.py
+│   ├── utils/                  # 工具函数
+│   │   ├── validators.py
+│   │   ├── formatters.py
+│   │   ├── calculators.py
+│   │   └── file_utils.py
+│   └── exceptions/             # 异常处理
+│       ├── base_exceptions.py
+│       └── business_exceptions.py
+└── run.py                      # 启动脚本
 ```
 
-#### 访问应用
+### 前端架构
+```
+frontend/
+├── src/
+│   ├── components/             # React组件
+│   ├── services/               # API服务
+│   ├── hooks/                  # 自定义Hooks
+│   ├── utils/                  # 工具函数
+│   └── config/                 # 配置文件
+└── dist/                       # 构建输出
+```
 
-- **Web应用**: http://localhost:5001
-- **API接口**: http://localhost:5001/api/
-- **健康检查**: http://localhost:5001/api/health
+## 快速开始
 
-### 方式二：本地开发
-
-#### 环境要求
-
+### 环境要求
 - Python 3.8+
 - Node.js 16+
-- tushare API token
+- Tushare Pro账户
 
-#### 开发步骤
+### 后端启动
 
+1. 安装依赖
 ```bash
-# 1. 克隆项目
-git clone https://github.com/jorben/etf-grid-design.git
-cd etf-grid-design
-
-# 2. 配置环境（必须）
-复制环境变量模板并配置真实的tushare token：
-cp .env.example .env
-# 编辑.env文件，必须配置有效的TUSHARE_TOKEN
-# 获取token：https://tushare.pro/register
-
-# 3. 安装依赖
-# 安装Python依赖
-uv sync
-
-# 安装前端依赖
-cd frontend && npm install
-
-# 4. 启动服务
-# 启动后端服务（端口5001）
-uv run python backend/app.py
-
-# 启动前端服务（端口3000）
-cd frontend && npm run dev
-
-# 5. 访问应用
-# 开发环境：http://localhost:3000
+pip install -r requirements.txt
 ```
 
-## 📊 核心功能
+2. 配置环境变量
+```bash
+# 创建.env文件
+TUSHARE_TOKEN=your_tushare_token_here
+ENVIRONMENT=development
+CACHE_DIR=./cache
+```
 
-### 1. ETF分析
+3. 启动后端服务
+```bash
+cd backend
+python run.py
+```
 
-- 获取ETF基本信息和最新价格
-- 分析近3个月的历史数据
-- 计算日振幅、波动率、趋势等关键指标
+后端服务将在 http://127.0.0.1:5000 启动
 
-### 2. 网格策略计算
+### 前端启动
 
-- **价格区间**：基于历史波动确定合理的网格上下边界
-- **网格数量**：根据交易频率自动计算最优网格数
-- **资金配置**：科学的仓位管理和资金分配方案
-- **收益预估**：预测网格交易的潜在收益和风险
+1. 安装依赖
+```bash
+cd frontend
+npm install
+```
 
-### 3. 适应性评估
+2. 启动开发服务器
+```bash
+npm run dev
+```
 
-- **振幅评估**：判断日均振幅是否适合网格交易
-- **波动率评估**：分析价格波动水平对策略的影响
-- **流动性评估**：确保有足够的交易量支持网格策略
-- **趋势评估**：识别市场是否处于震荡状态
+前端服务将在 http://localhost:3000 启动
 
-### 4. 动态调整建议
+## API文档
 
-- **波动率上升**：扩大区间、减少网格、降低仓位
-- **波动率下降**：缩小区间、增加网格、提高仓位
-- **趋势市场**：调整网格中心、加强风险管理
+### ETF相关接口
 
-## ⚠️ 重要说明
+- `GET /api/v1/etfs/popular` - 获取热门ETF列表
+- `GET /api/v1/etfs/{etf_code}/basic` - 获取ETF基本信息
+- `GET /api/v1/etfs/{etf_code}/latest` - 获取ETF最新数据
+- `GET /api/v1/etfs/{etf_code}/historical` - 获取ETF历史数据
+- `GET /api/v1/etfs/search` - 搜索ETF
 
-### 数据要求
-- **token获取**：请访问 https://tushare.pro/register 注册并获取API token
-- **数据质量**：所有分析结果基于tushare提供的真实市场数据
+### 分析相关接口
 
-### 风险提示
-1. **历史数据限制**：分析基于历史数据，不能保证未来表现
-2. **市场风险**：网格交易仍存在亏损风险，需谨慎操作
-3. **流动性风险**：确保ETF有足够的流动性支持频繁交易
-4. **参数调整**：市场环境变化时需要及时调整策略参数
+- `POST /api/v1/analysis/suitability/{etf_code}` - ETF适合性分析
+- `GET /api/v1/analysis/atr/{etf_code}` - ATR技术分析
+- `POST /api/v1/analysis/grid/{etf_code}` - 网格策略生成
+- `POST /api/v1/analysis/comprehensive/{etf_code}` - 综合分析
+- `POST /api/v1/analysis/batch/popular` - 批量分析热门ETF
 
-## 🤝 贡献指南
+### 系统相关接口
 
-1. Fork 项目
-2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 创建 Pull Request
+- `GET /api/v1/system/health` - 系统健康检查
+- `GET /api/v1/system/info` - 系统信息
+- `GET /api/v1/system/cache/info` - 缓存信息
 
-## 📄 许可证
+## 核心算法
 
-本项目采用 Apache-2.0 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+### ATR计算
+平均真实波幅(Average True Range)计算，用于衡量价格波动性：
+```
+TR = max(high - low, abs(high - prev_close), abs(low - prev_close))
+ATR = SMA(TR, period)
+```
 
-## 📞 联系方式
+### 网格策略
+基于ATR的智能网格策略：
+- 网格间距 = ATR百分比 × 调整系数
+- 资金分配 = 总资金 / 网格数量
+- 风险控制 = 最大回撤限制
 
-- 问题反馈：请使用 GitHub Issues
+### 适合性分析
+多维度评估ETF投资适合性：
+- 收益率评分 (30%)
+- 波动率评分 (30%)
+- 最大回撤评分 (25%)
+- 流动性评分 (15%)
 
----
+## 缓存策略
 
-**免责声明**：本工具提供的分析结果仅供参考，不构成投资建议。投资有风险，入市需谨慎。
+### 三级缓存体系
+1. **永久缓存**: ETF基本信息、交易日历
+2. **日缓存**: 当日价格数据，按日期目录存储
+3. **历史缓存**: 历史数据区间缓存
+
+### 缓存目录结构
+```
+cache/
+├── permanent/          # 永久缓存
+├── daily/             # 日缓存
+│   └── 20240101/      # 按日期分目录
+└── historical/        # 历史缓存
+```
+
+## 配置说明
+
+### 环境变量
+- `TUSHARE_TOKEN`: Tushare Pro API Token
+- `ENVIRONMENT`: 运行环境 (development/production)
+- `CACHE_DIR`: 缓存目录路径
+- `HOST`: 服务器地址 (默认: 127.0.0.1)
+- `PORT`: 服务器端口 (默认: 5000)
+- `DEBUG`: 调试模式 (默认: False)
+
+### 热门ETF配置
+系统预配置了常见的热门ETF，包括：
+- 沪深300ETF (510300.SH)
+- 中证500ETF (510500.SH)
+- 创业板ETF (159915.SZ)
+- 科创50ETF (588000.SH)
+- 等等...
+
+## 开发指南
+
+### 代码规范
+- 使用Python类型注解
+- 遵循PEP 8代码风格
+- 完善的异常处理
+- 详细的日志记录
+
+### 测试
+```bash
+# 运行测试
+pytest
+
+# 生成覆盖率报告
+pytest --cov=app
+```
+
+### 部署
+1. 生产环境配置
+2. 使用Gunicorn部署
+3. 配置反向代理
+4. 设置日志轮转
+
+## 注意事项
+
+1. **数据源**: 依赖Tushare Pro API，需要有效的Token
+2. **缓存管理**: 定期清理过期缓存文件
+3. **错误处理**: 完善的异常处理和错误日志
+4. **性能优化**: 合理使用缓存，避免频繁API调用
+
+## 许可证
+
+MIT License
+
+## 更新日志
+
+### v1.0.0 (2024-01-01)
+- 初始版本发布
+- 完整的ETF分析功能
+- ATR技术指标计算
+- 网格策略生成
+- 适合性分析系统

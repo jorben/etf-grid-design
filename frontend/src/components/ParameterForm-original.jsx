@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Search, TrendingUp, DollarSign, Settings, Shield, BarChart3, Grid3X3 } from 'lucide-react';
 import { usePersistedState } from '../hooks/usePersistedState';
 import ETFInfoSkeleton from './ETFInfoSkeleton';
-import { getPopularETFs, getETFInfo, getCapitalPresets } from '../services/api-fix'; // 使用修复版API
 
 const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
   // 使用持久化状态，但优先使用初始值
@@ -36,9 +35,10 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
     }
   }, [initialValues, etfCode, totalCapital, gridType, riskPreference, setEtfCode, setTotalCapital, setGridType, setRiskPreference]);
 
-  // 获取热门ETF列表 - 使用修复版API
+  // 获取热门ETF列表
   useEffect(() => {
-    getPopularETFs()
+    fetch('/api/v1/etfs/popular')
+      .then(res => res.json())
       .then(data => {
         if (data.success) {
           setPopularETFs(data.data);
@@ -47,43 +47,28 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
       .catch(err => console.error('获取热门ETF失败:', err));
   }, []);
 
-  // 获取资金预设 - 使用修复版API
+
+
+  // 获取资金预设
   useEffect(() => {
-    getCapitalPresets()
+    fetch('/api/v1/system/capital-presets')
+      .then(res => res.json())
       .then(data => {
         if (data.success) {
           setCapitalPresets(data.data);
-        } else {
-          // 如果后端没有预设，使用默认值
-          setCapitalPresets([
-            { value: 100000, label: '10万', popular: true },
-            { value: 200000, label: '20万', popular: true },
-            { value: 500000, label: '50万', popular: true },
-            { value: 1000000, label: '100万', popular: true },
-            { value: 2000000, label: '200万', popular: false },
-            { value: 5000000, label: '500万', popular: false }
-          ]);
         }
       })
-      .catch(err => {
-        console.error('获取资金预设失败:', err);
-        // 使用默认预设
-        setCapitalPresets([
-          { value: 100000, label: '10万', popular: true },
-          { value: 200000, label: '20万', popular: true },
-          { value: 500000, label: '50万', popular: true },
-          { value: 1000000, label: '100万', popular: true }
-        ]);
-      });
+      .catch(err => console.error('获取资金预设失败:', err));
   }, []);
 
-  // ETF代码变化时获取基础信息 - 使用修复版API
+  // ETF代码变化时获取基础信息
   useEffect(() => {
     if (etfCode && etfCode.length === 6) {
       setEtfLoading(true);
       setEtfInfo(null);
       
-      getETFInfo(etfCode)
+      fetch(`/api/v1/etfs/${etfCode}/basic`)
+        .then(res => res.json())
         .then(data => {
           if (data.success) {
             setEtfInfo(data.data);
@@ -136,6 +121,8 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
     }
   };
 
+
+
   // 选择热门ETF
   const selectPopularETF = (code) => {
     setEtfCode(code);
@@ -172,7 +159,7 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
               <span className="text-xs text-gray-500 mr-2">热门ETF：</span>
               <div className="flex flex-wrap gap-2">
                 {['510300', '510500', '159915', '588000', '512480', '159819'].map(code => {
-                  const etf = popularETFs.find(e => e.ts_code === code || e.code === code);
+                  const etf = popularETFs.find(e => e.code === code);
                   return (
                     <button
                       key={code}
@@ -380,6 +367,8 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
             ))}
           </div>
         </div>
+
+
       </form>
     </div>
   );
