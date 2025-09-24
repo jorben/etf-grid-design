@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import SuitabilityCard from './report/SuitabilityCard';
 import GridParametersCard from './report/GridParametersCard';
-import BacktestResultCard from './report/BacktestResultCard';
+
 import StrategyRationaleCard from './report/StrategyRationaleCard';
 
 import LoadingSpinner from './LoadingSpinner';
@@ -117,7 +117,6 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareB
     data_quality,
     suitability_evaluation,
     grid_strategy,
-    backtest_result,
     strategy_rationale,
     adjustment_suggestions,
     input_parameters
@@ -126,11 +125,10 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareB
   // 数据完整性检查 - 更精确的检查逻辑
   const isDataComplete = () => {
     // 检查基础对象是否存在
-    if (!suitability_evaluation || !grid_strategy || !backtest_result || !etf_info) {
+    if (!suitability_evaluation || !grid_strategy || !etf_info) {
       console.log('基础对象缺失:', {
         suitability_evaluation: !!suitability_evaluation,
         grid_strategy: !!grid_strategy,
-        backtest_result: !!backtest_result,
         etf_info: !!etf_info
       });
       return false;
@@ -140,14 +138,12 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareB
     const dataObjects = {
       suitability_evaluation: suitability_evaluation,
       grid_strategy: grid_strategy,
-      backtest_result: backtest_result,
       etf_info: etf_info
     };
 
     const requiredFields = {
       suitability_evaluation: ['total_score', 'conclusion'],
       grid_strategy: ['grid_config', 'fund_allocation'],
-      backtest_result: ['performance'],
       etf_info: ['code', 'name', 'current_price']
     };
 
@@ -208,8 +204,6 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareB
     { id: 'overview', label: '概览', icon: <Eye className="w-4 h-4" /> },
     { id: 'suitability', label: '适宜度评估', icon: <ThermometerSun className="w-4 h-4" /> },
     { id: 'strategy', label: '网格策略', icon: <Grid3X3 className="w-4 h-4" /> },
-    { id: 'backtest', label: '回测结果', icon: <BarChart3 className="w-4 h-4" /> },
-
   ];
 
   return (
@@ -459,15 +453,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareB
             />
           )}
 
-          {/* 回测结果标签页 */}
-          {activeTab === 'backtest' && (
-            <BacktestResultCard 
-              backtestResult={backtest_result}
-              strategyRationale={strategy_rationale}
-              adjustmentSuggestions={adjustment_suggestions}
-              showDetailed={true}
-            />
-          )}
+
 
 
         </div>

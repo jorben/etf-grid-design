@@ -138,7 +138,7 @@ const StrategyRationaleCard = ({ strategyRationale, adjustmentSuggestions }) => 
             </div>
             <div>
               <h4 className="font-semibold text-gray-900">收益预测依据</h4>
-              <p className="text-sm text-gray-600">基于历史回测的收益估算和风险评估</p>
+              <p className="text-sm text-gray-600">基于ATR算法的收益估算和风险评估</p>
             </div>
           </div>
 

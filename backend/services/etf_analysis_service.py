@@ -14,7 +14,7 @@ from .data_service import DataService
 from .atr_engine import ATREngine
 from .suitability_analyzer import SuitabilityAnalyzer
 from .grid_strategy import GridStrategy
-from .backtest_engine import run_grid_backtest
+
 
 logger = logging.getLogger(__name__)
 
@@ -190,48 +190,22 @@ class ETFAnalysisService:
                 market_indicators=market_indicators
             )
             
-            # 5. 执行简化回测
-            # 构建回测所需的网格水平数据
-            grid_levels = []
-            price_levels = grid_params['price_levels']
-            grid_funds = grid_params['fund_allocation']['grid_funds']
-            
-            # 使用价格水平和资金分配信息构建网格数据
-            for i, price in enumerate(price_levels[:-1]):  # 排除最高价格点
-                if i < len(grid_funds):
-                    fund_info = grid_funds[i]
-                    grid_levels.append({
-                        'price': price,
-                        'allocated_fund': fund_info.get('allocated_fund', fund_info.get('actual_fund', 1000)),
-                        'shares': fund_info.get('shares', 100)
-                    })
-            
-            logger.info(f"构建grid_levels完成，数量: {len(grid_levels)}")
-            
-            backtest_result = run_grid_backtest(
-                price_data=df,
-                initial_capital=total_capital,
-                grid_levels=grid_levels,
-                base_position_ratio=grid_params['fund_allocation']['base_position_ratio']
-            )
-            
-            # 6. 生成策略分析依据
+            # 5. 生成策略分析依据
             strategy_rationale = self._generate_strategy_rationale(
-                suitability_result, grid_params, backtest_result, risk_preference
+                suitability_result, grid_params, risk_preference
             )
             
-            # 7. 生成调整建议
+            # 6. 生成调整建议
             adjustment_suggestions = self._generate_adjustment_suggestions(
-                suitability_result, grid_params, backtest_result
+                suitability_result, grid_params
             )
             
-            # 8. 整合完整报告
+            # 7. 整合完整报告
             complete_report = {
                 'etf_info': etf_info,
                 'data_quality': suitability_result['data_quality'],
                 'suitability_evaluation': suitability_result,
                 'grid_strategy': grid_params,
-                'backtest_result': backtest_result,
                 'strategy_rationale': strategy_rationale,
                 'adjustment_suggestions': adjustment_suggestions,
                 'analysis_timestamp': datetime.now().isoformat(),
@@ -251,15 +225,13 @@ class ETFAnalysisService:
             raise
     
     def _generate_strategy_rationale(self, suitability_result: Dict, 
-                                   grid_params: Dict, backtest_result: Dict,
-                                   risk_preference: str) -> Dict:
+                                   grid_params: Dict, risk_preference: str) -> Dict:
         """
         生成策略分析依据
         
         Args:
             suitability_result: 适宜度评估结果
             grid_params: 网格参数
-            backtest_result: 回测结果
             risk_preference: 风险偏好
             
         Returns:
@@ -288,10 +260,10 @@ class ETFAnalysisService:
             
             # 收益预测依据
             profit_basis = {
-                'historical_performance': f"基于{backtest_result['backtest_period']['total_days']}天回测数据",
-                'trading_frequency': f"预期月交易{backtest_result['trading_stats']['expected_monthly_trades']:.1f}次",
-                'win_rate': f"历史胜率{backtest_result['performance']['win_rate']:.1%}",
-                'risk_control': f"最大回撤预估{backtest_result['performance']['max_drawdown']:.1%}"
+                'parameter_optimization': "基于ATR算法和历史波动率分析",
+                'trading_frequency': "根据网格密度和历史波动特征预估",
+                'risk_control': "基于ATR波动率和市场趋势指标设定",
+                'fund_allocation': "智能资金分配确保风险可控"
             }
             
             return {
@@ -310,14 +282,13 @@ class ETFAnalysisService:
             return {}
     
     def _generate_adjustment_suggestions(self, suitability_result: Dict,
-                                       grid_params: Dict, backtest_result: Dict) -> Dict:
+                                       grid_params: Dict) -> Dict:
         """
         生成调整建议
         
         Args:
             suitability_result: 适宜度评估结果
             grid_params: 网格参数
-            backtest_result: 回测结果
             
         Returns:
             调整建议
@@ -353,17 +324,16 @@ class ETFAnalysisService:
                 )
             
             # 风险控制建议
-            max_drawdown = backtest_result['performance']['max_drawdown']
-            if max_drawdown > 0.15:
+            if volatility > 0.4:
                 suggestions['risk_control'].append(
-                    "历史最大回撤较大，建议增加底仓比例或设置止损线"
+                    "波动率较高，建议增加底仓比例或设置止损线"
                 )
             
             # 收益增强建议
-            win_rate = backtest_result['performance']['win_rate']
-            if win_rate < 0.6:
+            grid_count = grid_params['grid_config']['count']
+            if grid_count < 20:
                 suggestions['profit_enhancement'].append(
-                    "胜率偏低，建议优化网格间距或调整交易频率"
+                    "网格数量较少，可考虑增加网格密度提高交易机会"
                 )
             
             # 资金效率建议

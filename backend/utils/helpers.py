@@ -169,17 +169,14 @@ def generate_strategy_summary(analysis_result: Dict) -> str:
     etf_info = analysis_result.get('etf_info', {})
     suitability = analysis_result.get('suitability_analysis', {})
     grid_params = analysis_result.get('grid_parameters', {})
-    backtest = analysis_result.get('backtest_result', {})
     
     etf_name = etf_info.get('name', '未知ETF')
     total_score = suitability.get('total_score', 0)
-    expected_return = backtest.get('performance', {}).get('annual_return', 0)
     
     summary = f"""
     【{etf_name}】网格交易策略分析摘要：
     
     ✓ 适宜度评分：{total_score:.1f}/100分
-    ✓ 预期年化收益：{format_percentage(expected_return)}
     ✓ 网格数量：{grid_params.get('grid_count', 0)}个
     ✓ 价格区间：¥{grid_params.get('price_lower', 0):.3f} - ¥{grid_params.get('price_upper', 0):.3f}
     
@@ -273,22 +270,11 @@ def generate_risk_warnings(analysis_result: Dict) -> List[str]:
     warnings = []
     
     suitability = analysis_result.get('suitability_analysis', {})
-    backtest = analysis_result.get('backtest_result', {})
     
     # 适宜度评分过低
     total_score = suitability.get('total_score', 0)
     if total_score < 60:
         warnings.append("⚠️ 该ETF适宜度评分较低，不建议进行网格交易")
-    
-    # 最大回撤过大
-    max_drawdown = backtest.get('performance', {}).get('max_drawdown', 0)
-    if max_drawdown > 0.2:
-        warnings.append("⚠️ 历史最大回撤超过20%，存在较高风险")
-    
-    # 胜率过低
-    win_rate = backtest.get('performance', {}).get('win_rate', 0)
-    if win_rate < 0.5:
-        warnings.append("⚠️ 历史交易胜率低于50%，策略效果可能不佳")
     
     # 流动性不足
     liquidity_score = suitability.get('liquidity_score', 0)
