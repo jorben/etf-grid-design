@@ -16,8 +16,11 @@ load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 # 导入API模块
 from api import register_routes, register_middleware, setup_cors, setup_logging
 
+# 导入版本信息
+from config import PROJECT_VERSION
+
 # 系统版本号
-VERSION = "0.1.2"
+VERSION = PROJECT_VERSION
 
 def create_app():
     """创建Flask应用实例"""

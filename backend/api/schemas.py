@@ -90,11 +90,13 @@ class HealthResponse:
     @staticmethod
     def get_response(environment: str = 'development') -> Dict[str, Any]:
         """获取健康检查响应"""
+        # 导入版本信息
+        from config import PROJECT_VERSION
         return {
             'status': 'healthy',
             'timestamp': datetime.now().isoformat(),
             'service': 'ETF Grid Trading Analysis System',
-            'version': '0.1.0',
+            'version': PROJECT_VERSION,
             'environment': environment
         }
 

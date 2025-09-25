@@ -13,6 +13,10 @@ from .validation import (
     ConfigValidator, ConfigurationSchema, EnvironmentValidator,
     validate_configuration, get_configuration_errors, is_configuration_valid
 )
+from .version import (
+    PROJECT_VERSION, API_VERSION, FRONTEND_VERSION, BACKEND_VERSION,
+    get_version_info
+)
 
 __all__ = [
     # 配置类
@@ -41,5 +45,12 @@ __all__ = [
     'EnvironmentValidator',
     'validate_configuration',
     'get_configuration_errors',
-    'is_configuration_valid'
+    'is_configuration_valid',
+    
+    # 版本信息
+    'PROJECT_VERSION',
+    'API_VERSION',
+    'FRONTEND_VERSION',
+    'BACKEND_VERSION',
+    'get_version_info'
 ]
