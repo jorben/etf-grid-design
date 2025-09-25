@@ -185,16 +185,22 @@ class ETFAnalysisService:
             # 2. 获取历史数据（1年）
             df = self.get_historical_data(etf_code, days=365)
             
-            # 3. 执性适宜度评估
+            # 3. 获取最新价格信息（使用TushareClient的get_latest_price接口）
+            latest_price_info = self.tushare_client.get_latest_price(etf_code)
+            if not latest_price_info:
+                raise ValueError(f"未获取到ETF最新价格: {etf_code}")
+            
+            # 4. 执性适宜度评估
             suitability_result = self.suitability_analyzer.comprehensive_evaluation(df, etf_info)
             
-            # 4. 计算网格策略参数（使用算法模块）
+            # 5. 计算网格策略参数（使用算法模块）
             atr_analysis = suitability_result['atr_analysis']
             market_indicators = suitability_result['market_indicators']
-            current_price = float(df.iloc[-1]['close'])
+            current_price = float(latest_price_info['current_price'])
             
             grid_params = self._calculate_grid_parameters(
                 current_price=current_price,
+                latest_price_info=latest_price_info,
                 atr_analysis=atr_analysis,
                 market_indicators=market_indicators,
                 total_capital=total_capital,
@@ -361,14 +367,15 @@ class ETFAnalysisService:
             logger.error(f"生成调整建议失败: {str(e)}")
             return {}
     
-    def _calculate_grid_parameters(self, current_price: float, atr_analysis: Dict,
-                                 market_indicators: Dict, total_capital: float,
-                                 grid_type: str, risk_preference: str) -> Dict:
+    def _calculate_grid_parameters(self, current_price: float, latest_price_info: Dict,
+                                 atr_analysis: Dict, market_indicators: Dict, 
+                                 total_capital: float, grid_type: str, risk_preference: str) -> Dict:
         """
         计算网格策略参数（使用算法模块）
         
         Args:
             current_price: 当前价格
+            latest_price_info: 最新价格信息（包含交易日期）
             atr_analysis: ATR分析结果
             market_indicators: 市场指标
             total_capital: 总投资资金
@@ -431,6 +438,7 @@ class ETFAnalysisService:
             
             result = {
                 'current_price': current_price,
+                'price_date': latest_price_info.get('trade_date', ''),  # 添加价格对应的交易日期
                 'price_range': {
                     'lower': round(price_lower, 3),
                     'upper': round(price_upper, 3),

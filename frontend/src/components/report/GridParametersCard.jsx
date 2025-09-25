@@ -68,6 +68,16 @@ const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, 
 
   // 获取价格日期显示文本
   const getPriceDateText = () => {
+    // 优先使用gridStrategy中的price_date（来自TushareClient::get_latest_price）
+    const priceDate = gridStrategy?.price_date;
+    if (priceDate) {
+      const formattedDate = formatDate(priceDate);
+      if (formattedDate) {
+        return `${formattedDate} 收盘价`;
+      }
+    }
+    
+    // 回退到dataQuality中的latest_date
     const latestDate = dataQuality?.latest_date;
     if (latestDate) {
       const formattedDate = formatDate(latestDate);
@@ -75,6 +85,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, 
         return `${formattedDate} 收盘价`;
       }
     }
+    
     return '最近交易日收盘价';
   };
 
