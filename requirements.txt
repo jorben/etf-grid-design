@@ -16,9 +16,9 @@ numpy==2.3.3
     # via etf-grid-design (pyproject.toml)
 pandas==2.3.2
     # via etf-grid-design (pyproject.toml)
-psutil==6.1.1
+psutil==7.1.0
     # via etf-grid-design (pyproject.toml)
-pydantic==2.10.6
+pydantic==2.11.9
     # via etf-grid-design (pyproject.toml)
 pydantic-settings==2.11.0
     # via etf-grid-design (pyproject.toml)
