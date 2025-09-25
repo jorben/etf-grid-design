@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2025-09-25
+### :sparkles: New Features
+- [`7f0f512`](https://github.com/jorben/etf-grid-design/commit/7f0f512b2e002f913cce8cce7035eb96c15981f5) - centralize version management in config module *(commit by [@jorben](https://github.com/jorben))*
+
+### :wrench: Chores
+- [`1d536b4`](https://github.com/jorben/etf-grid-design/commit/1d536b43859ec9a68784c43ed8961cb7c0a5ade9) - bump version to 0.1.3 and add unified version updater script *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.1.2] - 2025-09-24
 ### :sparkles: New Features
 - [`efd8940`](https://github.com/jorben/etf-grid-design/commit/efd894053b1ac3843ac49722229cb27263d4bef2) - restructure backend services and algorithms directories *(commit by [@jorben](https://github.com/jorben))*
@@ -93,3 +101,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.0]: https://github.com/jorben/etf-grid-design/compare/0.0.3...0.1.0
 [0.1.1]: https://github.com/jorben/etf-grid-design/compare/0.1.0...0.1.1
 [0.1.2]: https://github.com/jorben/etf-grid-design/compare/0.1.1...0.1.2
+[0.1.3]: https://github.com/jorben/etf-grid-design/compare/0.1.2...0.1.3
