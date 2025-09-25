@@ -10,7 +10,10 @@ from datetime import datetime
 health_bp = Blueprint('health', __name__)
 
 # 系统版本号
-VERSION = "0.1.0"
+# 导入版本信息
+from config import PROJECT_VERSION
+
+VERSION = PROJECT_VERSION
 
 @health_bp.route('/api/health', methods=['GET'])
 def health_check():

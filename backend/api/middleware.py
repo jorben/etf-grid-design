@@ -42,7 +42,9 @@ def register_middleware(app):
             
             # 添加响应头信息
             response.headers['X-Processing-Time'] = f'{processing_time:.3f}'
-            response.headers['X-Server-Version'] = '0.1.0'
+            # 导入版本信息
+            from config import PROJECT_VERSION
+            response.headers['X-Server-Version'] = PROJECT_VERSION
         
         return response
     
