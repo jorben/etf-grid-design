@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2025-09-25
+### :sparkles: New Features
+- [`43df8e9`](https://github.com/jorben/etf-grid-design/commit/43df8e91810d46204ce3b27d50be425e7850e4e4) - **report**: display latest price date in grid parameters card *(commit by [@jorben](https://github.com/jorben))*
+- [`5c9674e`](https://github.com/jorben/etf-grid-design/commit/5c9674e77f15f60913c2256bdc67401ae802feaa) - use real-time price from Tushare for grid parameter calculation *(commit by [@jorben](https://github.com/jorben))*
+- [`738add0`](https://github.com/jorben/etf-grid-design/commit/738add0fd9bee2ecc66fc491b35b93bd468387b9) - improve ETF name display format in analysis header *(commit by [@jorben](https://github.com/jorben))*
+
+### :wrench: Chores
+- [`fc9d44d`](https://github.com/jorben/etf-grid-design/commit/fc9d44dddb13439ef7a9cf1bfa81667ee06eed90) - bump version to 0.1.5 and add version-sync script *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.1.4] - 2025-09-25
 ### :bug: Bug Fixes
 - [`15592e6`](https://github.com/jorben/etf-grid-design/commit/15592e66d0d5e818d63507c82aa805a1d3e8c971) - **ui**: append version to GitHub link label for clarity *(commit by [@jorben](https://github.com/jorben))*
@@ -114,3 +124,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.2]: https://github.com/jorben/etf-grid-design/compare/0.1.1...0.1.2
 [0.1.3]: https://github.com/jorben/etf-grid-design/compare/0.1.2...0.1.3
 [0.1.4]: https://github.com/jorben/etf-grid-design/compare/0.1.3...0.1.4
+[0.1.5]: https://github.com/jorben/etf-grid-design/compare/0.1.4...0.1.5
