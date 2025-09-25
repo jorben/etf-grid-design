@@ -13,14 +13,14 @@ class GeometricGridCalculator:
     """等比网格计算器"""
     
     def calculate_grid_levels(self, price_lower: float, price_upper: float,
-                            grid_count: int, base_price: float) -> List[float]:
+                            step_size: float, base_price: float) -> List[float]:
         """
-        计算等比网格价位
+        计算等比网格价位（基于步长）
         
         Args:
             price_lower: 价格下边界
             price_upper: 价格上边界
-            grid_count: 网格数量
+            step_size: 网格步长（绝对值）
             base_price: 基准价格（当前价格，作为网格中心）
             
         Returns:
@@ -28,74 +28,70 @@ class GeometricGridCalculator:
         """
         try:
             # 输入验证
+            if step_size <= 0:
+                logger.error(f"步长必须大于0，当前值: {step_size}")
+                return [base_price]
+            
             if not (price_lower <= base_price <= price_upper):
                 base_price = max(price_lower, min(price_upper, base_price))
                 logger.warning(f"基准价格调整到区间内: {base_price}")
             
+            if price_lower <= 0:
+                logger.error(f"价格下边界必须为正数，当前值: {price_lower}")
+                return [base_price]
+            
             price_levels = [base_price]  # 基准价格作为中心点
             
-            if price_lower > 0 and price_upper > price_lower:
-                # 基于网格数量计算步长比例
-                step_ratio = self._calculate_step_ratio(price_lower, price_upper, grid_count, base_price)
-                
-                # 重新计算实际的网格数量分配
-                if price_upper > base_price and step_ratio > 0:
-                    # 向上网格数量 = ln(上限/基准) / ln(1 + 步长比例)
-                    upper_grids = int(np.log(price_upper / base_price) / np.log(1 + step_ratio))
-                else:
-                    upper_grids = 0
-                    
-                if base_price > price_lower and step_ratio > 0:
-                    # 向下网格数量 = ln(基准/下限) / ln(1 + 步长比例)
-                    lower_grids = int(np.log(base_price / price_lower) / np.log(1 + step_ratio))
-                else:
-                    lower_grids = 0
-                
-                # 生成向上网格点
-                if upper_grids > 0:
-                    multiplier = 1 + step_ratio
-                    current_price = base_price
-                    for i in range(upper_grids):
-                        current_price *= multiplier
-                        # 确保不超过上边界
-                        if current_price <= price_upper:
-                            price_levels.append(current_price)
-                        else:
-                            # 如果超出边界，使用边界价格作为最后一个网格点
-                            if abs(current_price - price_upper) / price_upper > 0.01:  # 误差超过1%
-                                price_levels.append(price_upper)
-                            break
-                
-                # 生成向下网格点
-                if lower_grids > 0:
-                    divisor = 1 + step_ratio
-                    current_price = base_price
-                    for i in range(lower_grids):
-                        current_price /= divisor
-                        # 确保不低于下边界
-                        if current_price >= price_lower:
-                            price_levels.append(current_price)
-                        else:
-                            # 如果超出边界，使用边界价格作为最后一个网格点
-                            if abs(current_price - price_lower) / price_lower > 0.01:  # 误差超过1%
-                                price_levels.append(price_lower)
-                            break
-                
-                logger.debug(f"等比网格生成: 基准{base_price:.3f}, 步长比例{step_ratio:.4f}, "
-                           f"上方{upper_grids}格, 下方{lower_grids}格, 共{len(price_levels)}个价格点")
+            # 将绝对步长转换为相对于基准价格的比例
+            step_ratio = step_size / base_price
+            
+            # 限制步长比例在合理范围内（0.1% - 10%）
+            step_ratio = max(0.001, min(0.1, step_ratio))
+            
+            # 向上扩展网格点
+            current_price = base_price
+            multiplier = 1 + step_ratio
+            while current_price * multiplier <= price_upper:
+                current_price *= multiplier
+                price_levels.append(current_price)
+            
+            # 向下扩展网格点
+            current_price = base_price
+            divisor = 1 + step_ratio
+            while current_price / divisor >= price_lower:
+                current_price /= divisor
+                price_levels.append(current_price)
             
             # 按价格升序排列
             price_levels.sort()
             
             # 去除重复价格（保留3位小数精度）
+            # 首先确保基准价格被包含，避免精度问题导致基准价格丢失
+            base_price_rounded = round(base_price, 3)
             unique_levels = []
+            base_price_included = False
+            
             for price in price_levels:
                 rounded_price = round(price, 3)
+                
+                # 检查是否是基准价格（考虑精度容差）
+                if abs(rounded_price - base_price_rounded) <= 0.001:
+                    if not base_price_included:
+                        unique_levels.append(base_price_rounded)
+                        base_price_included = True
+                    continue
+                
+                # 检查是否与上一个价格重复
                 if not unique_levels or abs(rounded_price - unique_levels[-1]) > 0.001:
                     unique_levels.append(rounded_price)
             
-            logger.info(f"等比网格生成: 基准{base_price:.3f}, 目标{grid_count}格, "
-                       f"实际{len(unique_levels)}个价格点")
+            # 如果基准价格还没有被包含，确保添加它
+            if not base_price_included:
+                unique_levels.append(base_price_rounded)
+                unique_levels.sort()
+            
+            logger.info(f"等比网格生成: 基准{base_price:.3f}, 步长{step_size:.3f}({step_ratio:.1%}), "
+                       f"共{len(unique_levels)}个价格点")
             
             return unique_levels
             

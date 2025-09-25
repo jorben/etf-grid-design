@@ -404,11 +404,11 @@ class ETFAnalysisService:
             # 4. 计算价格水平
             if grid_type == '等差':
                 price_levels = self.arithmetic_calculator.calculate_grid_levels(
-                    price_lower, price_upper, grid_count, current_price
+                    price_lower, price_upper, step_size, current_price
                 )
             else:  # 等比网格
                 price_levels = self.geometric_calculator.calculate_grid_levels(
-                    price_lower, price_upper, grid_count, current_price
+                    price_lower, price_upper, step_size, current_price
                 )
             
             # 5. 计算底仓比例

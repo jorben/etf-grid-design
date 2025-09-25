@@ -13,14 +13,14 @@ class ArithmeticGridCalculator:
     """等差网格计算器"""
     
     def calculate_grid_levels(self, price_lower: float, price_upper: float, 
-                            grid_count: int, base_price: float) -> List[float]:
+                            step_size: float, base_price: float) -> List[float]:
         """
-        计算等差网格价位
+        计算等差网格价位（基于步长）
         
         Args:
             price_lower: 价格下边界
             price_upper: 价格上边界
-            grid_count: 网格数量
+            step_size: 网格步长（绝对值）
             base_price: 基准价格（当前价格，作为网格中心）
             
         Returns:
@@ -28,44 +28,28 @@ class ArithmeticGridCalculator:
         """
         try:
             # 输入验证
+            if step_size <= 0:
+                logger.error(f"步长必须大于0，当前值: {step_size}")
+                return [base_price]
+            
             if not (price_lower <= base_price <= price_upper):
                 base_price = max(price_lower, min(price_upper, base_price))
                 logger.warning(f"基准价格调整到区间内: {base_price}")
             
             price_levels = [base_price]  # 基准价格作为中心点
             
-            # 计算上下方向各需要多少个网格
-            total_range = price_upper - price_lower
-            upper_range = price_upper - base_price
-            lower_range = base_price - price_lower
+            # 向上扩展网格点
+            current_price = base_price
+            while current_price + step_size <= price_upper:
+                current_price += step_size
+                price_levels.append(current_price)
             
-            # 按比例分配网格数量
-            if total_range > 0:
-                upper_ratio = upper_range / total_range
-                lower_ratio = lower_range / total_range
-                
-                upper_grids = int(grid_count * upper_ratio)
-                lower_grids = grid_count - upper_grids
-            else:
-                upper_grids = lower_grids = grid_count // 2
+            # 向下扩展网格点
+            current_price = base_price
+            while current_price - step_size >= price_lower:
+                current_price -= step_size
+                price_levels.append(current_price)
             
-            # 计算实际步长
-            if upper_grids > 0:
-                upper_step = upper_range / upper_grids
-                # 向上扩展
-                for i in range(1, upper_grids + 1):
-                    price = base_price + i * upper_step
-                    if price <= price_upper:
-                        price_levels.append(price)
-            
-            if lower_grids > 0:
-                lower_step = lower_range / lower_grids
-                # 向下扩展
-                for i in range(1, lower_grids + 1):
-                    price = base_price - i * lower_step
-                    if price >= price_lower:
-                        price_levels.append(price)
-                
             # 按价格升序排列
             price_levels.sort()
             
@@ -76,8 +60,8 @@ class ArithmeticGridCalculator:
                 if not unique_levels or abs(rounded_price - unique_levels[-1]) > 0.001:
                     unique_levels.append(rounded_price)
             
-            logger.info(f"等差网格生成: 基准{base_price:.3f}, 上方{upper_grids}格, "
-                       f"下方{lower_grids}格, 共{len(unique_levels)}个价格点")
+            logger.info(f"等差网格生成: 基准{base_price:.3f}, 步长{step_size:.3f}, "
+                       f"共{len(unique_levels)}个价格点")
             
             return unique_levels
             
