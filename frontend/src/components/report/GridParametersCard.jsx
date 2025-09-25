@@ -1,9 +1,9 @@
 import React from 'react';
-import { 
-  Grid3X3, 
-  DollarSign, 
-  Target, 
-  TrendingUp, 
+import {
+  Grid3X3,
+  DollarSign,
+  Target,
+  TrendingUp,
   BarChart3,
   PieChart,
   Calculator,
@@ -18,6 +18,7 @@ import {
   Shield,
   AlertTriangle
 } from 'lucide-react';
+import { formatCurrency, formatPercent, formatDate } from '../../shared/utils/format';
 
 const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, adjustmentSuggestions, showDetailed = false, dataQuality }) => {
   if (!gridStrategy) return null;
@@ -31,40 +32,6 @@ const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, 
     calculation_method
   } = gridStrategy;
 
-  // 格式化金额
-  const formatAmount = (amount) => {
-    return new Intl.NumberFormat('zh-CN', {
-      style: 'currency',
-      currency: 'CNY',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
-  };
-
-  // 格式化百分比
-  const formatPercent = (value) => {
-    return (value * 100).toFixed(2) + '%';
-  };
-
-  // 格式化日期
-  const formatDate = (dateStr) => {
-    if (!dateStr) return null;
-    
-    // 处理 YYYYMMDD 格式
-    if (dateStr.length === 8 && /^\d{8}$/.test(dateStr)) {
-      const year = dateStr.substring(0, 4);
-      const month = dateStr.substring(4, 6);
-      const day = dateStr.substring(6, 8);
-      return `${year}-${month}-${day}`;
-    }
-    
-    // 处理 YYYY-MM-DD 格式
-    if (dateStr.includes('-')) {
-      return dateStr;
-    }
-    
-    return null;
-  };
 
   // 获取价格日期显示文本
   const getPriceDateText = () => {

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  TrendingUp, 
-  BarChart3, 
-  Target, 
-  AlertTriangle, 
-  CheckCircle, 
+import {
+  TrendingUp,
+  BarChart3,
+  Target,
+  AlertTriangle,
+  CheckCircle,
   XCircle,
   Info,
   DollarSign,
@@ -23,9 +23,11 @@ import GridParametersCard from './report/GridParametersCard';
 import StrategyRationaleCard from './report/StrategyRationaleCard';
 
 import LoadingSpinner from './LoadingSpinner';
+import { useShare } from '../shared/hooks/useShare';
 
 const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareButton = false }) => {
   const [activeTab, setActiveTab] = useState('overview');
+  const { shareContent } = useShare();
 
   // 分享功能
   const handleShare = async () => {
@@ -34,47 +36,8 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareB
       text: `查看 ${data?.etf_info?.name || 'ETF'} 的智能网格交易策略分析结果`,
       url: window.location.href,
     };
-
-    // 优先使用Web Share API
-    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-      try {
-        await navigator.share(shareData);
-        return;
-      } catch (error) {
-        console.log('分享取消或失败，使用备用方案:', error);
-      }
-    }
-
-    // 备用方案：复制链接到剪贴板
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(window.location.href);
-        alert('分析报告链接已复制到剪贴板！');
-      } else {
-        // 更老的浏览器备用方案
-        const textArea = document.createElement('textarea');
-        textArea.value = window.location.href;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
-        try {
-          document.execCommand('copy');
-          alert('分析报告链接已复制到剪贴板！');
-        } catch (err) {
-          console.error('复制失败:', err);
-          prompt('请手动复制以下链接:', window.location.href);
-        } finally {
-          document.body.removeChild(textArea);
-        }
-      }
-    } catch (error) {
-      console.error('复制到剪贴板失败:', error);
-      prompt('请手动复制以下链接:', window.location.href);
-    }
+    
+    await shareContent(shareData);
   };
 
 

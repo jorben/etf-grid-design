@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, TrendingUp, DollarSign, Settings, Shield, BarChart3, Grid3X3 } from 'lucide-react';
 import { usePersistedState } from '../hooks/usePersistedState';
 import ETFInfoSkeleton from './ETFInfoSkeleton';
+import { validateETFCode, validateCapital } from '../shared/utils/validation';
 
 const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
   // 使用持久化状态，但优先使用初始值
@@ -95,13 +96,13 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!etfCode || etfCode.length !== 6 || !/^\d{6}$/.test(etfCode)) {
+    if (!validateETFCode(etfCode)) {
       newErrors.etfCode = '请输入6位数字ETF代码';
     }
 
-    const capital = parseFloat(totalCapital);
-    if (!totalCapital || isNaN(capital) || capital < 100000 || capital > 5000000) {
-      newErrors.totalCapital = '投资金额应在10万-500万之间';
+    const capitalValidation = validateCapital(parseFloat(totalCapital));
+    if (!capitalValidation.isValid) {
+      newErrors.totalCapital = capitalValidation.error;
     }
 
     setErrors(newErrors);
