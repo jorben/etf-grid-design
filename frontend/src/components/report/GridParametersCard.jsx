@@ -19,7 +19,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
-const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, adjustmentSuggestions, showDetailed = false }) => {
+const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, adjustmentSuggestions, showDetailed = false, dataQuality }) => {
   if (!gridStrategy) return null;
 
   const {
@@ -44,6 +44,38 @@ const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, 
   // 格式化百分比
   const formatPercent = (value) => {
     return (value * 100).toFixed(2) + '%';
+  };
+
+  // 格式化日期
+  const formatDate = (dateStr) => {
+    if (!dateStr) return null;
+    
+    // 处理 YYYYMMDD 格式
+    if (dateStr.length === 8 && /^\d{8}$/.test(dateStr)) {
+      const year = dateStr.substring(0, 4);
+      const month = dateStr.substring(4, 6);
+      const day = dateStr.substring(6, 8);
+      return `${year}-${month}-${day}`;
+    }
+    
+    // 处理 YYYY-MM-DD 格式
+    if (dateStr.includes('-')) {
+      return dateStr;
+    }
+    
+    return null;
+  };
+
+  // 获取价格日期显示文本
+  const getPriceDateText = () => {
+    const latestDate = dataQuality?.latest_date;
+    if (latestDate) {
+      const formattedDate = formatDate(latestDate);
+      if (formattedDate) {
+        return `${formattedDate} 收盘价`;
+      }
+    }
+    return '最近交易日收盘价';
   };
 
   return (
@@ -147,7 +179,7 @@ const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, 
             </div>
             <div className="text-sm text-gray-700 font-medium">基准价格</div>
             <div className="text-xs text-gray-600 mt-1">
-              最近交易日收盘价
+              {getPriceDateText()}
             </div>
           </div>
 

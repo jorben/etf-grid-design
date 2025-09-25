@@ -450,6 +450,7 @@ const AnalysisReport = ({ data, loading, onBackToInput, onReAnalysis, showShareB
               strategyRationale={strategy_rationale}
               adjustmentSuggestions={adjustment_suggestions}
               showDetailed={true}
+              dataQuality={data_quality}
             />
           )}
 
