@@ -263,7 +263,7 @@ const AnalysisPage = () => {
               
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
-                  {analysisData?.etf_info?.name || `ETF ${etfCode}`} 网格策略分析
+                  {analysisData?.etf_info?.name || `ETF`}({etfCode}) 网格策略分析
                 </h1>
                 <p className="text-sm text-gray-600">
                   投资金额：{currentParams?.totalCapital?.toLocaleString()}元 | 
