@@ -18,7 +18,16 @@ import {
   Shield,
   AlertTriangle
 } from 'lucide-react';
-import { formatCurrency, formatPercent, formatDate } from '../../shared/utils/format';
+import { formatCurrency, formatPercent, formatDate, formatNumber } from '../../shared/utils/format';
+
+const formatAmount = (amount) => {
+  return formatNumber(amount, {
+    style: 'currency',
+    currency: 'CNY',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  });
+};
 
 const GridParametersCard = ({ gridStrategy, inputParameters, strategyRationale, adjustmentSuggestions, showDetailed = false, dataQuality }) => {
   if (!gridStrategy) return null;

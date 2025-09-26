@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Search, TrendingUp, DollarSign, Settings, Shield, BarChart3, Grid3X3 } from 'lucide-react';
-import { usePersistedState } from '../hooks/usePersistedState';
-import ETFInfoSkeleton from './ETFInfoSkeleton';
+import { Settings } from 'lucide-react';
+import { usePersistedState } from '../shared/hooks/usePersistedState';
 import { validateETFCode, validateCapital } from '../shared/utils/validation';
+import ETFSelector from '../features/etf/components/ETFSelector';
+import CapitalInput from '../features/analysis/components/CapitalInput';
+import GridTypeSelector from '../features/analysis/components/GridTypeSelector';
+import RiskSelector from '../features/analysis/components/RiskSelector';
 
+/**
+ * 参数表单容器组件
+ * 负责协调各个输入组件和表单验证
+ */
 const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
-  // 使用持久化状态，但优先使用初始值
+  // 状态管理
   const [etfCode, setEtfCode] = usePersistedState('etfCode', initialValues?.etfCode || '510300');
   const [totalCapital, setTotalCapital] = usePersistedState('totalCapital', initialValues?.totalCapital?.toString() || '100000');
   const [gridType, setGridType] = usePersistedState('gridType', initialValues?.gridType || '等比');
   const [riskPreference, setRiskPreference] = usePersistedState('riskPreference', initialValues?.riskPreference || '稳健');
 
-  // 状态管理
   const [popularETFs, setPopularETFs] = useState([]);
   const [capitalPresets, setCapitalPresets] = useState([]);
   const [etfInfo, setEtfInfo] = useState(null);
@@ -47,8 +53,6 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
       })
       .catch(err => console.error('获取热门ETF失败:', err));
   }, []);
-
-
 
   // 获取资金预设
   useEffect(() => {
@@ -109,7 +113,7 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // 提交表单
+  // 表单提交
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
@@ -120,18 +124,6 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
         riskPreference
       });
     }
-  };
-
-
-
-  // 选择热门ETF
-  const selectPopularETF = (code) => {
-    setEtfCode(code);
-  };
-
-  // 选择预设资金
-  const selectCapitalPreset = (amount) => {
-    setTotalCapital(amount.toString());
   };
 
   return (
@@ -147,132 +139,23 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* ETF标的选择 */}
-        <div>
-          <div className="flex justify-between items-center mb-3">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <Search className="w-4 h-4" />
-              ETF标的选择
-            </label>
-            
-            {/* 热门ETF - 靠右对齐 */}
-            <div className="flex items-center">
-              <span className="text-xs text-gray-500 mr-2">热门ETF：</span>
-              <div className="flex flex-wrap gap-2">
-                {['510300', '510500', '159915', '588000', '512480', '159819'].map(code => {
-                  const etf = popularETFs.find(e => e.code === code);
-                  return (
-                    <button
-                      key={code}
-                      type="button"
-                      onClick={() => selectPopularETF(code)}
-                      className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                        etfCode === code
-                          ? 'bg-blue-100 border-blue-300 text-blue-700'
-                          : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      {code} {etf?.name || ''}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+        <ETFSelector
+          value={etfCode}
+          onChange={setEtfCode}
+          error={errors.etfCode}
+          popularETFs={popularETFs}
+          etfInfo={etfInfo}
+          loading={etfLoading}
+        />
 
-          <div className="relative">
-            <input
-              type="text"
-              value={etfCode}
-              onChange={(e) => setEtfCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="请输入6位ETF代码，如：510300"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.etfCode ? 'border-red-300' : 'border-gray-300'
-              }`}
-              maxLength={6}
-            />
-            
-            {/* ETF信息区域 - 固定高度避免跳动 */}
-            <div className="mt-2" style={{ minHeight: '80px' }}>
-              {etfLoading && <ETFInfoSkeleton />}
-              
-              {!etfLoading && etfInfo && (
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-blue-600" />
-                    <span className="font-medium text-blue-800">{etfInfo.name}</span>
-                    <span className="text-sm text-blue-600">
-                      ¥{etfInfo.current_price?.toFixed(3)} 
-                      <span className={etfInfo.change_pct >= 0 ? 'text-red-600' : 'text-green-600'}>
-                        ({etfInfo.change_pct >= 0 ? '+' : ''}{etfInfo.change_pct?.toFixed(2)}%)
-                      </span>
-                    </span>
-                  </div>
-                  <p className="text-xs text-blue-600 mt-1">{etfInfo.management_company}</p>
-                </div>
-              )}
-              
-              {!etfLoading && errors.etfCode && (
-                <p className="mt-1 text-sm text-red-600">{errors.etfCode}</p>
-              )}
-            </div>
-          </div>
-        </div>
+        <CapitalInput
+          value={totalCapital}
+          onChange={setTotalCapital}
+          error={errors.totalCapital}
+          presets={capitalPresets}
+        />
 
-        {/* 总投资资金量 */}
-        <div>
-          {/* 标题和常用金额 - 响应式布局 */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-3">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <DollarSign className="w-4 h-4" />
-              总投资资金量
-            </label>
-            
-            {/* 常用金额 - 在小屏幕上换行，大屏幕上靠右对齐 */}
-            <div className="flex items-center">
-              <span className="text-xs text-gray-500 mr-2">常用金额:</span>
-              <div className="flex flex-wrap gap-2">
-                {capitalPresets.filter(preset => preset.popular).map(preset => (
-                  <button
-                    key={preset.value}
-                    type="button"
-                    onClick={() => selectCapitalPreset(preset.value)}
-                    className={`px-2 py-1 text-xs rounded-full border transition-colors ${
-                      totalCapital === preset.value.toString()
-                        ? 'bg-blue-100 border-blue-300 text-blue-700'
-                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="relative">
-            <input
-              type="number"
-              value={totalCapital}
-              onChange={(e) => setTotalCapital(e.target.value)}
-              placeholder="请输入投资金额（10万-500万）"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.totalCapital ? 'border-red-300' : 'border-gray-300'
-              }`}
-              min={100000}
-              max={5000000}
-              step={10000}
-            />
-            <div className="absolute right-3 top-3 text-gray-400">
-              元
-            </div>
-            {errors.totalCapital && (
-              <p className="mt-1 text-sm text-red-600">{errors.totalCapital}</p>
-            )}
-          </div>
-        </div>
-
-        {/* 开始分析按钮 */}
+        {/* 提交按钮 */}
         <div className="pt-2">
           <button
             type="submit"
@@ -300,76 +183,8 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
           </div>
         </div>
 
-        {/* 网格间距类型 */}
-        <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
-            <Grid3X3 className="w-4 h-4" />
-            网格间距类型
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { value: '等比', label: '等比网格', desc: '比例间距相等，推荐使用' },
-              { value: '等差', label: '等差网格', desc: '价格间距相等，适合新手' }
-            ].map(option => (
-              <label
-                key={option.value}
-                className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                  gridType === option.value
-                    ? 'border-blue-300 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="gridType"
-                  value={option.value}
-                  checked={gridType === option.value}
-                  onChange={(e) => setGridType(e.target.value)}
-                  className="sr-only"
-                />
-                <div className="font-medium text-gray-900">{option.label}</div>
-                <div className="text-sm text-gray-600">{option.desc}</div>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* 风险偏好 */}
-        <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
-            <Shield className="w-4 h-4" />
-            风险偏好
-          </label>
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { value: '保守', label: '保守型', desc: '耐心低频交易', color: 'green' },
-              { value: '稳健', label: '稳健型', desc: '平衡机会风险', color: 'blue' },
-              { value: '激进', label: '激进型', desc: '更多成交机会', color: 'red' }
-            ].map(option => (
-              <label
-                key={option.value}
-                className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                  riskPreference === option.value
-                    ? `border-${option.color}-300 bg-${option.color}-50`
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="riskPreference"
-                  value={option.value}
-                  checked={riskPreference === option.value}
-                  onChange={(e) => setRiskPreference(e.target.value)}
-                  className="sr-only"
-                />
-                <div className="font-medium text-gray-900">{option.label}</div>
-                <div className="text-sm text-gray-600">{option.desc}</div>
-              </label>
-            ))}
-          </div>
-        </div>
-
-
+        <GridTypeSelector value={gridType} onChange={setGridType} />
+        <RiskSelector value={riskPreference} onChange={setRiskPreference} />
       </form>
     </div>
   );
