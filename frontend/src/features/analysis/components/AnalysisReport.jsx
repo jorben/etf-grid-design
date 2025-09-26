@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import LoadingSpinner from './LoadingSpinner';
-import { useShare } from '../shared/hooks/useShare';
-import ReportTabs from '../features/analysis/components/ReportTabs';
-import OverviewTab from '../features/analysis/components/OverviewTab';
-import ErrorState from '../features/analysis/components/ErrorState';
-import Disclaimer from '../features/analysis/components/Disclaimer';
-import SuitabilityCard from './report/SuitabilityCard';
-import GridParametersCard from './report/GridParametersCard';
+import { LoadingSpinner } from '@shared/components/ui';
+import { useShare } from '@shared/hooks';
+import ReportTabs from './ReportTabs';
+import OverviewTab from './OverviewTab';
+import ErrorState from './ErrorState';
+import Disclaimer from './Disclaimer';
+import SuitabilityCard from './ReportCards/SuitabilityCard';
+import GridParametersCard from './ReportCards/GridParametersCard';
 
 /**
  * 分析报告容器组件

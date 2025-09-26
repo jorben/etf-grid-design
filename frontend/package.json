@@ -3,6 +3,13 @@
   "private": true,
   "version": "0.1.5",
   "type": "module",
+  "imports": {
+    "@/*": ["./src/*"],
+    "@shared/*": ["./src/shared/*"],
+    "@features/*": ["./src/features/*"],
+    "@pages/*": ["./src/pages/*"],
+    "@app/*": ["./src/app/*"]
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -2,16 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Share2, ArrowLeft, RefreshCw, AlertTriangle } from 'lucide-react';
-import ParameterForm from '../components/ParameterForm';
-import AnalysisReport from '../components/AnalysisReport';
-import { analyzeETF } from '../services/api';
+import AnalysisReport from '@features/analysis/components/AnalysisReport';
+import { analyzeETF } from '@shared/services/api';
 import {
   parseAnalysisURL,
   validateAndCompleteParams,
   generateAnalysisURL,
   encodeAnalysisParams
-} from '../shared/utils/urlParams';
-import { useShare } from '../shared/hooks/useShare';
+} from '@shared/utils/url';
+import { useShare } from '@shared/hooks/useShare';
 
 /**
  * 分析页面组件

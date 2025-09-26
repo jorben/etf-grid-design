@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Settings } from 'lucide-react';
-import { usePersistedState } from '../shared/hooks/usePersistedState';
-import { validateETFCode, validateCapital } from '../shared/utils/validation';
-import ETFSelector from '../features/etf/components/ETFSelector';
-import CapitalInput from '../features/analysis/components/CapitalInput';
-import GridTypeSelector from '../features/analysis/components/GridTypeSelector';
-import RiskSelector from '../features/analysis/components/RiskSelector';
+import { usePersistedState } from '@shared/hooks';
+import { validateETFCode, validateCapital } from '@shared/utils/validation';
+import ETFSelector from '@features/etf/components/ETFSelector';
+import CapitalInput from './CapitalInput';
+import GridTypeSelector from './GridTypeSelector';
+import RiskSelector from './RiskSelector';
 
 /**
  * 参数表单容器组件

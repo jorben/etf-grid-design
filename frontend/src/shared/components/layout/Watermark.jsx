@@ -1,11 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import './Watermark.css';
-import { watermarkConfig, getResponsiveConfig } from '../../../config/watermarkConfig';
+import { watermarkConfig, getResponsiveConfig } from '@shared/constants/config';
 
-/**
- * 全局水印组件
- * 负责在页面上显示防篡改的水印效果
- */
 const Watermark = ({ 
   text = watermarkConfig.text,
   fontSize = watermarkConfig.fontSize,

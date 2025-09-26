@@ -18,7 +18,7 @@ import {
   Shield,
   AlertTriangle
 } from 'lucide-react';
-import { formatCurrency, formatPercent, formatDate, formatNumber } from '../../shared/utils/format';
+import { formatCurrency, formatPercent, formatDate, formatNumber } from '@shared/utils';
 
 const formatAmount = (amount) => {
   return formatNumber(amount, {

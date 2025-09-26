@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Waypoints, Github } from 'lucide-react';
-import { getVersion } from '../services/api';
+import { getVersion } from '@shared/services/api';
 
 /**
  * 应用头部组件

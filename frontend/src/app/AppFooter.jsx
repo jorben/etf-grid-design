@@ -1,10 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getVersion } from '@shared/services/api';
 
 /**
  * 应用底部组件
  * 负责显示系统信息、风险提示和技术支持信息
  */
-export default function AppFooter({ version = 'v1.0.0' }) {
+export default function AppFooter() {
+  const [version, setVersion] = useState('v1.0.0');
+
+  useEffect(() => {
+    const fetchVersion = async () => {
+      try {
+        const response = await getVersion();
+        if (response.success && response.data.version) {
+          setVersion(`v${response.data.version}`);
+        }
+      } catch (error) {
+        console.error('获取版本号失败:', error);
+      }
+    };
+
+    fetchVersion();
+  }, []);
   return (
     <footer className="bg-white border-t border-gray-200 mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
