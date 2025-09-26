@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - 2025-09-26
+### :boom: BREAKING CHANGES
+- due to [`45f0322`](https://github.com/jorben/etf-grid-design/commit/45f032222956b3ad11f13258ffa6232f588dd585) - restructure frontend application with modular architecture *(commit by [@jorben](https://github.com/jorben))*:
+
+  Frontend application structure has been completely reorganized from monolithic to modular architecture. Import paths have changed to use alias-based imports (@shared, @features, @pages). Existing component references may need to be updated to use new module paths.
+
+- due to [`1643e60`](https://github.com/jorben/etf-grid-design/commit/1643e60b30e496b5e887e80cc504d925455f4e14) - restructure project with modular architecture and path aliases *(commit by [@jorben](https://github.com/jorben))*:
+
+  All component imports have been updated to use new path aliases. Existing relative imports will no longer work. Developers must update import statements to use @shared, @features, @pages, and @app aliases.
+
+- due to [`53a6f0c`](https://github.com/jorben/etf-grid-design/commit/53a6f0c83500fae59afa3d66f28cbd333f23ba53) - restructure project with modular architecture and path aliases *(commit by [@jorben](https://github.com/jorben))*:
+
+  项目目录结构发生重大变更，所有相对路径导入已更新为别名路径。需要更新开发环境配置以支持新的路径映射。
+
+
+### :recycle: Refactors
+- [`45f0322`](https://github.com/jorben/etf-grid-design/commit/45f032222956b3ad11f13258ffa6232f588dd585) - **frontend**: restructure frontend application with modular architecture *(commit by [@jorben](https://github.com/jorben))*
+- [`1643e60`](https://github.com/jorben/etf-grid-design/commit/1643e60b30e496b5e887e80cc504d925455f4e14) - **frontend**: restructure project with modular architecture and path aliases *(commit by [@jorben](https://github.com/jorben))*
+- [`53a6f0c`](https://github.com/jorben/etf-grid-design/commit/53a6f0c83500fae59afa3d66f28cbd333f23ba53) - **frontend**: restructure project with modular architecture and path aliases *(commit by [@jorben](https://github.com/jorben))*
+
+### :wrench: Chores
+- [`5019ad7`](https://github.com/jorben/etf-grid-design/commit/5019ad703890004236e1ac91be52e867593f7c37) - **release**: bump version to 0.1.6 *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.1.5] - 2025-09-25
 ### :sparkles: New Features
 - [`43df8e9`](https://github.com/jorben/etf-grid-design/commit/43df8e91810d46204ce3b27d50be425e7850e4e4) - **report**: display latest price date in grid parameters card *(commit by [@jorben](https://github.com/jorben))*
@@ -125,3 +149,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.3]: https://github.com/jorben/etf-grid-design/compare/0.1.2...0.1.3
 [0.1.4]: https://github.com/jorben/etf-grid-design/compare/0.1.3...0.1.4
 [0.1.5]: https://github.com/jorben/etf-grid-design/compare/0.1.4...0.1.5
+[0.1.6]: https://github.com/jorben/etf-grid-design/compare/0.1.5...0.1.6
