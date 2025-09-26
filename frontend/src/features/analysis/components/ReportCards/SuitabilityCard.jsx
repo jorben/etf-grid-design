@@ -272,9 +272,9 @@ const SuitabilityCard = ({ evaluation, dataQuality, showDetailed = false }) => {
                 波动率评估 (30分)
               </h5>
               <ul className="space-y-1 text-blue-700">
-                <li>• 波动率 15%-40%: 30分 (理想区间)</li>
+                <li>• 波动率 15%-45%: 30分 (理想区间)</li>
                 <li>• 波动率 &lt; 15%: 18分 (波动偏低)</li>
-                <li>• 波动率 &gt; 40%: 12分 (波动过高)</li>
+                <li>• 波动率 &gt; 45%: 12分 (波动过高)</li>
               </ul>
             </div>
             <div>
