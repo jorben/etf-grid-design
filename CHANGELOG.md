@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - 2025-09-26
+### :bug: Bug Fixes
+- [`8ec69a2`](https://github.com/jorben/etf-grid-design/commit/8ec69a2ca817f93ef7e132e4d7c0891d566956eb) - **analysis**: adjust volatility threshold criteria in suitability evaluation *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.1.6] - 2025-09-26
 ### :boom: BREAKING CHANGES
 - due to [`45f0322`](https://github.com/jorben/etf-grid-design/commit/45f032222956b3ad11f13258ffa6232f588dd585) - restructure frontend application with modular architecture *(commit by [@jorben](https://github.com/jorben))*:
@@ -150,3 +155,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.4]: https://github.com/jorben/etf-grid-design/compare/0.1.3...0.1.4
 [0.1.5]: https://github.com/jorben/etf-grid-design/compare/0.1.4...0.1.5
 [0.1.6]: https://github.com/jorben/etf-grid-design/compare/0.1.5...0.1.6
+[0.1.7]: https://github.com/jorben/etf-grid-design/compare/0.1.6...0.1.7
