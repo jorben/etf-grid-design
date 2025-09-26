@@ -1,5 +1,5 @@
-import React from 'react';
-import { Shield } from 'lucide-react';
+import React from "react";
+import { Shield } from "lucide-react";
 
 /**
  * 风险偏好选择组件
@@ -7,9 +7,9 @@ import { Shield } from 'lucide-react';
  */
 export default function RiskSelector({ value, onChange }) {
   const riskOptions = [
-    { value: '保守', label: '保守型', desc: '耐心低频交易', color: 'green' },
-    { value: '稳健', label: '稳健型', desc: '平衡机会风险', color: 'blue' },
-    { value: '激进', label: '激进型', desc: '更多成交机会', color: 'red' }
+    { value: "保守", label: "保守型", desc: "耐心低频交易", color: "green" },
+    { value: "稳健", label: "稳健型", desc: "平衡机会风险", color: "blue" },
+    { value: "激进", label: "激进型", desc: "更多成交机会", color: "red" },
   ];
 
   return (
@@ -19,13 +19,13 @@ export default function RiskSelector({ value, onChange }) {
         风险偏好
       </label>
       <div className="grid grid-cols-3 gap-3">
-        {riskOptions.map(option => (
+        {riskOptions.map((option) => (
           <label
             key={option.value}
             className={`p-4 border rounded-lg cursor-pointer transition-colors ${
               value === option.value
                 ? `border-${option.color}-300 bg-${option.color}-50`
-                : 'border-gray-200 hover:border-gray-300'
+                : "border-gray-200 hover:border-gray-300"
             }`}
           >
             <input

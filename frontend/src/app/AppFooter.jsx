@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { getVersion } from '@shared/services/api';
+import React, { useState, useEffect } from "react";
+import { getVersion } from "@shared/services/api";
 
 /**
  * 应用底部组件
  * 负责显示系统信息、风险提示和技术支持信息
  */
 export default function AppFooter() {
-  const [version, setVersion] = useState('v1.0.0');
+  const [version, setVersion] = useState("v1.0.0");
 
   useEffect(() => {
     const fetchVersion = async () => {
@@ -16,7 +16,7 @@ export default function AppFooter() {
           setVersion(`v${response.data.version}`);
         }
       } catch (error) {
-        console.error('获取版本号失败:', error);
+        console.error("获取版本号失败:", error);
       }
     };
 

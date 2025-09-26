@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Settings } from 'lucide-react';
-import { usePersistedState } from '@shared/hooks';
-import { validateETFCode, validateCapital } from '@shared/utils/validation';
-import ETFSelector from '@features/etf/components/ETFSelector';
-import CapitalInput from './CapitalInput';
-import GridTypeSelector from './GridTypeSelector';
-import RiskSelector from './RiskSelector';
+import React, { useState, useEffect } from "react";
+import { Settings } from "lucide-react";
+import { usePersistedState } from "@shared/hooks";
+import { validateETFCode, validateCapital } from "@shared/utils/validation";
+import ETFSelector from "@features/etf/components/ETFSelector";
+import CapitalInput from "./CapitalInput";
+import GridTypeSelector from "./GridTypeSelector";
+import RiskSelector from "./RiskSelector";
 
 /**
  * 参数表单容器组件
@@ -13,10 +13,22 @@ import RiskSelector from './RiskSelector';
  */
 const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
   // 状态管理
-  const [etfCode, setEtfCode] = usePersistedState('etfCode', initialValues?.etfCode || '510300');
-  const [totalCapital, setTotalCapital] = usePersistedState('totalCapital', initialValues?.totalCapital?.toString() || '100000');
-  const [gridType, setGridType] = usePersistedState('gridType', initialValues?.gridType || '等比');
-  const [riskPreference, setRiskPreference] = usePersistedState('riskPreference', initialValues?.riskPreference || '稳健');
+  const [etfCode, setEtfCode] = usePersistedState(
+    "etfCode",
+    initialValues?.etfCode || "510300",
+  );
+  const [totalCapital, setTotalCapital] = usePersistedState(
+    "totalCapital",
+    initialValues?.totalCapital?.toString() || "100000",
+  );
+  const [gridType, setGridType] = usePersistedState(
+    "gridType",
+    initialValues?.gridType || "等比",
+  );
+  const [riskPreference, setRiskPreference] = usePersistedState(
+    "riskPreference",
+    initialValues?.riskPreference || "稳健",
+  );
 
   const [popularETFs, setPopularETFs] = useState([]);
   const [capitalPresets, setCapitalPresets] = useState([]);
@@ -30,40 +42,56 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
       if (initialValues.etfCode && initialValues.etfCode !== etfCode) {
         setEtfCode(initialValues.etfCode);
       }
-      if (initialValues.totalCapital && initialValues.totalCapital.toString() !== totalCapital) {
+      if (
+        initialValues.totalCapital &&
+        initialValues.totalCapital.toString() !== totalCapital
+      ) {
         setTotalCapital(initialValues.totalCapital.toString());
       }
       if (initialValues.gridType && initialValues.gridType !== gridType) {
         setGridType(initialValues.gridType);
       }
-      if (initialValues.riskPreference && initialValues.riskPreference !== riskPreference) {
+      if (
+        initialValues.riskPreference &&
+        initialValues.riskPreference !== riskPreference
+      ) {
         setRiskPreference(initialValues.riskPreference);
       }
     }
-  }, [initialValues, etfCode, totalCapital, gridType, riskPreference, setEtfCode, setTotalCapital, setGridType, setRiskPreference]);
+  }, [
+    initialValues,
+    etfCode,
+    totalCapital,
+    gridType,
+    riskPreference,
+    setEtfCode,
+    setTotalCapital,
+    setGridType,
+    setRiskPreference,
+  ]);
 
   // 获取热门ETF列表
   useEffect(() => {
-    fetch('/api/popular-etfs')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/api/popular-etfs")
+      .then((res) => res.json())
+      .then((data) => {
         if (data.success) {
           setPopularETFs(data.data);
         }
       })
-      .catch(err => console.error('获取热门ETF失败:', err));
+      .catch((err) => console.error("获取热门ETF失败:", err));
   }, []);
 
   // 获取资金预设
   useEffect(() => {
-    fetch('/api/capital-presets')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/api/capital-presets")
+      .then((res) => res.json())
+      .then((data) => {
         if (data.success) {
           setCapitalPresets(data.data);
         }
       })
-      .catch(err => console.error('获取资金预设失败:', err));
+      .catch((err) => console.error("获取资金预设失败:", err));
   }, []);
 
   // ETF代码变化时获取基础信息
@@ -71,21 +99,21 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
     if (etfCode && etfCode.length === 6) {
       setEtfLoading(true);
       setEtfInfo(null);
-      
+
       fetch(`/api/etf/basic-info/${etfCode}`)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           if (data.success) {
             setEtfInfo(data.data);
-            setErrors(prev => ({ ...prev, etfCode: '' }));
+            setErrors((prev) => ({ ...prev, etfCode: "" }));
           } else {
             setEtfInfo(null);
-            setErrors(prev => ({ ...prev, etfCode: data.error }));
+            setErrors((prev) => ({ ...prev, etfCode: data.error }));
           }
         })
-        .catch(err => {
+        .catch((err) => {
           setEtfInfo(null);
-          setErrors(prev => ({ ...prev, etfCode: '获取ETF信息失败' }));
+          setErrors((prev) => ({ ...prev, etfCode: "获取ETF信息失败" }));
         })
         .finally(() => {
           setEtfLoading(false);
@@ -101,7 +129,7 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
     const newErrors = {};
 
     if (!validateETFCode(etfCode)) {
-      newErrors.etfCode = '请输入6位数字ETF代码';
+      newErrors.etfCode = "请输入6位数字ETF代码";
     }
 
     const capitalValidation = validateCapital(parseFloat(totalCapital));
@@ -121,7 +149,7 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
         etfCode,
         totalCapital: parseFloat(totalCapital),
         gridType,
-        riskPreference
+        riskPreference,
       });
     }
   };
@@ -134,7 +162,9 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
         </div>
         <div>
           <h2 className="text-xl font-bold text-gray-900">策略参数设置</h2>
-          <p className="text-sm text-gray-600">请填写您的投资偏好，系统将为您量身定制网格交易策略</p>
+          <p className="text-sm text-gray-600">
+            请填写您的投资偏好，系统将为您量身定制网格交易策略
+          </p>
         </div>
       </div>
 
@@ -168,7 +198,7 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
                 正在分析策略...
               </div>
             ) : (
-              '开始分析策略'
+              "开始分析策略"
             )}
           </button>
         </div>

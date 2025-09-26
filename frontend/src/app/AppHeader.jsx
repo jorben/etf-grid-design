@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Waypoints, Github } from 'lucide-react';
-import { getVersion } from '@shared/services/api';
+import React, { useState, useEffect } from "react";
+import { Waypoints, Github } from "lucide-react";
+import { getVersion } from "@shared/services/api";
 
 /**
  * 应用头部组件
  * 负责显示logo、标题、导航和版本信息
  */
 export default function AppHeader() {
-  const [version, setVersion] = useState('v1.0.0');
+  const [version, setVersion] = useState("v1.0.0");
 
   useEffect(() => {
     const fetchVersion = async () => {
@@ -17,7 +17,7 @@ export default function AppHeader() {
           setVersion(`v${response.data.version}`);
         }
       } catch (error) {
-        console.error('获取版本号失败:', error);
+        console.error("获取版本号失败:", error);
       }
     };
 
@@ -35,7 +35,9 @@ export default function AppHeader() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">ETFer.Top</h1>
-              <p className="text-sm text-gray-600">基于ATR算法的智能网格交易策略设计工具</p>
+              <p className="text-sm text-gray-600">
+                基于ATR算法的智能网格交易策略设计工具
+              </p>
             </div>
           </div>
 

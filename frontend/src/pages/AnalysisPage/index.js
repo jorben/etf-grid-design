@@ -1,1 +1,1 @@
-export { default } from './AnalysisPage';
+export { default } from "./AnalysisPage";

@@ -1,7 +1,11 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import HomePage from '@pages/HomePage';
-import AnalysisPage from '@pages/AnalysisPage';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import HomePage from "@pages/HomePage";
+import AnalysisPage from "@pages/AnalysisPage";
 
 /**
  * 应用路由配置组件

@@ -1,5 +1,5 @@
-import React from 'react';
-import './ETFInfoSkeleton.css';
+import React from "react";
+import "./ETFInfoSkeleton.css";
 
 const ETFInfoSkeleton = () => {
   return (
@@ -12,7 +12,7 @@ const ETFInfoSkeleton = () => {
         </div>
         <div className="skeleton-company"></div>
       </div>
-      
+
       <div className="skeleton-loading">
         <div className="loading-spinner"></div>
         <span className="loading-text">正在加载ETF信息...</span>

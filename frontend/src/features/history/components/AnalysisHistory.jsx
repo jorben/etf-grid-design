@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { History, Clock, TrendingUp, ExternalLink, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { History, Clock, TrendingUp, ExternalLink, Trash2 } from "lucide-react";
 
-const AnalysisHistory = ({ className = '' }) => {
+const AnalysisHistory = ({ className = "" }) => {
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const navigate = useNavigate();
@@ -14,18 +14,20 @@ const AnalysisHistory = ({ className = '' }) => {
 
   const loadAnalysisHistory = () => {
     try {
-      const savedHistory = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+      const savedHistory = JSON.parse(
+        localStorage.getItem("analysisHistory") || "[]",
+      );
       setHistory(savedHistory);
     } catch (error) {
-      console.error('加载分析历史失败:', error);
+      console.error("加载分析历史失败:", error);
       setHistory([]);
     }
   };
 
   // 清除历史记录
   const clearHistory = () => {
-    if (window.confirm('确定要清除所有分析历史记录吗？')) {
-      localStorage.removeItem('analysisHistory');
+    if (window.confirm("确定要清除所有分析历史记录吗？")) {
+      localStorage.removeItem("analysisHistory");
       setHistory([]);
     }
   };
@@ -33,10 +35,10 @@ const AnalysisHistory = ({ className = '' }) => {
   // 删除单条记录
   const deleteHistoryItem = (index, event) => {
     event.stopPropagation();
-    
+
     const newHistory = history.filter((_, i) => i !== index);
     setHistory(newHistory);
-    localStorage.setItem('analysisHistory', JSON.stringify(newHistory));
+    localStorage.setItem("analysisHistory", JSON.stringify(newHistory));
   };
 
   // 跳转到分析页面
@@ -48,8 +50,8 @@ const AnalysisHistory = ({ className = '' }) => {
   // 获取网格类型编码
   const getGridTypeCode = (gridType) => {
     const mapping = {
-      '等比': 'geometric',
-      '等差': 'arithmetic'
+      等比: "geometric",
+      等差: "arithmetic",
     };
     return mapping[gridType] || gridType;
   };
@@ -57,9 +59,9 @@ const AnalysisHistory = ({ className = '' }) => {
   // 获取风险偏好编码
   const getRiskCode = (risk) => {
     const mapping = {
-      '保守': 'conservative',
-      '稳健': 'balanced',
-      '激进': 'aggressive'
+      保守: "conservative",
+      稳健: "balanced",
+      激进: "aggressive",
     };
     return mapping[risk] || risk;
   };
@@ -73,16 +75,16 @@ const AnalysisHistory = ({ className = '' }) => {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffMins < 1) return '刚刚';
+    if (diffMins < 1) return "刚刚";
     if (diffMins < 60) return `${diffMins}分钟前`;
     if (diffHours < 24) return `${diffHours}小时前`;
     if (diffDays < 7) return `${diffDays}天前`;
-    
-    return date.toLocaleDateString('zh-CN', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+
+    return date.toLocaleDateString("zh-CN", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -91,7 +93,9 @@ const AnalysisHistory = ({ className = '' }) => {
   }
 
   return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 ${className}`}>
+    <div
+      className={`bg-white rounded-xl shadow-sm border border-gray-200 ${className}`}
+    >
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <button
@@ -102,7 +106,7 @@ const AnalysisHistory = ({ className = '' }) => {
             <span className="font-medium">分析历史</span>
             <span className="text-sm text-gray-500">({history.length})</span>
           </button>
-          
+
           {history.length > 0 && (
             <button
               onClick={clearHistory}
@@ -131,15 +135,17 @@ const AnalysisHistory = ({ className = '' }) => {
                       ETF {record.etfCode}
                     </span>
                   </div>
-                  
+
                   <div className="text-sm text-gray-600">
-                    <span>资金: {record.params.totalCapital?.toLocaleString()}元</span>
+                    <span>
+                      资金: {record.params.totalCapital?.toLocaleString()}元
+                    </span>
                     <span className="mx-2">•</span>
                     <span>{record.params.gridType}</span>
                     <span className="mx-2">•</span>
                     <span>{record.params.riskPreference}</span>
                   </div>
-                  
+
                   <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
                     <Clock className="w-3 h-3" />
                     {formatTime(record.timestamp)}

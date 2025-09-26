@@ -1,6 +1,6 @@
-import React from 'react';
-import { Target } from 'lucide-react';
-import FeatureCards from './FeatureCards';
+import React from "react";
+import { Target } from "lucide-react";
+import FeatureCards from "./FeatureCards";
 
 /**
  * 首页英雄区域组件

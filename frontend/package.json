@@ -14,7 +14,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint src --ext js,jsx --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,json,css,md}\"",
+    "check-unused": "node scripts/check-unused-imports.js",
+    "clean": "rm -rf dist node_modules/.cache"
   },
   "dependencies": {
     "axios": "^1.6.0",

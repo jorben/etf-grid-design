@@ -1,5 +1,5 @@
-import React from 'react';
-import { Grid3X3 } from 'lucide-react';
+import React from "react";
+import { Grid3X3 } from "lucide-react";
 
 /**
  * 网格类型选择组件
@@ -7,8 +7,8 @@ import { Grid3X3 } from 'lucide-react';
  */
 export default function GridTypeSelector({ value, onChange }) {
   const gridTypes = [
-    { value: '等比', label: '等比网格', desc: '比例间距相等，推荐使用' },
-    { value: '等差', label: '等差网格', desc: '价格间距相等，适合新手' }
+    { value: "等比", label: "等比网格", desc: "比例间距相等，推荐使用" },
+    { value: "等差", label: "等差网格", desc: "价格间距相等，适合新手" },
   ];
 
   return (
@@ -18,13 +18,13 @@ export default function GridTypeSelector({ value, onChange }) {
         网格间距类型
       </label>
       <div className="grid grid-cols-2 gap-3">
-        {gridTypes.map(option => (
+        {gridTypes.map((option) => (
           <label
             key={option.value}
             className={`p-4 border rounded-lg cursor-pointer transition-colors ${
               value === option.value
-                ? 'border-blue-300 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? "border-blue-300 bg-blue-50"
+                : "border-gray-200 hover:border-gray-300"
             }`}
           >
             <input

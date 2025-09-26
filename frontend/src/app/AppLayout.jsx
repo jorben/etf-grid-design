@@ -1,7 +1,7 @@
-import React from 'react';
-import AppHeader from './AppHeader';
-import AppFooter from './AppFooter';
-import Watermark from '../shared/components/layout/Watermark';
+import React from "react";
+import AppHeader from "./AppHeader";
+import AppFooter from "./AppFooter";
+import Watermark from "../shared/components/layout/Watermark";
 
 /**
  * 应用布局组件

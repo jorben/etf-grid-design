@@ -1,21 +1,21 @@
-import { useCallback } from 'react';
+import { useCallback } from "react";
 
 /**
  * 分享功能Hook
  * 提供统一的分享功能实现，支持Web Share API和备用方案
- * 
+ *
  * @returns {Object} 包含shareContent方法的对象
- * 
+ *
  * @example
  * const { shareContent } = useShare();
- * 
+ *
  * const handleShare = async () => {
  *   const result = await shareContent({
  *     title: '分享标题',
  *     text: '分享描述',
  *     url: 'https://example.com'
  *   });
- *   
+ *
  *   if (result.success) {
  *     console.log('分享成功，使用方式:', result.method);
  *   }
@@ -32,12 +32,16 @@ export const useShare = () => {
    */
   const shareContent = useCallback(async (shareData) => {
     // 优先使用Web Share API
-    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+    if (
+      navigator.share &&
+      navigator.canShare &&
+      navigator.canShare(shareData)
+    ) {
       try {
         await navigator.share(shareData);
-        return { success: true, method: 'native' };
+        return { success: true, method: "native" };
       } catch (error) {
-        console.log('分享取消或失败，使用备用方案:', error);
+        console.log("分享取消或失败，使用备用方案:", error);
         // 继续执行备用方案
       }
     }
@@ -45,39 +49,41 @@ export const useShare = () => {
     // 备用方案：复制链接到剪贴板
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(shareData.url || window.location.href);
-        alert('链接已复制到剪贴板！');
-        return { success: true, method: 'clipboard' };
+        await navigator.clipboard.writeText(
+          shareData.url || window.location.href,
+        );
+        alert("链接已复制到剪贴板！");
+        return { success: true, method: "clipboard" };
       } else {
         // 更老的浏览器备用方案
-        const textArea = document.createElement('textarea');
+        const textArea = document.createElement("textarea");
         textArea.value = shareData.url || window.location.href;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
-          document.execCommand('copy');
-          alert('链接已复制到剪贴板！');
-          return { success: true, method: 'fallback' };
+          document.execCommand("copy");
+          alert("链接已复制到剪贴板！");
+          return { success: true, method: "fallback" };
         } catch (err) {
-          console.error('复制失败:', err);
-          prompt('请手动复制以下链接:', shareData.url || window.location.href);
-          return { success: false, method: 'manual' };
+          console.error("复制失败:", err);
+          prompt("请手动复制以下链接:", shareData.url || window.location.href);
+          return { success: false, method: "manual" };
         } finally {
           document.body.removeChild(textArea);
         }
       }
     } catch (error) {
-      console.error('复制到剪贴板失败:', error);
-      prompt('请手动复制以下链接:', shareData.url || window.location.href);
-      return { success: false, method: 'manual' };
+      console.error("复制到剪贴板失败:", error);
+      prompt("请手动复制以下链接:", shareData.url || window.location.href);
+      return { success: false, method: "manual" };
     }
   }, []);
-  
+
   return { shareContent };
 };
 
@@ -105,6 +111,6 @@ export const getShareCapabilities = () => {
   return {
     webShare: canUseWebShare(),
     clipboard: canUseClipboard(),
-    fallback: true // 总是支持备用方案
+    fallback: true, // 总是支持备用方案
   };
 };

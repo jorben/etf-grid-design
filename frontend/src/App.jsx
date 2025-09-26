@@ -1,8 +1,8 @@
-import React from 'react';
-import { HelmetProvider } from 'react-helmet-async';
-import AppRouter from './app/AppRouter';
-import AppLayout from './app/AppLayout';
-import './App.css';
+import React from "react";
+import { HelmetProvider } from "react-helmet-async";
+import AppRouter from "./app/AppRouter";
+import AppLayout from "./app/AppLayout";
+import "./App.css";
 
 /**
  * 主应用组件 - 简化版本

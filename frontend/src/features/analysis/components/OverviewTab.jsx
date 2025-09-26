@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   TrendingUp,
   BarChart3,
@@ -10,25 +10,25 @@ import {
   DollarSign,
   Calendar,
   Database,
-  ThermometerSun
-} from 'lucide-react';
+  ThermometerSun,
+} from "lucide-react";
 
 /**
  * 概览标签页组件
  * 负责展示分析报告的核心指标和摘要信息
  */
-export default function OverviewTab({ 
-  etfInfo, 
-  suitabilityEvaluation, 
-  gridStrategy, 
-  dataQuality, 
-  inputParameters 
+export default function OverviewTab({
+  etfInfo,
+  suitabilityEvaluation,
+  gridStrategy,
+  dataQuality,
+  inputParameters,
 }) {
   // 获取适宜度等级颜色
   const getSuitabilityColor = (score) => {
-    if (score >= 70) return 'text-green-600 bg-green-100';
-    if (score >= 60) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
+    if (score >= 70) return "text-green-600 bg-green-100";
+    if (score >= 60) return "text-yellow-600 bg-yellow-100";
+    return "text-red-600 bg-red-100";
   };
 
   return (
@@ -41,11 +41,13 @@ export default function OverviewTab({
             重要风险提示
           </div>
           <p className="text-red-700 text-sm">
-            该标的存在致命缺陷：{suitabilityEvaluation?.fatal_flaws?.join('、') || '未知风险'}，不建议进行网格交易。
+            该标的存在致命缺陷：
+            {suitabilityEvaluation?.fatal_flaws?.join("、") || "未知风险"}
+            ，不建议进行网格交易。
           </p>
         </div>
       )}
-      
+
       {/* 核心指标卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-lg">
@@ -56,10 +58,10 @@ export default function OverviewTab({
             <h3 className="font-semibold text-orange-900">所选标的</h3>
           </div>
           <div className="text-2xl font-bold text-orange-900 mb-1">
-            {etfInfo?.code || '未知'}
+            {etfInfo?.code || "未知"}
           </div>
           <p className="text-orange-700 text-sm">
-            {etfInfo?.name || '未知标的'}
+            {etfInfo?.name || "未知标的"}
           </p>
         </div>
 
@@ -74,7 +76,7 @@ export default function OverviewTab({
             {suitabilityEvaluation?.total_score || 0}/100分
           </div>
           <p className="text-blue-700 text-sm">
-            {suitabilityEvaluation?.recommendation || '暂无评估'}
+            {suitabilityEvaluation?.recommendation || "暂无评估"}
           </p>
         </div>
 
@@ -86,11 +88,10 @@ export default function OverviewTab({
             <h3 className="font-semibold text-green-900">网格价格区间</h3>
           </div>
           <div className="text-2xl font-bold text-green-900 mb-1">
-            ¥{(gridStrategy?.price_range?.lower || 0).toFixed(3)} - ¥{(gridStrategy?.price_range?.upper || 0).toFixed(3)}
+            ¥{(gridStrategy?.price_range?.lower || 0).toFixed(3)} - ¥
+            {(gridStrategy?.price_range?.upper || 0).toFixed(3)}
           </div>
-          <p className="text-green-700 text-sm">
-            网格交易价格范围
-          </p>
+          <p className="text-green-700 text-sm">网格交易价格范围</p>
         </div>
 
         <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-6 rounded-lg">
@@ -101,13 +102,17 @@ export default function OverviewTab({
             <h3 className="font-semibold text-purple-900">网格步长</h3>
           </div>
           {/* 根据网格类型动态展示重点 */}
-          {gridStrategy?.grid_config?.type === '等比' ? (
+          {gridStrategy?.grid_config?.type === "等比" ? (
             <>
               <div className="text-2xl font-bold text-purple-900 mb-1">
-                {((gridStrategy?.grid_config?.step_ratio || 0) * 100).toFixed(2)}%
+                {((gridStrategy?.grid_config?.step_ratio || 0) * 100).toFixed(
+                  2,
+                )}
+                %
               </div>
               <p className="text-purple-700 text-sm">
-                步长比例 · ¥{(gridStrategy?.grid_config?.step_size || 0).toFixed(3)}
+                步长比例 · ¥
+                {(gridStrategy?.grid_config?.step_size || 0).toFixed(3)}
               </p>
             </>
           ) : (
@@ -116,7 +121,11 @@ export default function OverviewTab({
                 ¥{(gridStrategy?.grid_config?.step_size || 0).toFixed(3)}
               </div>
               <p className="text-purple-700 text-sm">
-                步长价格 · {((gridStrategy?.grid_config?.step_ratio || 0) * 100).toFixed(2)}%
+                步长价格 ·{" "}
+                {((gridStrategy?.grid_config?.step_ratio || 0) * 100).toFixed(
+                  2,
+                )}
+                %
               </p>
             </>
           )}
@@ -142,15 +151,21 @@ export default function OverviewTab({
                 <Calendar className="w-4 h-4 text-blue-600" />
                 <span className="font-medium text-gray-900">数据时效性</span>
               </div>
-              <div className={`text-sm px-2 py-1 rounded-full ${
-                dataQuality?.freshness === '优秀' ? 'bg-green-100 text-green-800' :
-                dataQuality?.freshness === '良好' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {dataQuality?.freshness || '未知'}
+              <div
+                className={`text-sm px-2 py-1 rounded-full ${
+                  dataQuality?.freshness === "优秀"
+                    ? "bg-green-100 text-green-800"
+                    : dataQuality?.freshness === "良好"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-red-100 text-red-800"
+                }`}
+              >
+                {dataQuality?.freshness || "未知"}
               </div>
             </div>
-            <p className="text-xs text-gray-600 mt-1">{dataQuality?.freshness_desc || '暂无描述'}</p>
+            <p className="text-xs text-gray-600 mt-1">
+              {dataQuality?.freshness_desc || "暂无描述"}
+            </p>
             {dataQuality?.latest_date && (
               <p className="text-xs text-gray-500 mt-1">
                 最新数据: {dataQuality.latest_date}
@@ -164,15 +179,21 @@ export default function OverviewTab({
                 <CheckCircle className="w-4 h-4 text-green-600" />
                 <span className="font-medium text-gray-900">数据完整性</span>
               </div>
-              <div className={`text-sm px-2 py-1 rounded-full ${
-                dataQuality?.completeness === '优秀' ? 'bg-green-100 text-green-800' :
-                dataQuality?.completeness === '良好' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {dataQuality?.completeness || '未知'}
+              <div
+                className={`text-sm px-2 py-1 rounded-full ${
+                  dataQuality?.completeness === "优秀"
+                    ? "bg-green-100 text-green-800"
+                    : dataQuality?.completeness === "良好"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-red-100 text-red-800"
+                }`}
+              >
+                {dataQuality?.completeness || "未知"}
               </div>
             </div>
-            <p className="text-xs text-gray-600 mt-1">{dataQuality?.completeness_desc || '暂无描述'}</p>
+            <p className="text-xs text-gray-600 mt-1">
+              {dataQuality?.completeness_desc || "暂无描述"}
+            </p>
             {dataQuality?.total_records && (
               <p className="text-xs text-gray-500 mt-1">
                 数据记录: {dataQuality.total_records}条
@@ -210,19 +231,58 @@ export default function OverviewTab({
           <div>
             <h4 className="font-medium text-blue-800 mb-2">投资配置</h4>
             <ul className="space-y-1 text-sm text-blue-600">
-              <li>• 总投资资金：¥{(inputParameters?.total_capital || 0).toLocaleString()}</li>
-              <li>• 底仓资金：¥{(gridStrategy?.fund_allocation?.base_position_amount || 0).toLocaleString()}</li>
-              <li>• 网格资金：¥{(gridStrategy?.fund_allocation?.grid_trading_amount || 0).toLocaleString()}</li>
-              <li>• 网格资金利用率：{((gridStrategy?.fund_allocation?.grid_fund_utilization_rate || 0) * 100).toFixed(1)}%</li>
+              <li>
+                • 总投资资金：¥
+                {(inputParameters?.total_capital || 0).toLocaleString()}
+              </li>
+              <li>
+                • 底仓资金：¥
+                {(
+                  gridStrategy?.fund_allocation?.base_position_amount || 0
+                ).toLocaleString()}
+              </li>
+              <li>
+                • 网格资金：¥
+                {(
+                  gridStrategy?.fund_allocation?.grid_trading_amount || 0
+                ).toLocaleString()}
+              </li>
+              <li>
+                • 网格资金利用率：
+                {(
+                  (gridStrategy?.fund_allocation?.grid_fund_utilization_rate ||
+                    0) * 100
+                ).toFixed(1)}
+                %
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="font-medium text-blue-800 mb-2">策略特征</h4>
             <ul className="space-y-1 text-sm text-blue-600">
-              <li>• 价格区间：¥{(gridStrategy?.price_range?.lower || 0).toFixed(3)} - ¥{(gridStrategy?.price_range?.upper || 0).toFixed(3)}</li>
-              <li>• 网格步长：¥{(gridStrategy?.grid_config?.step_size || 0).toFixed(3)} ({((gridStrategy?.grid_config?.step_ratio || 0) * 100).toFixed(2)}%)</li>
-              <li>• 单笔股数：{(gridStrategy?.fund_allocation?.single_trade_quantity || 0)}股</li>
-              <li>• 预估单笔收益：¥{(gridStrategy?.fund_allocation?.expected_profit_per_trade || 0).toFixed(2)}</li>
+              <li>
+                • 价格区间：¥
+                {(gridStrategy?.price_range?.lower || 0).toFixed(3)} - ¥
+                {(gridStrategy?.price_range?.upper || 0).toFixed(3)}
+              </li>
+              <li>
+                • 网格步长：¥
+                {(gridStrategy?.grid_config?.step_size || 0).toFixed(3)} (
+                {((gridStrategy?.grid_config?.step_ratio || 0) * 100).toFixed(
+                  2,
+                )}
+                %)
+              </li>
+              <li>
+                • 单笔股数：
+                {gridStrategy?.fund_allocation?.single_trade_quantity || 0}股
+              </li>
+              <li>
+                • 预估单笔收益：¥
+                {(
+                  gridStrategy?.fund_allocation?.expected_profit_per_trade || 0
+                ).toFixed(2)}
+              </li>
             </ul>
           </div>
         </div>

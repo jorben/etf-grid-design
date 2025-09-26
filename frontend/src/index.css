@@ -5,7 +5,11 @@
 /* 自定义样式 */
 @layer base {
   body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family:
+      "Inter",
+      system-ui,
+      -apple-system,
+      sans-serif;
     background-color: #f8fafc;
   }
 }
@@ -14,88 +18,88 @@
   .card {
     @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
   }
-  
+
   .card-header {
     @apply flex items-center justify-between mb-4;
   }
-  
+
   .card-title {
     @apply text-lg font-semibold text-gray-900;
   }
-  
+
   .btn {
     @apply inline-flex items-center justify-center px-4 py-2 border border-transparent 
            text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 
            focus:ring-offset-2 transition-colors duration-200;
   }
-  
+
   .btn-primary {
     @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
   }
-  
+
   .btn-secondary {
     @apply btn bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200 
            focus:ring-gray-500;
   }
-  
+
   .btn-success {
     @apply btn bg-success-600 text-white hover:bg-success-700 focus:ring-success-500;
   }
-  
+
   .btn-warning {
     @apply btn bg-warning-600 text-white hover:bg-warning-700 focus:ring-warning-500;
   }
-  
+
   .btn-danger {
     @apply btn bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
   }
-  
+
   .input {
     @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
            placeholder-gray-400 focus:outline-none focus:ring-primary-500 
            focus:border-primary-500 sm:text-sm;
   }
-  
+
   .select {
     @apply input;
   }
-  
+
   .label {
     @apply block text-sm font-medium text-gray-700 mb-1;
   }
-  
+
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
-  
+
   .badge-success {
     @apply badge bg-success-100 text-success-800;
   }
-  
+
   .badge-warning {
     @apply badge bg-warning-100 text-warning-800;
   }
-  
+
   .badge-danger {
     @apply badge bg-danger-100 text-danger-800;
   }
-  
+
   .badge-info {
     @apply badge bg-primary-100 text-primary-800;
   }
-  
+
   .loading-spinner {
     @apply animate-spin rounded-full h-4 w-4 border-b-2 border-white;
   }
-  
+
   .loading-spinner-sm {
     @apply animate-spin rounded-full h-3 w-3 border-b-2 border-gray-400;
   }
-  
+
   .fade-in {
     animation: fade-in 0.5s ease-in-out;
   }
-  
+
   .slide-up {
     animation: slide-up 0.3s ease-out;
   }

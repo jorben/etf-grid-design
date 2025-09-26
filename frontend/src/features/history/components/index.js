@@ -1,1 +1,1 @@
-export { default as AnalysisHistory } from './AnalysisHistory';
+export { default as AnalysisHistory } from "./AnalysisHistory";
