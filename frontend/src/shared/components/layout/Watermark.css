@@ -1,0 +1,85 @@
+/* 水印容器样式 */
+.watermark-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* 水印画布样式 */
+.watermark-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+/* 防止水印被选中或拖拽 */
+.watermark-container *,
+.watermark-canvas {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+/* 响应式优化 */
+@media (max-width: 640px) {
+  .watermark-container {
+    /* 在小屏幕上可以调整z-index，确保不影响交互 */
+    z-index: 9998;
+  }
+}
+
+@media (max-width: 480px) {
+  .watermark-container {
+    /* 超小屏幕进一步优化 */
+    z-index: 9997;
+  }
+}
+
+/* 打印时隐藏水印（可选） */
+@media print {
+  .watermark-container {
+    display: none !important;
+  }
+}
+
+/* 高对比度模式适配 */
+@media (prefers-contrast: high) {
+  .watermark-container {
+    opacity: 0.8;
+  }
+}
+
+/* 减少动画偏好适配 */
+@media (prefers-reduced-motion: reduce) {
+  .watermark-container {
+    /* 如果有动画效果，在此模式下禁用 */
+    animation: none;
+    transition: none;
+  }
+}

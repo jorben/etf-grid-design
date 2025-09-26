@@ -19,6 +19,9 @@ RUN npm run build
 # 阶段2: 后端运行环境
 FROM python:3.11-slim
 
+ENV FLASK_ENV=production
+ENV TUSHARE_TOKEN=
+
 # 设置工作目录
 WORKDIR /app
 

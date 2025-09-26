@@ -6,7 +6,8 @@
 
 /* 动画效果 */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -66,7 +67,7 @@
 
 /* 网格线效果 */
 .grid-pattern {
-  background-image: 
+  background-image:
     linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
@@ -83,7 +84,7 @@
 }
 
 .price-tag::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -132,19 +133,21 @@
 }
 
 .loading-dots::after {
-  content: '';
+  content: "";
   animation: loadingDots 1.5s infinite;
 }
 
 @keyframes loadingDots {
-  0%, 20% {
-    content: '.';
+  0%,
+  20% {
+    content: ".";
   }
   40% {
-    content: '..';
+    content: "..";
   }
-  60%, 100% {
-    content: '...';
+  60%,
+  100% {
+    content: "...";
   }
 }
 
@@ -194,7 +197,7 @@
 }
 
 .custom-checkbox:checked::after {
-  content: '✓';
+  content: "✓";
   position: absolute;
   top: -2px;
   left: 2px;
@@ -237,7 +240,7 @@
   .no-print {
     display: none !important;
   }
-  
+
   .print-break {
     page-break-before: always;
   }

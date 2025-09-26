@@ -1,13 +1,24 @@
 {
   "name": "etf-grid-trading-frontend",
   "private": true,
-  "version": "0.1.5",
+  "version": "0.1.6",
   "type": "module",
+  "imports": {
+    "@/*": ["./src/*"],
+    "@shared/*": ["./src/shared/*"],
+    "@features/*": ["./src/features/*"],
+    "@pages/*": ["./src/pages/*"],
+    "@app/*": ["./src/app/*"]
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint src --ext js,jsx --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,json,css,md}\"",
+    "check-unused": "node scripts/check-unused-imports.js",
+    "clean": "rm -rf dist node_modules/.cache"
   },
   "dependencies": {
     "axios": "^1.6.0",
