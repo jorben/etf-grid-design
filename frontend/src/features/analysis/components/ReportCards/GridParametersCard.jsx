@@ -95,7 +95,7 @@ const GridParametersCard = ({
             </div>
             <div className="text-sm text-blue-700 font-medium">底仓资金</div>
             <div className="text-xs text-gray-600 mt-1">
-              {formatPercent(fund_allocation.base_position_ratio)} 风险缓冲
+              {formatPercent(fund_allocation.base_position_ratio)} 稳定仓位
             </div>
           </div>
 

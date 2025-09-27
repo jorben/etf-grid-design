@@ -7,8 +7,8 @@ import { Grid3X3 } from "lucide-react";
  */
 export default function GridTypeSelector({ value, onChange }) {
   const gridTypes = [
-    { value: "等比", label: "等比网格", desc: "比例间距相等，推荐使用" },
-    { value: "等差", label: "等差网格", desc: "价格间距相等，适合新手" },
+    { value: "等比", label: "固定每笔比例", desc: "比例间距相等，推荐使用" },
+    { value: "等差", label: "固定每笔金额", desc: "价格间距相等，适合新手" },
   ];
 
   return (
