@@ -20,27 +20,38 @@ class GridOptimizer:
         self.geometric_calculator = GeometricGridCalculator()
     
     def calculate_optimal_step_size(self, atr_ratio: float, current_price: float, 
-                                   risk_preference: str) -> Tuple[float, float]:
+                                   risk_preference: str, adjustment_coefficient: float) -> Tuple[float, float]:
         """
         基于ATR计算最优步长
         
         Args:
             atr_ratio: ATR比率
             current_price: 当前价格
-            risk_preference: 风险偏好
+            risk_preference: 频率偏好
+            adjustment_coefficient: 调节系数
             
         Returns:
             (step_size, step_ratio)
         """
         try:
-            # ATR 基础步长系数（根据风险偏好）
-            risk_multipliers = {
-                '保守': 0.8,   # 0.8倍ATR作为步长，步长较大，交易频次较低
-                '稳健': 0.5,   # 0.5倍ATR作为步长，平衡交易频次
-                '激进': 0.2    # 0.2倍ATR作为步长，步长较小，交易频次较高
+            # ATR 基础步长系数（根据频率偏好）
+            default_risk_multipliers = {
+                '低频': 0.8,   # 0.8倍ATR作为步长，步长较大，交易频次较低
+                '均衡': 0.5,   # 0.5倍ATR作为步长，平衡交易频次
+                '高频': 0.2    # 0.2倍ATR作为步长，步长较小，交易频次较高
             }
             
-            risk_multiplier = risk_multipliers.get(risk_preference, 1)
+            # 应用调节系数
+            risk_multipliers = {}
+            for risk_level, default_value in default_risk_multipliers.items():
+                # 计算与中间值(4)的差异
+                diff_from_mid = default_value - 0.5
+                # 应用调节系数：系数越大差异放大，系数越小差异缩小
+                adjusted_diff = diff_from_mid * adjustment_coefficient
+                # 计算调整后的风险系数
+                risk_multipliers[risk_level] = 0.5 + adjusted_diff
+            
+            risk_multiplier = risk_multipliers.get(risk_preference, 0.5)
             
             # 计算基于ATR的步长
             atr_value = atr_ratio * current_price
@@ -71,7 +82,7 @@ class GridOptimizer:
         
         Args:
             atr_ratio: ATR比率
-            risk_preference: 风险偏好
+            risk_preference: 频率偏好
             adx_value: ADX指数
             volatility: 年化波动率
             
@@ -79,11 +90,11 @@ class GridOptimizer:
             底仓比例
         """
         try:
-            # 基础比例（根据风险偏好）
+            # 基础比例（根据频率偏好）
             base_ratios = {
-                '保守': 0.30,  # 35%底仓，65%网格
-                '稳健': 0.20,  # 25%底仓，75%网格
-                '激进': 0.10   # 15%底仓，85%网格
+                '低频': 0.30,  # 35%底仓，65%网格
+                '均衡': 0.20,  # 25%底仓，75%网格
+                '高频': 0.10   # 15%底仓，85%网格
             }
             
             base_ratio = base_ratios.get(risk_preference, 0.25)
@@ -365,7 +376,7 @@ class GridOptimizer:
             资金分配结果
         """
         try:
-            # 使用保守的底仓比例（30%）
+            # 使用低频的底仓比例（30%）
             base_position_ratio = 0.3
             base_position_amount = total_capital * base_position_ratio
             

@@ -11,9 +11,9 @@ export const PARAM_MAPPINGS = {
     等差: "arithmetic",
   },
   riskPreference: {
-    保守: "conservative",
-    稳健: "balanced",
-    激进: "aggressive",
+    低频: "conservative",
+    均衡: "balanced",
+    高频: "aggressive",
   },
 };
 
@@ -24,9 +24,9 @@ export const REVERSE_PARAM_MAPPINGS = {
     arithmetic: "等差",
   },
   riskPreference: {
-    conservative: "保守",
-    balanced: "稳健",
-    aggressive: "激进",
+    conservative: "低频",
+    balanced: "均衡",
+    aggressive: "高频",
   },
 };
 
@@ -34,7 +34,8 @@ export const REVERSE_PARAM_MAPPINGS = {
 export const DEFAULT_PARAMS = {
   capital: "100000",
   grid: "geometric", // 对应"等比"
-  risk: "balanced", // 对应"稳健"
+  risk: "balanced", // 对应"均衡"
+  adjustment: "1.0", // 调节系数默认值
 };
 
 /**
@@ -46,7 +47,7 @@ export const encodeAnalysisParams = (params) => {
   const searchParams = new URLSearchParams();
 
   // 资金参数
-  if (params.totalCapital) {
+  if (params.totalCapital !== undefined && params.totalCapital !== null) {
     searchParams.set("capital", params.totalCapital.toString());
   }
 
@@ -57,12 +58,17 @@ export const encodeAnalysisParams = (params) => {
     searchParams.set("grid", encodedGrid);
   }
 
-  // 风险偏好参数
+  // 频率偏好参数
   if (params.riskPreference) {
     const encodedRisk =
       PARAM_MAPPINGS.riskPreference[params.riskPreference] ||
       params.riskPreference;
     searchParams.set("risk", encodedRisk);
+  }
+
+  // 调节系数参数
+  if (params.adjustmentCoefficient !== undefined && params.adjustmentCoefficient !== null) {
+    searchParams.set("adjustment", params.adjustmentCoefficient.toString());
   }
 
   return searchParams;
@@ -91,10 +97,19 @@ export const decodeAnalysisParams = (searchParams) => {
     params.gridType = REVERSE_PARAM_MAPPINGS.gridType[grid] || grid;
   }
 
-  // 解析风险偏好参数
+  // 解析频率偏好参数
   const risk = searchParams.get("risk");
   if (risk) {
     params.riskPreference = REVERSE_PARAM_MAPPINGS.riskPreference[risk] || risk;
+  }
+
+  // 解析调节系数参数
+  const adjustment = searchParams.get("adjustment");
+  if (adjustment !== null) {
+    const adjustmentNum = parseFloat(adjustment);
+    if (!isNaN(adjustmentNum) && adjustmentNum >= 0.0 && adjustmentNum <= 2.0) {
+      params.adjustmentCoefficient = adjustmentNum;
+    }
   }
 
   return params;
@@ -113,7 +128,7 @@ export const validateAndCompleteParams = (params) => {
   };
 
   // 验证并补全资金参数
-  if (!params.totalCapital) {
+  if (params.totalCapital === undefined || params.totalCapital === null) {
     result.params.totalCapital = parseFloat(DEFAULT_PARAMS.capital);
   } else {
     const capital = parseFloat(params.totalCapital);
@@ -133,14 +148,25 @@ export const validateAndCompleteParams = (params) => {
       REVERSE_PARAM_MAPPINGS.gridType[DEFAULT_PARAMS.grid];
   }
 
-  // 验证并补全风险偏好参数
+  // 验证并补全频率偏好参数
   if (!params.riskPreference) {
     result.params.riskPreference =
       REVERSE_PARAM_MAPPINGS.riskPreference[DEFAULT_PARAMS.risk];
-  } else if (!["保守", "稳健", "激进"].includes(params.riskPreference)) {
-    result.errors.push("风险偏好参数无效");
+  } else if (!["低频", "均衡", "高频"].includes(params.riskPreference)) {
+    result.errors.push("频率偏好参数无效");
     result.params.riskPreference =
       REVERSE_PARAM_MAPPINGS.riskPreference[DEFAULT_PARAMS.risk];
+  }
+
+  // 验证并补全调节系数参数
+  if (params.adjustmentCoefficient === undefined || params.adjustmentCoefficient === null) {
+    result.params.adjustmentCoefficient = parseFloat(DEFAULT_PARAMS.adjustment);
+  } else {
+    const adjustment = parseFloat(params.adjustmentCoefficient);
+    if (isNaN(adjustment) || adjustment < 0.0 || adjustment > 2.0) {
+      result.errors.push("调节系数应在0.0-2.0之间");
+      result.params.adjustmentCoefficient = parseFloat(DEFAULT_PARAMS.adjustment);
+    }
   }
 
   return result;

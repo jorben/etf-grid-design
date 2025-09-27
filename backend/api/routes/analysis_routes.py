@@ -55,10 +55,18 @@ def analyze_etf_strategy():
             }), 400
         
         risk_preference = data['riskPreference']
-        if risk_preference not in ['保守', '稳健', '激进']:
+        if risk_preference not in ['低频', '均衡', '高频']:
             return jsonify({
                 'success': False,
-                'error': '风险偏好只能是"保守"、"稳健"或"激进"'
+                'error': '频率偏好只能是"低频"、"均衡"或"高频"'
+            }), 400
+        
+        # 获取调节系数（可选参数，默认1.0）
+        adjustment_coefficient = float(data.get('adjustmentCoefficient', 1.0))
+        if adjustment_coefficient < 0.0 or adjustment_coefficient > 2.0:
+            return jsonify({
+                'success': False,
+                'error': '调节系数应在0.0-2.0之间'
             }), 400
         
         from flask import current_app
@@ -70,7 +78,8 @@ def analyze_etf_strategy():
             etf_code=etf_code,
             total_capital=total_capital,
             grid_type=grid_type,
-            risk_preference=risk_preference
+            risk_preference=risk_preference,
+            adjustment_coefficient=adjustment_coefficient
         )
         
         current_app.logger.info(f"ETF策略分析完成: {etf_code}, "

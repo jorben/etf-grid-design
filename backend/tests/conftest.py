@@ -86,7 +86,7 @@ def sample_analysis_input() -> Dict[str, Any]:
         "etf_code": "510300",
         "total_capital": 1000000.0,
         "grid_type": "等差",
-        "risk_preference": "稳健",
+        "risk_preference": "均衡",
         "analysis_days": 365
     }
 

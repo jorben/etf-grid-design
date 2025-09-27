@@ -52,8 +52,13 @@ class ETFRequestSchemas:
     
     @staticmethod
     def validate_risk_preference(risk_preference: str) -> bool:
-        """验证风险偏好"""
-        return risk_preference in ['保守', '稳健', '激进']
+        """验证频率偏好"""
+        return risk_preference in ['低频', '均衡', '高频']
+    
+    @staticmethod
+    def validate_adjustment_coefficient(coefficient: float) -> bool:
+        """验证调节系数"""
+        return 0.0 <= coefficient <= 2.0
 
 class AnalysisRequest:
     """分析请求参数模型"""
@@ -63,6 +68,7 @@ class AnalysisRequest:
         self.total_capital = float(data.get('totalCapital', 0))
         self.grid_type = data.get('gridType', '')
         self.risk_preference = data.get('riskPreference', '')
+        self.adjustment_coefficient = float(data.get('adjustmentCoefficient', 1.0))
     
     def validate(self) -> Optional[Dict[str, Any]]:
         """验证请求参数"""
@@ -78,7 +84,10 @@ class AnalysisRequest:
             errors.append('网格类型只能是"等差"或"等比"')
         
         if not ETFRequestSchemas.validate_risk_preference(self.risk_preference):
-            errors.append('风险偏好只能是"保守"、"稳健"或"激进"')
+            errors.append('频率偏好只能是"低频"、"均衡"或"高频"')
+        
+        if not ETFRequestSchemas.validate_adjustment_coefficient(self.adjustment_coefficient):
+            errors.append('调节系数应在0.0-2.0之间')
         
         if errors:
             return {'errors': errors}

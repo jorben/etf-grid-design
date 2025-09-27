@@ -162,7 +162,8 @@ class ETFAnalysisService:
             raise
     
     def analyze_etf_strategy(self, etf_code: str, total_capital: float,
-                           grid_type: str, risk_preference: str) -> Dict:
+                           grid_type: str, risk_preference: str,
+                           adjustment_coefficient: float = 1.0) -> Dict:
         """
         完整的ETF网格交易策略分析
         
@@ -170,14 +171,14 @@ class ETFAnalysisService:
             etf_code: ETF代码
             total_capital: 总投资资金
             grid_type: 网格类型 ('等差' 或 '等比')
-            risk_preference: 风险偏好 ('保守', '稳健', '激进')
+            risk_preference: 频率偏好 ('低频', '均衡', '高频')
             
         Returns:
             完整的策略分析报告
         """
         try:
             logger.info(f"开始ETF策略分析: {etf_code}, 资金{total_capital}, "
-                       f"{grid_type}网格, {risk_preference}")
+                       f"{grid_type}网格, {risk_preference}, 调节系数{adjustment_coefficient}")
             
             # 1. 获取ETF基础信息
             etf_info = self.get_etf_basic_info(etf_code)
@@ -196,7 +197,6 @@ class ETFAnalysisService:
             # 5. 计算网格策略参数（使用算法模块）
             atr_analysis = suitability_result['atr_analysis']
             market_indicators = suitability_result['market_indicators']
-            current_price = float(latest_price_info['current_price'])
             
             grid_params = self._calculate_grid_parameters(
                 latest_price_info=latest_price_info,
@@ -204,7 +204,8 @@ class ETFAnalysisService:
                 market_indicators=market_indicators,
                 total_capital=total_capital,
                 grid_type=grid_type,
-                risk_preference=risk_preference
+                risk_preference=risk_preference,
+                adjustment_coefficient=adjustment_coefficient
             )
             
             # 5. 生成策略分析依据
@@ -230,7 +231,8 @@ class ETFAnalysisService:
                     'etf_code': etf_code,
                     'total_capital': total_capital,
                     'grid_type': grid_type,
-                    'risk_preference': risk_preference
+                    'risk_preference': risk_preference,
+                    'adjustment_coefficient': adjustment_coefficient
                 }
             }
             
@@ -249,7 +251,7 @@ class ETFAnalysisService:
         Args:
             suitability_result: 适宜度评估结果
             grid_params: 网格参数
-            risk_preference: 风险偏好
+            risk_preference: 频率偏好
             
         Returns:
             策略分析依据
@@ -268,7 +270,7 @@ class ETFAnalysisService:
             
             # 参数选择逻辑
             parameter_logic = {
-                'price_range': f"基于ATR比率{atr_analysis['current_atr_pct']:.2f}%和{risk_preference}风险偏好计算",
+                'price_range': f"基于ATR比率{atr_analysis['current_atr_pct']:.2f}%和{risk_preference}频率偏好计算",
                 'grid_count': f"基于ATR智能步长算法设定{grid_params['grid_config']['count']}个网格",
                 'fund_allocation': f"底仓比例{grid_params['fund_allocation']['base_position_ratio']:.1%}，"
                                  f"基于网格需求计算，确保买卖仓位充足",
@@ -367,8 +369,9 @@ class ETFAnalysisService:
             return {}
     
     def _calculate_grid_parameters(self, latest_price_info: Dict,
-                                 atr_analysis: Dict, market_indicators: Dict, 
-                                 total_capital: float, grid_type: str, risk_preference: str) -> Dict:
+                                 atr_analysis: Dict, market_indicators: Dict,
+                                 total_capital: float, grid_type: str,
+                                 risk_preference: str, adjustment_coefficient: float = 1.0) -> Dict:
         """
         计算网格策略参数（使用算法模块）
         
@@ -378,7 +381,7 @@ class ETFAnalysisService:
             market_indicators: 市场指标
             total_capital: 总投资资金
             grid_type: 网格类型
-            risk_preference: 风险偏好
+            risk_preference: 频率偏好
             
         Returns:
             网格策略参数
@@ -388,14 +391,14 @@ class ETFAnalysisService:
 
             current_price = float(latest_price_info['current_price'])
             
-            # 1. 计算价格区间（基于ATR和风险偏好）
+            # 1. 计算价格区间（基于ATR、频率偏好和调节系数）
             price_lower, price_upper = self.atr_analyzer.calculate_price_range(
-                current_price, atr_ratio, risk_preference
+                current_price, atr_ratio, risk_preference, adjustment_coefficient
             )
             
             # 2. 基于ATR计算最优步长
             step_size, step_ratio = self.grid_optimizer.calculate_optimal_step_size(
-                atr_ratio, current_price, risk_preference
+                atr_ratio, current_price, risk_preference, adjustment_coefficient
             )
             
             
@@ -456,7 +459,7 @@ class ETFAnalysisService:
                 'calculation_method': 'ATR智能算法',
                 'calculation_logic': {
                     'step1': f'ATR比率: {atr_ratio:.1%}',
-                    'step2': f'基于ATR和风险偏好计算最优步长: {step_size:.3f} ({step_ratio:.1%})',
+                    'step2': f'基于ATR和频率偏好计算最优步长: {step_size:.3f} ({step_ratio:.1%})',
                     'step3': f'基于步长计算网格数量: {grid_count}个',
                     'step4': f'调整价格区间: [{price_lower:.3f}, {price_upper:.3f}]',
                     'step5': f'生成{len(price_levels)}个价格水平'

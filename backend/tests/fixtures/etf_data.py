@@ -135,21 +135,21 @@ ANALYSIS_INPUT_DATA = {
         "etf_code": "510300",
         "total_capital": 1000000.0,
         "grid_type": "等差",
-        "risk_preference": "稳健",
+        "risk_preference": "均衡",
         "analysis_days": 365
     },
     "aggressive": {
         "etf_code": "159915",
         "total_capital": 500000.0,
         "grid_type": "等比",
-        "risk_preference": "激进",
+        "risk_preference": "高频",
         "analysis_days": 180
     },
     "conservative": {
         "etf_code": "510500",
         "total_capital": 2000000.0,
         "grid_type": "等差",
-        "risk_preference": "保守",
+        "risk_preference": "低频",
         "analysis_days": 730
     }
 }
@@ -211,7 +211,7 @@ ANALYSIS_RESULT_DATA = {
                 "buy_grid_safety_ratio": 1.2,
                 "extreme_case_safe": True
             },
-            "risk_preference": "稳健",
+            "risk_preference": "均衡",
             "atr_based": True,
             "atr_score": 85,
             "atr_description": "基于ATR的网格策略",
@@ -245,25 +245,25 @@ ERROR_SCENARIOS = {
         "etf_code": "12345",  # 无效代码
         "total_capital": 1000000.0,
         "grid_type": "等差",
-        "risk_preference": "稳健"
+        "risk_preference": "均衡"
     },
     "insufficient_capital": {
         "etf_code": "510300",
         "total_capital": 50000.0,  # 资金不足
         "grid_type": "等差",
-        "risk_preference": "稳健"
+        "risk_preference": "均衡"
     },
     "invalid_grid_type": {
         "etf_code": "510300",
         "total_capital": 1000000.0,
         "grid_type": "无效类型",  # 无效网格类型
-        "risk_preference": "稳健"
+        "risk_preference": "均衡"
     },
     "invalid_risk_preference": {
         "etf_code": "510300",
         "total_capital": 1000000.0,
         "grid_type": "等差",
-        "risk_preference": "无效偏好"  # 无效风险偏好
+        "risk_preference": "无效偏好"  # 无效频率偏好
     }
 }
 

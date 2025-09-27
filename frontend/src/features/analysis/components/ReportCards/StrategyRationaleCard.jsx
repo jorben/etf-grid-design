@@ -103,7 +103,7 @@ const StrategyRationaleCard = ({
           <div>
             <h4 className="font-semibold text-gray-900">参数选择逻辑</h4>
             <p className="text-sm text-gray-600">
-              基于历史数据和风险偏好的科学匹配
+              基于历史数据和交易偏好的科学匹配
             </p>
           </div>
         </div>

@@ -180,7 +180,7 @@ def generate_strategy_summary(analysis_result: Dict) -> str:
     ✓ 网格数量：{grid_params.get('grid_count', 0)}个
     ✓ 价格区间：¥{grid_params.get('price_lower', 0):.3f} - ¥{grid_params.get('price_upper', 0):.3f}
     
-    该策略基于ATR算法设计，适合{grid_params.get('risk_preference', '稳健')}型投资者。
+    该策略基于ATR算法设计，适合{grid_params.get('risk_preference', '均衡')}型投资者。
     """
     
     return summary.strip()

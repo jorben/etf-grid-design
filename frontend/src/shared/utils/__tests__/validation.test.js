@@ -154,9 +154,9 @@ describe("validation utils", () => {
         isValid: false,
         error: "投资金额是必填项",
       });
-      expect(validateRequired(undefined, "风险偏好")).toEqual({
+      expect(validateRequired(undefined, "频率偏好")).toEqual({
         isValid: false,
-        error: "风险偏好是必填项",
+        error: "频率偏好是必填项",
       });
     });
   });

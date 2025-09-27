@@ -180,7 +180,7 @@ const AnalysisPage = () => {
   const generateSEOData = () => {
     const etfName = analysisData?.etf_info?.name || `ETF ${etfCode}`;
     const title = `${etfName} - 智能网格交易策略分析 | ETFer.Top`;
-    const description = `${etfName}的专业网格交易策略分析，基于ATR算法计算最优网格参数，提供详细的收益预测和风险评估。投资金额：${currentParams?.totalCapital?.toLocaleString()}元，网格类型：${currentParams?.gridType}，风险偏好：${currentParams?.riskPreference}。`;
+    const description = `${etfName}的专业网格交易策略分析，基于ATR算法计算最优网格参数，提供详细的收益预测和风险评估。投资金额：${currentParams?.totalCapital?.toLocaleString()}元，网格类型：${currentParams?.gridType}，频率偏好：${currentParams?.riskPreference}，调节系数：${currentParams?.adjustmentCoefficient}。`;
 
     return { title, description };
   };
@@ -239,8 +239,8 @@ const AnalysisPage = () => {
                 </h1>
                 <p className="text-sm text-gray-600">
                   投资金额：{currentParams?.totalCapital?.toLocaleString()}元 |
-                  网格类型：{currentParams?.gridType} | 风险偏好：
-                  {currentParams?.riskPreference}
+                  网格类型：{currentParams?.gridType} | 频率偏好：
+                  {currentParams?.riskPreference} | 调节系数：{currentParams?.adjustmentCoefficient}
                 </p>
               </div>
             </div>

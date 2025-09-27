@@ -1,22 +1,22 @@
 import React from "react";
-import { Shield } from "lucide-react";
+import { Activity } from "lucide-react";
 
 /**
- * 风险偏好选择组件
- * 负责投资风险偏好的选择
+ * 频率偏好选择组件
+ * 负责投资频率偏好的选择
  */
 export default function RiskSelector({ value, onChange }) {
   const riskOptions = [
-    { value: "保守", label: "保守型", desc: "耐心低频交易", color: "green" },
-    { value: "稳健", label: "稳健型", desc: "平衡机会风险", color: "blue" },
-    { value: "激进", label: "激进型", desc: "更多成交机会", color: "red" },
+    { value: "低频", label: "低频型", desc: "潜心等待机会浮现", color: "green" },
+    { value: "均衡", label: "均衡型", desc: "稳中求进平衡布局", color: "blue" },
+    { value: "高频", label: "高频型", desc: "频繁出手波浪穿梭", color: "red" },
   ];
 
   return (
     <div>
       <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
-        <Shield className="w-4 h-4" />
-        风险偏好
+        <Activity className="w-4 h-4" />
+        频率偏好
       </label>
       <div className="grid grid-cols-3 gap-3">
         {riskOptions.map((option) => (

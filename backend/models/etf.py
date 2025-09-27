@@ -81,7 +81,7 @@ class ETFAnalysisInput(BaseModel):
     etf_code: str = Field(..., description="ETF代码")
     total_capital: float = Field(..., gt=0, description="总投资资金")
     grid_type: str = Field(..., pattern="^(等差|等比)$", description="网格类型")
-    risk_preference: str = Field(..., pattern="^(保守|稳健|激进)$", description="风险偏好")
+    risk_preference: str = Field(..., pattern="^(低频|均衡|高频)$", description="频率偏好")
     analysis_days: int = Field(default=365, ge=30, le=1000, description="分析天数")
 
 

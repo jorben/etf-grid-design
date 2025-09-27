@@ -64,27 +64,39 @@ class ATRAnalyzer:
             raise
     
     def calculate_price_range(self, current_price: float, atr_ratio: float, 
-                            risk_preference: str) -> Tuple[float, float]:
+                            risk_preference: str, adjustment_coefficient: float = 1.0) -> Tuple[float, float]:
         """
         基于ATR计算价格区间
         
         Args:
             current_price: 当前价格
             atr_ratio: ATR比率
-            risk_preference: 风险偏好 ('保守', '稳健', '激进')
-            
+            risk_preference: 频率偏好 ('低频', '均衡', '高频')
+            adjustment_coefficient: 调节系数 (0-2)，默认1.0
+                系数越大，频率系数越离散；系数越小，频率系数越聚拢
+                
         Returns:
             (下边界, 上边界) 价格区间
         """
         try:
-            # 风险系数映射
-            risk_multipliers = {
-                '保守': 3,
-                '稳健': 4,
-                '激进': 5,
+            # 默认风险系数映射
+            default_risk_multipliers = {
+                '低频': 7,
+                '均衡': 5.5,
+                '高频': 4,
             }
             
-            multiplier = risk_multipliers.get(risk_preference, 4)
+            # 应用调节系数
+            risk_multipliers = {}
+            for risk_level, default_value in default_risk_multipliers.items():
+                # 计算与中间值(4)的差异
+                diff_from_mid = default_value - 5
+                # 应用调节系数：系数越大差异放大，系数越小差异缩小
+                adjusted_diff = diff_from_mid * adjustment_coefficient
+                # 计算调整后的风险系数
+                risk_multipliers[risk_level] = 5 + adjusted_diff
+            
+            multiplier = risk_multipliers.get(risk_preference, 5)
             
             # 计算价格区间比例
             price_range_ratio = atr_ratio * multiplier
@@ -93,7 +105,7 @@ class ATRAnalyzer:
             price_lower = current_price * (1 - price_range_ratio)
             price_upper = current_price * (1 + price_range_ratio)
             
-            logger.info(f"价格区间计算完成: [{price_lower:.3f}, {price_upper:.3f}]")
+            logger.info(f"价格区间计算完成: [{price_lower:.3f}, {price_upper:.3f}]，AtrRatio：{atr_ratio}，risk：{risk_preference}，adjustment：{adjustment_coefficient:.1f}")
             return price_lower, price_upper
             
         except Exception as e:

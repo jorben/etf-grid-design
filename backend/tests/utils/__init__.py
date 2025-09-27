@@ -72,7 +72,7 @@ class TestDataGenerator:
             "etf_code": etf_code,
             "total_capital": total_capital,
             "grid_type": "等差",
-            "risk_preference": "稳健",
+            "risk_preference": "均衡",
             "analysis_days": 365
         }
 

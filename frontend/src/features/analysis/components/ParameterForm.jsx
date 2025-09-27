@@ -6,6 +6,7 @@ import ETFSelector from "@features/etf/components/ETFSelector";
 import CapitalInput from "./CapitalInput";
 import GridTypeSelector from "./GridTypeSelector";
 import RiskSelector from "./RiskSelector";
+import AdjustmentCoefficientSlider from "./AdjustmentCoefficientSlider";
 
 /**
  * 参数表单容器组件
@@ -27,7 +28,11 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
   );
   const [riskPreference, setRiskPreference] = usePersistedState(
     "riskPreference",
-    initialValues?.riskPreference || "稳健",
+    initialValues?.riskPreference || "均衡",
+  );
+  const [adjustmentCoefficient, setAdjustmentCoefficient] = usePersistedState(
+    "adjustmentCoefficient",
+    initialValues?.adjustmentCoefficient || 1.0,
   );
 
   const [popularETFs, setPopularETFs] = useState([]);
@@ -57,6 +62,12 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
       ) {
         setRiskPreference(initialValues.riskPreference);
       }
+      if (
+        initialValues.adjustmentCoefficient &&
+        initialValues.adjustmentCoefficient !== adjustmentCoefficient
+      ) {
+        setAdjustmentCoefficient(initialValues.adjustmentCoefficient);
+      }
     }
   }, [
     initialValues,
@@ -64,10 +75,12 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
     totalCapital,
     gridType,
     riskPreference,
+    adjustmentCoefficient,
     setEtfCode,
     setTotalCapital,
     setGridType,
     setRiskPreference,
+    setAdjustmentCoefficient,
   ]);
 
   // 获取热门ETF列表
@@ -150,6 +163,7 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
         totalCapital: parseFloat(totalCapital),
         gridType,
         riskPreference,
+        adjustmentCoefficient: parseFloat(adjustmentCoefficient),
       });
     }
   };
@@ -215,6 +229,10 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
 
         <GridTypeSelector value={gridType} onChange={setGridType} />
         <RiskSelector value={riskPreference} onChange={setRiskPreference} />
+        <AdjustmentCoefficientSlider
+          value={adjustmentCoefficient}
+          onChange={setAdjustmentCoefficient}
+        />
       </form>
     </div>
   );

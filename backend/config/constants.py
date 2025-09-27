@@ -43,7 +43,7 @@ class GridConstants:
     GRID_TYPES = ["等差", "等比"]
     
     # 风险偏好
-    RISK_PREFERENCES = ["保守", "稳健", "激进"]
+    RISK_PREFERENCES = ["低频", "均衡", "高频"]
     
     # 网格数量限制
     MIN_GRID_COUNT = 5
@@ -73,9 +73,9 @@ class ATRConstants:
     
     # ATR乘数
     ATR_MULTIPLIERS = {
-        "保守": 1.0,
-        "稳健": 1.5, 
-        "激进": 2.0
+        "低频": 1.0,
+        "均衡": 1.5, 
+        "高频": 2.0
     }
     
     # 波动率等级阈值
@@ -109,9 +109,9 @@ class RiskConstants:
     
     # 最大回撤限制
     MAX_DRAWDOWN_LIMITS = {
-        "保守": 0.05,   # 5%
-        "稳健": 0.10,   # 10%
-        "激进": 0.15    # 15%
+        "低频": 0.05,   # 5%
+        "均衡": 0.10,   # 10%
+        "高频": 0.15    # 15%
     }
 
 

@@ -17,9 +17,9 @@ class GridType(str, Enum):
 
 class RiskPreference(str, Enum):
     """风险偏好枚举"""
-    CONSERVATIVE = "保守"
-    MODERATE = "稳健"
-    AGGRESSIVE = "激进"
+    CONSERVATIVE = "低频"
+    MODERATE = "均衡"
+    AGGRESSIVE = "高频"
 
 
 class StrategyStatus(str, Enum):

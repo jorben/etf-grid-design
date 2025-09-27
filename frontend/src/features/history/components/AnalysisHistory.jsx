@@ -56,12 +56,12 @@ const AnalysisHistory = ({ className = "" }) => {
     return mapping[gridType] || gridType;
   };
 
-  // 获取风险偏好编码
+  // 获取频率偏好编码
   const getRiskCode = (risk) => {
     const mapping = {
-      保守: "conservative",
-      稳健: "balanced",
-      激进: "aggressive",
+      低频: "conservative",
+      均衡: "balanced",
+      高频: "aggressive",
     };
     return mapping[risk] || risk;
   };
