@@ -77,6 +77,7 @@ const AnalysisPage = () => {
         // 保存分析历史记录
         saveAnalysisHistory({
           etfCode: parameters.etfCode,
+          etfName: response.data?.etf_info?.name || `ETF ${parameters.etfCode}`,
           params: parameters,
           timestamp: Date.now(),
           url: generateAnalysisURL(parameters.etfCode, parameters),

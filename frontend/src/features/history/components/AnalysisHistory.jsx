@@ -17,7 +17,31 @@ const AnalysisHistory = ({ className = "" }) => {
       const savedHistory = JSON.parse(
         localStorage.getItem("analysisHistory") || "[]",
       );
-      setHistory(savedHistory);
+      
+      // 处理兼容性：为旧历史记录设置默认值，并验证数据结构
+      const processedHistory = savedHistory
+        .map(record => {
+          // 验证并补全记录结构
+          if (!validateHistoryRecord(record)) {
+            console.warn('发现无效的历史记录，已跳过:', record);
+            return null;
+          }
+          
+          // 确保调节系数有默认值
+          if (!record.params.adjustmentCoefficient) {
+            record.params.adjustmentCoefficient = 1.0;
+          }
+          
+          // 确保ETF名称有默认值
+          if (!record.etfName) {
+            record.etfName = `ETF ${record.etfCode}`;
+          }
+          
+          return record;
+        })
+        .filter(record => record !== null); // 过滤掉无效记录
+      
+      setHistory(processedHistory);
     } catch (error) {
       console.error("加载分析历史失败:", error);
       setHistory([]);
@@ -41,9 +65,40 @@ const AnalysisHistory = ({ className = "" }) => {
     localStorage.setItem("analysisHistory", JSON.stringify(newHistory));
   };
 
+  // 验证历史记录数据结构完整性
+  const validateHistoryRecord = (record) => {
+    const requiredFields = ['etfCode', 'params', 'timestamp'];
+    const requiredParams = ['totalCapital', 'gridType', 'riskPreference'];
+    
+    for (const field of requiredFields) {
+      if (!record[field]) {
+        return false;
+      }
+    }
+    
+    for (const param of requiredParams) {
+      if (!record.params[param]) {
+        return false;
+      }
+    }
+    
+    // 确保调节系数有默认值
+    if (!record.params.adjustmentCoefficient) {
+      record.params.adjustmentCoefficient = 1.0;
+    }
+    
+    // 确保ETF名称有默认值
+    if (!record.etfName) {
+      record.etfName = `ETF ${record.etfCode}`;
+    }
+    
+    return true;
+  };
+
   // 跳转到分析页面
   const navigateToAnalysis = (record) => {
-    const url = `/analysis/${record.etfCode}?capital=${record.params.totalCapital}&grid=${encodeURIComponent(getGridTypeCode(record.params.gridType))}&risk=${encodeURIComponent(getRiskCode(record.params.riskPreference))}`;
+    const adjustmentCoefficient = record.params.adjustmentCoefficient || 1.0;
+    const url = `/analysis/${record.etfCode}?capital=${record.params.totalCapital}&grid=${encodeURIComponent(getGridTypeCode(record.params.gridType))}&risk=${encodeURIComponent(getRiskCode(record.params.riskPreference))}&adjustment=${adjustmentCoefficient}`;
     navigate(url);
   };
 
@@ -132,7 +187,7 @@ const AnalysisHistory = ({ className = "" }) => {
                   <div className="flex items-center gap-2 mb-1">
                     <TrendingUp className="w-4 h-4 text-blue-600" />
                     <span className="font-medium text-gray-900">
-                      ETF {record.etfCode}
+                      {`${record.etfName} (${record.etfCode})` || `ETF ${record.etfCode}`}
                     </span>
                   </div>
 
@@ -144,6 +199,8 @@ const AnalysisHistory = ({ className = "" }) => {
                     <span>{record.params.gridType}</span>
                     <span className="mx-2">•</span>
                     <span>{record.params.riskPreference}</span>
+                    <span className="mx-2">•</span>
+                    <span>调节: {record.params.adjustmentCoefficient || 1.0}</span>
                   </div>
 
                   <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
