@@ -199,7 +199,6 @@ class ETFAnalysisService:
             current_price = float(latest_price_info['current_price'])
             
             grid_params = self._calculate_grid_parameters(
-                current_price=current_price,
                 latest_price_info=latest_price_info,
                 atr_analysis=atr_analysis,
                 market_indicators=market_indicators,
@@ -272,7 +271,7 @@ class ETFAnalysisService:
                 'price_range': f"基于ATR比率{atr_analysis['current_atr_pct']:.2f}%和{risk_preference}风险偏好计算",
                 'grid_count': f"基于ATR智能步长算法设定{grid_params['grid_config']['count']}个网格",
                 'fund_allocation': f"底仓比例{grid_params['fund_allocation']['base_position_ratio']:.1%}，"
-                                 f"考虑ATR波动、ADX趋势和波动率调整",
+                                 f"基于网格需求计算，确保买卖仓位充足",
                 'grid_type': f"{grid_params['grid_config']['type']}网格更适合当前市场特征"
             }
             
@@ -344,7 +343,7 @@ class ETFAnalysisService:
             # 风险控制建议
             if volatility > 0.4:
                 suggestions['risk_control'].append(
-                    "波动率较高，建议增加底仓比例或设置止损线"
+                    "波动率较高，建议设置止损线或减少网格密度"
                 )
             
             # 收益增强建议
@@ -367,14 +366,13 @@ class ETFAnalysisService:
             logger.error(f"生成调整建议失败: {str(e)}")
             return {}
     
-    def _calculate_grid_parameters(self, current_price: float, latest_price_info: Dict,
+    def _calculate_grid_parameters(self, latest_price_info: Dict,
                                  atr_analysis: Dict, market_indicators: Dict, 
                                  total_capital: float, grid_type: str, risk_preference: str) -> Dict:
         """
         计算网格策略参数（使用算法模块）
         
         Args:
-            current_price: 当前价格
             latest_price_info: 最新价格信息（包含交易日期）
             atr_analysis: ATR分析结果
             market_indicators: 市场指标
@@ -387,6 +385,8 @@ class ETFAnalysisService:
         """
         try:
             atr_ratio = atr_analysis['current_atr_ratio']
+
+            current_price = float(latest_price_info['current_price'])
             
             # 1. 计算价格区间（基于ATR和风险偏好）
             price_lower, price_upper = self.atr_analyzer.calculate_price_range(
@@ -398,37 +398,34 @@ class ETFAnalysisService:
                 atr_ratio, current_price, risk_preference
             )
             
-            # 3. 基于步长计算网格数量
+            
             if grid_type == '等差':
+                # 3. 基于步长计算网格数量
                 grid_count = self.arithmetic_calculator.calculate_grid_count_from_step(
                     price_lower, price_upper, step_size, current_price
                 )
-            else:  # 等比网格
-                grid_count = self.geometric_calculator.calculate_grid_count_from_step(
-                    price_lower, price_upper, step_size, current_price
-                )
-            
-            # 4. 计算价格水平
-            if grid_type == '等差':
+                # 4. 计算价格水平
                 price_levels = self.arithmetic_calculator.calculate_grid_levels(
                     price_lower, price_upper, step_size, current_price
                 )
             else:  # 等比网格
+                # 3. 基于步长计算网格数量
+                grid_count = self.geometric_calculator.calculate_grid_count_from_step(
+                    price_lower, price_upper, step_size, current_price
+                )
+                # 4. 计算价格水平
                 price_levels = self.geometric_calculator.calculate_grid_levels(
                     price_lower, price_upper, step_size, current_price
                 )
             
-            # 5. 计算底仓比例
-            base_position_ratio = self.grid_optimizer.calculate_base_position_ratio(
-                atr_ratio, risk_preference, 
-                market_indicators['adx_value'], 
-                market_indicators['volatility']
+            # 5. 使用新的资金分配算法（不依赖外部底仓比例）
+            # 直接调用V2版本，忽略底仓比例计算
+            fund_allocation = self.grid_optimizer.calculate_fund_allocation_v2(
+                total_capital, price_levels, current_price
             )
             
-            # 6. 计算资金分配
-            fund_allocation = self.grid_optimizer.calculate_fund_allocation(
-                total_capital, base_position_ratio, grid_count, price_levels, current_price
-            )
+            # 获取计算出的底仓比例（新算法反推结果）
+            base_position_ratio = fund_allocation['base_position_ratio']
             
             # 7. 计算价格区间比例
             price_range_ratio = (price_upper - price_lower) / current_price
