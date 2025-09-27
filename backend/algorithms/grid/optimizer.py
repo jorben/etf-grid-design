@@ -36,22 +36,22 @@ class GridOptimizer:
         try:
             # ATR 基础步长系数（根据频率偏好）
             default_risk_multipliers = {
-                '低频': 0.8,   # 0.8倍ATR作为步长，步长较大，交易频次较低
-                '均衡': 0.5,   # 0.5倍ATR作为步长，平衡交易频次
-                '高频': 0.2    # 0.2倍ATR作为步长，步长较小，交易频次较高
+                '低频': 1.5,   # 0.8倍ATR作为步长，步长较大，交易频次较低
+                '均衡': 0.6,   # 0.5倍ATR作为步长，平衡交易频次
+                '高频': 0.35,    # 0.2倍ATR作为步长，步长较小，交易频次较高
             }
             
             # 应用调节系数
             risk_multipliers = {}
             for risk_level, default_value in default_risk_multipliers.items():
                 # 计算与中间值(4)的差异
-                diff_from_mid = default_value - 0.5
+                diff_from_mid = default_value - 0.6
                 # 应用调节系数：系数越大差异放大，系数越小差异缩小
                 adjusted_diff = diff_from_mid * adjustment_coefficient
                 # 计算调整后的风险系数
-                risk_multipliers[risk_level] = 0.5 + adjusted_diff
+                risk_multipliers[risk_level] = 0.6 + adjusted_diff
             
-            risk_multiplier = risk_multipliers.get(risk_preference, 0.5)
+            risk_multiplier = risk_multipliers.get(risk_preference, 0.6)
             
             # 计算基于ATR的步长
             atr_value = atr_ratio * current_price
@@ -59,8 +59,8 @@ class GridOptimizer:
             optimal_step_ratio = optimal_step_size / current_price
             
             # 确保步长在合理范围内（0.5% - 5%）
-            min_step_ratio = 0.005  # 0.2%
-            max_step_ratio = 0.05   # 5%
+            min_step_ratio = 0.002  # 0.2%
+            max_step_ratio = 0.15   # 30%
             optimal_step_ratio = max(min_step_ratio, min(max_step_ratio, optimal_step_ratio))
             optimal_step_size = optimal_step_ratio * current_price
             
