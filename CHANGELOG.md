@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-09-27
+### :boom: BREAKING CHANGES
+- due to [`d5de171`](https://github.com/jorben/etf-grid-design/commit/d5de171bf4679075a05ae508728971c8ce91c902) - 添加调节系数参数支持网格策略定制化 *(commit by [@jorben](https://github.com/jorben))*:
+
+  风险偏好参数更名为频率偏好，原有保守/稳健/激进改为低频/均衡/高频
+
+- due to [`fa0fa17`](https://github.com/jorben/etf-grid-design/commit/fa0fa1726e40b43999a88bb33bcb32c044bae9d7) - 增强分析历史记录兼容性和测试覆盖 *(commit by [@jorben](https://github.com/jorben))*:
+
+  历史记录URL现在包含adjustment参数，需要前端路由相应更新
+
+
+### :sparkles: New Features
+- [`d5de171`](https://github.com/jorben/etf-grid-design/commit/d5de171bf4679075a05ae508728971c8ce91c902) - **algorithms**: 添加调节系数参数支持网格策略定制化 *(commit by [@jorben](https://github.com/jorben))*
+- [`fa0fa17`](https://github.com/jorben/etf-grid-design/commit/fa0fa1726e40b43999a88bb33bcb32c044bae9d7) - **history**: 增强分析历史记录兼容性和测试覆盖 *(commit by [@jorben](https://github.com/jorben))*
+- [`9d6aa1a`](https://github.com/jorben/etf-grid-design/commit/9d6aa1a24b915f0833764fdda7372efb88f4bbb5) - **ui**: 优化网格类型和资金分配描述文案 *(commit by [@jorben](https://github.com/jorben))*
+
+### :wrench: Chores
+- [`a891ed2`](https://github.com/jorben/etf-grid-design/commit/a891ed2066d33ece5422b38f84a80acfffa12abc) - **release**: bump version to 0.2.1 *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.2.0] - 2025-09-27
 ### :boom: BREAKING CHANGES
 - due to [`d6d4e0c`](https://github.com/jorben/etf-grid-design/commit/d6d4e0c7244cfa08ba78a35358e274f04262f610) - implement grid demand-based fund allocation algorithm *(commit by [@jorben](https://github.com/jorben))*:
@@ -171,3 +191,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.6]: https://github.com/jorben/etf-grid-design/compare/0.1.5...0.1.6
 [0.1.7]: https://github.com/jorben/etf-grid-design/compare/0.1.6...0.1.7
 [0.2.0]: https://github.com/jorben/etf-grid-design/compare/0.1.7...0.2.0
+[0.2.1]: https://github.com/jorben/etf-grid-design/compare/0.2.0...0.2.1
