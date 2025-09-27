@@ -86,7 +86,7 @@ export const decodeAnalysisParams = (searchParams) => {
   const capital = searchParams.get("capital");
   if (capital) {
     const capitalNum = parseFloat(capital);
-    if (!isNaN(capitalNum) && capitalNum >= 100000 && capitalNum <= 5000000) {
+    if (!isNaN(capitalNum) && capitalNum >= 10000 && capitalNum <= 1000000) {
       params.totalCapital = capitalNum;
     }
   }
@@ -132,8 +132,8 @@ export const validateAndCompleteParams = (params) => {
     result.params.totalCapital = parseFloat(DEFAULT_PARAMS.capital);
   } else {
     const capital = parseFloat(params.totalCapital);
-    if (isNaN(capital) || capital < 100000 || capital > 5000000) {
-      result.errors.push("投资金额应在10万-500万之间");
+    if (isNaN(capital) || capital < 10000 || capital > 1000000) {
+      result.errors.push("投资金额应在1万-100万之间");
       result.params.totalCapital = parseFloat(DEFAULT_PARAMS.capital);
     }
   }

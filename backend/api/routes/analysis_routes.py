@@ -41,10 +41,10 @@ def analyze_etf_strategy():
             }), 400
         
         total_capital = float(data['totalCapital'])
-        if total_capital < 100000 or total_capital > 5000000:
+        if total_capital < 10000 or total_capital > 1000000:
             return jsonify({
                 'success': False,
-                'error': '投资金额应在10万-500万之间'
+                'error': '投资金额应在1万-100万之间'
             }), 400
         
         grid_type = data['gridType']

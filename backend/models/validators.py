@@ -128,11 +128,11 @@ class GridValidators:
         if total_capital <= 0:
             return False, "投资资金必须大于0"
         
-        if total_capital < 100000:  # 最少10万
-            return False, "投资金额不能少于10万元"
+        if total_capital < 10000:  # 最少1万
+            return False, "投资金额不能少于1万元"
         
-        if total_capital > 5000000:  # 最多500万
-            return False, "投资金额不能超过500万元"
+        if total_capital > 1000000:  # 最多500万
+            return False, "投资金额不能超过100万元"
         
         return True, ""
     

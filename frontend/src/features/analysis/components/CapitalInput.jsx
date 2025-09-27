@@ -52,12 +52,12 @@ export default function CapitalInput({ value, onChange, error, presets = [] }) {
           type="number"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="请输入投资金额（10万-500万）"
+          placeholder="请输入投资金额（1万-100万）"
           className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
             error ? "border-red-300" : "border-gray-300"
           }`}
-          min={100000}
-          max={5000000}
+          min={10000}
+          max={1000000}
           step={10000}
         />
         <div className="absolute right-3 top-3 text-gray-400">元</div>

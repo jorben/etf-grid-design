@@ -339,10 +339,10 @@ def validate_parameters(params: Dict) -> Tuple[bool, List[str]]:
     
     # 验证投资金额
     total_capital = params.get('total_capital', 0)
-    if total_capital < 100000:  # 最少10万
-        errors.append("投资金额不能少于10万元")
-    elif total_capital > 5000000:  # 最多500万
-        errors.append("投资金额不能超过500万元")
+    if total_capital < 10000:  # 最少1万
+        errors.append("投资金额不能少于1万元")
+    elif total_capital > 1000000:  # 最多500万
+        errors.append("投资金额不能超过100万元")
     
     # 验证网格类型
     grid_type = params.get('grid_type', '')

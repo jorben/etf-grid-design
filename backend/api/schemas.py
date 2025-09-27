@@ -43,7 +43,7 @@ class ETFRequestSchemas:
     @staticmethod
     def validate_capital_amount(amount: float) -> bool:
         """验证投资金额范围"""
-        return 100000 <= amount <= 5000000
+        return 10000 <= amount <= 1000000
     
     @staticmethod
     def validate_grid_type(grid_type: str) -> bool:
@@ -78,7 +78,7 @@ class AnalysisRequest:
             errors.append('ETF代码格式错误，请输入6位数字')
         
         if not ETFRequestSchemas.validate_capital_amount(self.total_capital):
-            errors.append('投资金额应在10万-500万之间')
+            errors.append('投资金额应在1万-500万之间')
         
         if not ETFRequestSchemas.validate_grid_type(self.grid_type):
             errors.append('网格类型只能是"等差"或"等比"')
