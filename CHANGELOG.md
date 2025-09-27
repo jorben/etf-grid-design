@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2025-09-27
+### :bug: Bug Fixes
+- [`5f3e71b`](https://github.com/jorben/etf-grid-design/commit/5f3e71b8c3b9138b804988a69e8961f0b097c546) - **algorithms**: 调整网格优化器步长参数和频率系数，扩大不同频率方案差异 *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.2.2] - 2025-09-27
 ### :sparkles: New Features
 - [`81d666a`](https://github.com/jorben/etf-grid-design/commit/81d666a6396240a0cd214470853292a5587a64a9) - **analytics**: 添加 Cloudflare Web Analytics 集成 *(commit by [@jorben](https://github.com/jorben))*
@@ -198,3 +203,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.2.0]: https://github.com/jorben/etf-grid-design/compare/0.1.7...0.2.0
 [0.2.1]: https://github.com/jorben/etf-grid-design/compare/0.2.0...0.2.1
 [0.2.2]: https://github.com/jorben/etf-grid-design/compare/0.2.1...0.2.2
+[0.2.3]: https://github.com/jorben/etf-grid-design/compare/0.2.2...0.2.3
