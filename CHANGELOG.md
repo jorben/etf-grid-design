@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-09-27
+### :boom: BREAKING CHANGES
+- due to [`d6d4e0c`](https://github.com/jorben/etf-grid-design/commit/d6d4e0c7244cfa08ba78a35358e274f04262f610) - implement grid demand-based fund allocation algorithm *(commit by [@jorben](https://github.com/jorben))*:
+
+  Removes base_position_ratio parameter from calculate_fund_allocation method in favor of internal calculation. Existing calls will continue to work through compatibility layer but should migrate to new V2 interface.
+
+
+### :sparkles: New Features
+- [`d6d4e0c`](https://github.com/jorben/etf-grid-design/commit/d6d4e0c7244cfa08ba78a35358e274f04262f610) - **algorithms**: implement grid demand-based fund allocation algorithm *(commit by [@jorben](https://github.com/jorben))*
+
+### :wrench: Chores
+- [`27b2bef`](https://github.com/jorben/etf-grid-design/commit/27b2bef5cdd52c3e011f658f200552ff9409bac0) - **release**: bump version to 0.2.0 *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.1.7] - 2025-09-26
 ### :bug: Bug Fixes
 - [`8ec69a2`](https://github.com/jorben/etf-grid-design/commit/8ec69a2ca817f93ef7e132e4d7c0891d566956eb) - **analysis**: adjust volatility threshold criteria in suitability evaluation *(commit by [@jorben](https://github.com/jorben))*
@@ -156,3 +170,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.5]: https://github.com/jorben/etf-grid-design/compare/0.1.4...0.1.5
 [0.1.6]: https://github.com/jorben/etf-grid-design/compare/0.1.5...0.1.6
 [0.1.7]: https://github.com/jorben/etf-grid-design/compare/0.1.6...0.1.7
+[0.2.0]: https://github.com/jorben/etf-grid-design/compare/0.1.7...0.2.0
