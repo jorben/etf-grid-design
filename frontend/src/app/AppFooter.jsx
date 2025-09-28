@@ -62,7 +62,7 @@ export default function AppFooter() {
 
         <div className="border-t border-gray-200 mt-8 pt-8 text-center">
           <p className="text-sm text-gray-500">
-            &copy; 2024 ETFer.Top 本系统仅供学习和研究使用，不构成投资建议。
+            &copy; 2025 ETFer.Top 本系统仅供学习和研究使用，不构成投资建议。
           </p>
         </div>
       </div>
