@@ -422,13 +422,9 @@ class ETFAnalysisService:
                 )
             
             # 5. 使用新的资金分配算法（不依赖外部底仓比例）
-            # 直接调用V2版本，忽略底仓比例计算
             fund_allocation = self.grid_optimizer.calculate_fund_allocation_v2(
                 total_capital, price_levels, current_price
             )
-            
-            # 获取计算出的底仓比例（新算法反推结果）
-            base_position_ratio = fund_allocation['base_position_ratio']
             
             # 7. 计算价格区间比例
             price_range_ratio = (price_upper - price_lower) / current_price
