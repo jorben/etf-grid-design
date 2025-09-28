@@ -4,16 +4,16 @@
 """
 
 # 项目主版本号
-PROJECT_VERSION = "0.2.4"
+PROJECT_VERSION = "0.2.5"
 
 # API版本号
 API_VERSION = "v1"
 
 # 前端版本号（与package.json同步）
-FRONTEND_VERSION = "0.2.4"
+FRONTEND_VERSION = "0.2.5"
 
 # 后端版本号
-BACKEND_VERSION = "0.2.4"
+BACKEND_VERSION = "0.2.5"
 
 # 完整版本信息
 def get_version_info():
