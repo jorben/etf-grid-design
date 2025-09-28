@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Settings } from "lucide-react";
 import { usePersistedState } from "@shared/hooks";
 import { validateETFCode, validateCapital } from "@shared/utils/validation";
+import { checkDisclaimerStatus, acceptDisclaimer } from "@shared/utils/disclaimer";
 import ETFSelector from "@features/etf/components/ETFSelector";
 import CapitalInput from "./CapitalInput";
 import GridTypeSelector from "./GridTypeSelector";
@@ -173,24 +174,22 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
       adjustmentCoefficient: parseFloat(adjustmentCoefficient),
     };
 
-    // 检查用户是否已同意免责声明
-    const disclaimerAccepted = localStorage.getItem('disclaimer_accepted');
-    
-    if (!disclaimerAccepted) {
-      // 首次使用，显示免责声明弹窗
+    // 检查用户是否需要重新确认免责声明
+    if (!checkDisclaimerStatus()) {
+      // 未确认或已过期，显示免责声明弹窗
       setPendingFormData(formData);
       setShowDisclaimer(true);
       return;
     }
 
-    // 已同意免责声明，直接执行分析
+    // 已同意且未过期，直接执行分析
     onAnalysis(formData);
   };
 
   // 处理免责声明同意
   const handleDisclaimerAccept = () => {
     // 记录用户已同意免责声明
-    localStorage.setItem('disclaimer_accepted', new Date().toISOString());
+    acceptDisclaimer();
     setShowDisclaimer(false);
     
     // 执行之前暂存的表单提交

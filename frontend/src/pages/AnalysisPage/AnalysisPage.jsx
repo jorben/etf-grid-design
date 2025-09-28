@@ -11,6 +11,7 @@ import {
   generateAnalysisURL,
   encodeAnalysisParams,
 } from "@shared/utils/url";
+import { checkDisclaimerStatus, acceptDisclaimer } from "@shared/utils/disclaimer";
 import { useShare } from "@shared/hooks/useShare";
 
 /**
@@ -64,14 +65,12 @@ const AnalysisPage = () => {
     }
 
     // 检查免责声明状态
-    const disclaimerAccepted = localStorage.getItem('disclaimer_accepted');
-    
-    if (!disclaimerAccepted) {
-      // 用户未同意免责声明，显示弹窗
+    if (!checkDisclaimerStatus()) {
+      // 用户未同意免责声明或已过期，显示弹窗
       setShowDisclaimer(true);
       setDisclaimerChecked(false);
     } else {
-      // 已同意免责声明，直接执行分析
+      // 已同意免责声明且未过期，直接执行分析
       handleAnalysis(validation.params);
     }
   }, [etfCode, searchParams, navigate, setSearchParams]);
@@ -192,7 +191,7 @@ const AnalysisPage = () => {
   // 处理免责声明同意
   const handleDisclaimerAccept = () => {
     // 记录用户已同意免责声明
-    localStorage.setItem('disclaimer_accepted', new Date().toISOString());
+    acceptDisclaimer();
     setShowDisclaimer(false);
     setDisclaimerChecked(true);
     
@@ -309,7 +308,7 @@ const AnalysisPage = () => {
         </div>
 
         {/* 分析报告 - 只有在同意免责声明后才显示 */}
-        {(disclaimerChecked || localStorage.getItem('disclaimer_accepted')) && (
+        {(disclaimerChecked || checkDisclaimerStatus()) && (
           <AnalysisReport
             data={analysisData}
             loading={loading}
