@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2025-09-28
+### :boom: BREAKING CHANGES
+- due to [`dbb644a`](https://github.com/jorben/etf-grid-design/commit/dbb644a38b720a28cebe784bd237fac7caa30e5d) - 调整投资金额验证范围为1万-100万 *(commit by [@jorben](https://github.com/jorben))*:
+
+  投资金额范围从10万-500万调整为1万-100万，可能影响现有用户的参数设置
+
+
+### :sparkles: New Features
+- [`dbb644a`](https://github.com/jorben/etf-grid-design/commit/dbb644a38b720a28cebe784bd237fac7caa30e5d) - **config**: 调整投资金额验证范围为1万-100万 *(commit by [@jorben](https://github.com/jorben))*
+- [`399e989`](https://github.com/jorben/etf-grid-design/commit/399e989a2b8a49225b832ff5a8da8f159995769a) - **analysis**: add giscus comments integration *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.2.3] - 2025-09-27
 ### :bug: Bug Fixes
 - [`5f3e71b`](https://github.com/jorben/etf-grid-design/commit/5f3e71b8c3b9138b804988a69e8961f0b097c546) - **algorithms**: 调整网格优化器步长参数和频率系数，扩大不同频率方案差异 *(commit by [@jorben](https://github.com/jorben))*
@@ -204,3 +216,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.2.1]: https://github.com/jorben/etf-grid-design/compare/0.2.0...0.2.1
 [0.2.2]: https://github.com/jorben/etf-grid-design/compare/0.2.1...0.2.2
 [0.2.3]: https://github.com/jorben/etf-grid-design/compare/0.2.2...0.2.3
+[0.2.4]: https://github.com/jorben/etf-grid-design/compare/0.2.3...0.2.4
