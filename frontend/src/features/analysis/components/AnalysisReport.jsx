@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { LoadingSpinner } from "@shared/components/ui";
 import { useShare } from "@shared/hooks";
 import ReportTabs from "./ReportTabs";
@@ -20,6 +20,35 @@ const AnalysisReport = ({
 }) => {
   const [activeTab, setActiveTab] = useState("overview");
   const { shareContent } = useShare();
+  const giscusRef = useRef(null);
+
+  // 加载 Giscus 评论组件
+  useEffect(() => {
+    if (data && !data.error && giscusRef.current) {
+      // 清除之前的 Giscus 实例
+      giscusRef.current.innerHTML = '';
+      
+      // 创建 Giscus 脚本
+      const script = document.createElement('script');
+      script.src = 'https://giscus.app/client.js';
+      script.setAttribute('data-repo', 'jorben/etf-grid-design');
+      script.setAttribute('data-repo-id', 'R_kgDOPzq5AA');
+      script.setAttribute('data-category', 'General');
+      script.setAttribute('data-category-id', 'DIC_kwDOPzq5AM4Cv-y9');
+      script.setAttribute('data-mapping', 'title');
+      script.setAttribute('data-strict', '0');
+      script.setAttribute('data-reactions-enabled', '1');
+      script.setAttribute('data-emit-metadata', '0');
+      script.setAttribute('data-input-position', 'top');
+      script.setAttribute('data-theme', 'preferred_color_scheme');
+      script.setAttribute('data-lang', 'zh-CN');
+      script.setAttribute('data-loading', 'lazy');
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+      
+      giscusRef.current.appendChild(script);
+    }
+  }, [data]);
 
 
   // 显示加载状态
@@ -137,6 +166,12 @@ const AnalysisReport = ({
             />
           )}
         </div>
+      </div>
+
+      {/* GitHub 评论组件 */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">讨论与反馈</h3>
+        <div ref={giscusRef} className="giscus-container"></div>
       </div>
 
       {/* 免责声明 */}

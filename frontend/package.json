@@ -4,11 +4,21 @@
   "version": "0.2.4",
   "type": "module",
   "imports": {
-    "@/*": ["./src/*"],
-    "@shared/*": ["./src/shared/*"],
-    "@features/*": ["./src/features/*"],
-    "@pages/*": ["./src/pages/*"],
-    "@app/*": ["./src/app/*"]
+    "@/*": [
+      "./src/*"
+    ],
+    "@shared/*": [
+      "./src/shared/*"
+    ],
+    "@features/*": [
+      "./src/features/*"
+    ],
+    "@pages/*": [
+      "./src/pages/*"
+    ],
+    "@app/*": [
+      "./src/app/*"
+    ]
   },
   "scripts": {
     "dev": "vite",
@@ -23,6 +33,7 @@
   "dependencies": {
     "axios": "^1.6.0",
     "clsx": "^2.0.0",
+    "gitalk": "^1.8.0",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
