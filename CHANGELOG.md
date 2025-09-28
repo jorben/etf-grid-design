@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2025-09-28
+### :sparkles: New Features
+- [`2ee17d5`](https://github.com/jorben/etf-grid-design/commit/2ee17d50171a2e8de2d8e6ac66524573d815e419) - **analysis**: add disclaimer modal for first-time users *(commit by [@jorben](https://github.com/jorben))*
+
+### :wrench: Chores
+- [`b5f12a7`](https://github.com/jorben/etf-grid-design/commit/b5f12a7178a77cab726699f4a621a95d5dab892a) - bump version to 0.2.5 *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [0.2.4] - 2025-09-28
 ### :boom: BREAKING CHANGES
 - due to [`dbb644a`](https://github.com/jorben/etf-grid-design/commit/dbb644a38b720a28cebe784bd237fac7caa30e5d) - 调整投资金额验证范围为1万-100万 *(commit by [@jorben](https://github.com/jorben))*:
@@ -217,3 +225,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.2.2]: https://github.com/jorben/etf-grid-design/compare/0.2.1...0.2.2
 [0.2.3]: https://github.com/jorben/etf-grid-design/compare/0.2.2...0.2.3
 [0.2.4]: https://github.com/jorben/etf-grid-design/compare/0.2.3...0.2.4
+[0.2.5]: https://github.com/jorben/etf-grid-design/compare/0.2.4...0.2.5
