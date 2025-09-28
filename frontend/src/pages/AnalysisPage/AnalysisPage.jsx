@@ -3,6 +3,7 @@ import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Share2, ArrowLeft, AlertTriangle } from "lucide-react";
 import AnalysisReport from "@features/analysis/components/AnalysisReport";
+import DisclaimerModal from "@features/analysis/components/DisclaimerModal";
 import { analyzeETF } from "@shared/services/api";
 import {
   parseAnalysisURL,
@@ -28,6 +29,8 @@ const AnalysisPage = () => {
   const [currentParams, setCurrentParams] = useState(null);
   const [paramErrors, setParamErrors] = useState([]);
   const [showParameterForm, setShowParameterForm] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [disclaimerChecked, setDisclaimerChecked] = useState(false);
 
   // 引用
   const parameterFormRef = useRef(null);
@@ -60,8 +63,17 @@ const AnalysisPage = () => {
       setSearchParams(newSearchParams, { replace: true });
     }
 
-    // 自动触发分析
-    handleAnalysis(validation.params);
+    // 检查免责声明状态
+    const disclaimerAccepted = localStorage.getItem('disclaimer_accepted');
+    
+    if (!disclaimerAccepted) {
+      // 用户未同意免责声明，显示弹窗
+      setShowDisclaimer(true);
+      setDisclaimerChecked(false);
+    } else {
+      // 已同意免责声明，直接执行分析
+      handleAnalysis(validation.params);
+    }
   }, [etfCode, searchParams, navigate, setSearchParams]);
 
   // 执行分析
@@ -177,6 +189,25 @@ const AnalysisPage = () => {
     }
   };
 
+  // 处理免责声明同意
+  const handleDisclaimerAccept = () => {
+    // 记录用户已同意免责声明
+    localStorage.setItem('disclaimer_accepted', new Date().toISOString());
+    setShowDisclaimer(false);
+    setDisclaimerChecked(true);
+    
+    // 执行分析
+    if (currentParams) {
+      handleAnalysis(currentParams);
+    }
+  };
+
+  // 处理免责声明取消 - 返回首页
+  const handleDisclaimerCancel = () => {
+    setShowDisclaimer(false);
+    navigate("/", { replace: true });
+  };
+
   // 生成SEO元数据
   const generateSEOData = () => {
     const etfName = analysisData?.etf_info?.name || `ETF ${etfCode}`;
@@ -277,13 +308,22 @@ const AnalysisPage = () => {
           )}
         </div>
 
-        {/* 分析报告 */}
-        <AnalysisReport
-          data={analysisData}
-          loading={loading}
-          onBackToInput={handleBackToHome}
-          onReAnalysis={handleReAnalysis}
-          showShareButton={true}
+        {/* 分析报告 - 只有在同意免责声明后才显示 */}
+        {(disclaimerChecked || localStorage.getItem('disclaimer_accepted')) && (
+          <AnalysisReport
+            data={analysisData}
+            loading={loading}
+            onBackToInput={handleBackToHome}
+            onReAnalysis={handleReAnalysis}
+            showShareButton={true}
+          />
+        )}
+
+        {/* 免责声明弹窗 */}
+        <DisclaimerModal
+          isOpen={showDisclaimer}
+          onAccept={handleDisclaimerAccept}
+          onCancel={handleDisclaimerCancel}
         />
       </div>
     </>

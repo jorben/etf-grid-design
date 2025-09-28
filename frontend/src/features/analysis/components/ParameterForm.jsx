@@ -7,6 +7,7 @@ import CapitalInput from "./CapitalInput";
 import GridTypeSelector from "./GridTypeSelector";
 import RiskSelector from "./RiskSelector";
 import AdjustmentCoefficientSlider from "./AdjustmentCoefficientSlider";
+import DisclaimerModal from "./DisclaimerModal";
 
 /**
  * 参数表单容器组件
@@ -40,6 +41,8 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
   const [etfInfo, setEtfInfo] = useState(null);
   const [etfLoading, setEtfLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState(null);
 
   // 当初始值变化时更新状态
   useEffect(() => {
@@ -157,15 +160,50 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
   // 表单提交
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      onAnalysis({
-        etfCode,
-        totalCapital: parseFloat(totalCapital),
-        gridType,
-        riskPreference,
-        adjustmentCoefficient: parseFloat(adjustmentCoefficient),
-      });
+    
+    if (!validateForm()) {
+      return;
     }
+
+    const formData = {
+      etfCode,
+      totalCapital: parseFloat(totalCapital),
+      gridType,
+      riskPreference,
+      adjustmentCoefficient: parseFloat(adjustmentCoefficient),
+    };
+
+    // 检查用户是否已同意免责声明
+    const disclaimerAccepted = localStorage.getItem('disclaimer_accepted');
+    
+    if (!disclaimerAccepted) {
+      // 首次使用，显示免责声明弹窗
+      setPendingFormData(formData);
+      setShowDisclaimer(true);
+      return;
+    }
+
+    // 已同意免责声明，直接执行分析
+    onAnalysis(formData);
+  };
+
+  // 处理免责声明同意
+  const handleDisclaimerAccept = () => {
+    // 记录用户已同意免责声明
+    localStorage.setItem('disclaimer_accepted', new Date().toISOString());
+    setShowDisclaimer(false);
+    
+    // 执行之前暂存的表单提交
+    if (pendingFormData) {
+      onAnalysis(pendingFormData);
+      setPendingFormData(null);
+    }
+  };
+
+  // 处理免责声明取消
+  const handleDisclaimerCancel = () => {
+    setShowDisclaimer(false);
+    setPendingFormData(null);
   };
 
   return (
@@ -234,6 +272,13 @@ const ParameterForm = ({ onAnalysis, loading, initialValues }) => {
           onChange={setAdjustmentCoefficient}
         />
       </form>
+
+      {/* 免责声明弹窗 */}
+      <DisclaimerModal
+        isOpen={showDisclaimer}
+        onAccept={handleDisclaimerAccept}
+        onCancel={handleDisclaimerCancel}
+      />
     </div>
   );
 };
