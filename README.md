@@ -4,7 +4,7 @@
 
 ## 🎯 功能特点
 
-- **智能分析**：基于tushare数据，分析ETF的历史价格波动特征
+- **智能分析**：基于tushare数据（或akshare接口，详见**feat_akshare**分支），分析ETF的历史价格波动特征
 - **策略设计**：根据用户设定的交易频率，自动生成最优网格参数
 - **适应性评估**：综合评估ETF对网格交易策略的适应性
 - **风险控制**：提供详细的风险评估和资金管理建议
@@ -67,7 +67,7 @@ docker-compose up -d
 
 - Python 3.8+
 - Node.js 16+
-- tushare API token
+- tushare API token（没有tushare积分可以使用**feat_akshare**分支版本，TUSHARE_TOKEN随便设个值）
 
 #### 开发步骤
 
@@ -131,10 +131,12 @@ cd frontend && npm run dev
 ## ⚠️ 重要说明
 
 ### 数据要求
+
 - **token获取**：请访问 https://tushare.pro/register 注册并获取API token
 - **数据质量**：所有分析结果基于tushare提供的真实市场数据
 
 ### 风险提示
+
 1. **历史数据限制**：分析基于历史数据，不能保证未来表现
 2. **市场风险**：网格交易仍存在亏损风险，需谨慎操作
 3. **流动性风险**：确保ETF有足够的流动性支持频繁交易
