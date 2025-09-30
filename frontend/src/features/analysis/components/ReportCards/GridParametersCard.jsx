@@ -17,7 +17,7 @@ import {
   Shield,
   AlertTriangle,
 } from "lucide-react";
-import { formatCurrency, formatPercent, formatDate } from "@shared/utils";
+import { formatCurrency, formatPercent, formatDate, formatTimestamp } from "@shared/utils";
 
 const GridParametersCard = ({
   gridStrategy,
@@ -43,9 +43,9 @@ const GridParametersCard = ({
     // 优先使用gridStrategy中的price_date（来自TushareClient::get_latest_price）
     const priceDate = gridStrategy?.price_date;
     if (priceDate) {
-      const formattedDate = formatDate(priceDate);
+      const formattedDate = formatTimestamp(priceDate);
       if (formattedDate) {
-        return `${formattedDate} 收盘价`;
+        return `更新时间 ${formattedDate}`;
       }
     }
 
@@ -54,7 +54,7 @@ const GridParametersCard = ({
     if (latestDate) {
       const formattedDate = formatDate(latestDate);
       if (formattedDate) {
-        return `${formattedDate} 收盘价`;
+        return `更新时间 ${formattedDate}`;
       }
     }
 

@@ -79,6 +79,34 @@ export const formatDate = (dateStr) => {
 };
 
 /**
+ * 格式化毫秒时间戳为日期时间字符串
+ * @param {number} timestamp - 毫秒时间戳
+ * @returns {string} 格式化后的日期时间字符串，格式：YYYY-MM-DD HH:mm:ss
+ * @throws {Error} 当timestamp不是有效数字时
+ *
+ * @example
+ * formatTimestamp(1735716239000) // '2025-01-01 13:23:59'
+ */
+export const formatTimestamp = (timestamp) => {
+  if (typeof timestamp !== "number" || isNaN(timestamp)) {
+    throw new Error("Timestamp must be a valid number");
+  }
+
+  const date = new Date(timestamp);
+  
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
+
+
+
+/**
  * 格式化数字为千分位分隔格式
  * @param {number} number - 要格式化的数字
  * @returns {string} 格式化后的字符串

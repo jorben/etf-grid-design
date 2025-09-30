@@ -292,8 +292,8 @@ class SuitabilityAnalyzer:
             adx_value = calculate_adx(df_processed)
             
             # 计算流动性指标
-            # Tushare API返回的amount单位是千元，需要除以10转换为万元
-            avg_amount = df['amount'].mean() / 10  # 千元转换为万元
+            # Akshare API返回的amount单位是千元，需要除以10转换为万元
+            avg_amount = df['amount'].mean() / 10000  # 千元转换为万元
             
             # 成交量稳定性（变异系数）
             volume_stability = df['vol'].std() / df['vol'].mean()  # 变异系数

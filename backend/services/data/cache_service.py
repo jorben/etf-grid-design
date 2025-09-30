@@ -253,12 +253,12 @@ class TradingDateManager:
         self.market_open_time = "09:30"
         self.market_close_time = "15:00"
     
-    def get_latest_trading_date(self, tushare_pro) -> str:
+    def get_latest_trading_date(self, akshare_client=None) -> str:
         """
         获取最近的交易日
         
         Args:
-            tushare_pro: tushare pro接口实例
+            akshare_client: akshare客户端实例（可选，如果为None则使用akshare直接调用）
             
         Returns:
             str: 最近的交易日 (YYYYMMDD格式)
@@ -267,7 +267,7 @@ class TradingDateManager:
         current_date = current_time.strftime('%Y%m%d')
         
         # 获取交易日历
-        trading_calendar = self._get_trading_calendar(tushare_pro, current_time.year)
+        trading_calendar = self._get_trading_calendar(current_time.year, akshare_client)
         
         if not trading_calendar:
             # 如果获取交易日历失败，使用简单逻辑
@@ -287,13 +287,13 @@ class TradingDateManager:
             # 当前不是交易日，获取上一个交易日
             return self._get_previous_trading_date(current_date, trading_calendar)
     
-    def _get_trading_calendar(self, tushare_pro, year: int) -> List[str]:
+    def _get_trading_calendar(self, year: int, akshare_client=None) -> List[str]:
         """
         获取交易日历（带缓存）
         
         Args:
-            tushare_pro: tushare pro接口实例
             year: 年份
+            akshare_client: akshare客户端实例（可选）
             
         Returns:
             List[str]: 交易日列表
@@ -304,23 +304,31 @@ class TradingDateManager:
             logger.debug(f"从缓存获取{year}年交易日历")
             return cached_calendar
         
-        # 缓存未命中，调用接口
+        # 缓存未命中，调用akshare接口
         try:
-            start_date = f"{year}0101"
-            end_date = f"{year}1231"
+            import akshare as ak
             
-            df = tushare_pro.trade_cal(
-                exchange='SSE',
-                start_date=start_date,
-                end_date=end_date,
-                is_open='1'
-            )
+            # 如果提供了akshare客户端，使用客户端的方法
+            if akshare_client and hasattr(akshare_client, '_get_trading_calendar_from_akshare'):
+                trading_days = akshare_client._get_trading_calendar_from_akshare(year)
+            else:
+                # 直接调用akshare接口
+                df = ak.tool_trade_date_hist_sina()
+                
+                if df.empty:
+                    logger.warning(f"获取{year}年交易日历失败：返回空数据")
+                    return []
+                
+                # 处理日期格式
+                df['trade_date'] = df['trade_date'].astype(str).str.replace('-', '')
+                
+                # 筛选年份
+                year_filter = df['trade_date'].str.startswith(str(year))
+                trading_days = df[year_filter]['trade_date'].tolist()
             
-            if df.empty:
-                logger.warning(f"获取{year}年交易日历失败：返回空数据")
+            if not trading_days:
+                logger.warning(f"获取{year}年交易日历失败：无交易日数据")
                 return []
-            
-            trading_days = df['cal_date'].tolist()
             
             # 保存到缓存
             self.cache.set_permanent_cache("trading_cal", str(year), trading_days)
@@ -328,6 +336,9 @@ class TradingDateManager:
             
             return trading_days
             
+        except ImportError:
+            logger.error("akshare库未安装，无法获取交易日历")
+            return []
         except Exception as e:
             logger.error(f"获取{year}年交易日历失败: {e}")
             return []

@@ -147,7 +147,7 @@ class TushareClient:
             Dict: 最新价格信息
         """
         # 1. 获取最近的交易日
-        latest_trading_date = self.trading_date_manager.get_latest_trading_date(self.pro)
+        latest_trading_date = self.trading_date_manager.get_latest_trading_date(None)
         
         # 2. 检查该交易日的缓存
         cached_data = self.cache.get_daily_cache(latest_trading_date, "price", etf_code)
@@ -352,7 +352,7 @@ class TushareClient:
             
             # 按年获取交易日历
             for year in range(start_year, end_year + 1):
-                year_calendar = self.trading_date_manager._get_trading_calendar(self.pro, year)
+                year_calendar = self.trading_date_manager._get_trading_calendar(year, None)
                 all_trading_days.extend(year_calendar)
             
             # 过滤指定日期范围
@@ -381,4 +381,4 @@ class TushareClient:
         Returns:
             str: 最近的交易日 (YYYYMMDD格式)
         """
-        return self.trading_date_manager.get_latest_trading_date(self.pro)
+        return self.trading_date_manager.get_latest_trading_date(None)

@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 import logging
 from datetime import datetime, timedelta
 
-from ..data.tushare_client import TushareClient
+from ..data.akshare_client import AkShareClient
 from algorithms.atr.analyzer import ATRAnalyzer
 from algorithms.atr.calculator import ATRCalculator
 from algorithms.grid.arithmetic_grid import ArithmeticGridCalculator
@@ -38,7 +38,7 @@ class ETFAnalysisService:
             grid_optimizer: 网格优化器实例
             suitability_analyzer: 适宜度分析器实例
         """
-        self.tushare_client = TushareClient()
+        self.akshare_client = AkShareClient()
         
         # 使用依赖注入或创建默认实例
         self.atr_analyzer = atr_analyzer or ATRAnalyzer(ATRCalculator())
@@ -86,22 +86,22 @@ class ETFAnalysisService:
         """
         try:
             # 获取基础信息（使用增强缓存）
-            basic_info = self.tushare_client.get_etf_basic_info(etf_code)
+            basic_info = self.akshare_client.get_etf_basic_info(etf_code)
             if not basic_info:
                 raise ValueError(f"未找到ETF代码: {etf_code}")
             
             # 获取最新价格（使用增强缓存）
-            price_data = self.tushare_client.get_latest_price(etf_code)
+            price_data = self.akshare_client.get_latest_price(etf_code)
             if not price_data:
                 raise ValueError(f"未获取到ETF价格数据: {etf_code}")
             
             # 获取ETF名称（使用增强缓存）
-            etf_name = self.tushare_client.get_etf_name(etf_code)
+            etf_name = price_data.get('etf_name', '') or self.akshare_client.get_etf_name(etf_code)
             
             # 整合信息
             etf_info = {
                 'code': etf_code,
-                'name': etf_name or basic_info.get('name', '未知'),
+                'name': etf_name or f'ETF {etf_code}',
                 'management_company': basic_info.get('management', '未知'),
                 'current_price': price_data.get('current_price', 0),
                 'change_pct': price_data.get('pct_change', 0),
@@ -110,8 +110,8 @@ class ETFAnalysisService:
                 'setup_date': basic_info.get('found_date', ''),
                 'list_date': basic_info.get('list_date', ''),
                 'fund_type': 'ETF',
-                'status': 'L',
                 'trade_date': price_data.get('trade_date', ''),
+                'trade_timestamp': price_data.get('timestamp', ''),
                 'data_age_days': price_data.get('data_age_days', 0)
             }
             
@@ -139,7 +139,7 @@ class ETFAnalysisService:
             start_date = (datetime.now() - timedelta(days=days)).strftime('%Y%m%d')
             
             # 获取历史数据（使用增强缓存）
-            df = self.tushare_client.get_etf_daily_data(etf_code, start_date, end_date)
+            df = self.akshare_client.get_etf_daily_data(etf_code, start_date, end_date)
             if df is None or len(df) == 0:
                 raise ValueError(f"未获取到历史数据: {etf_code}")
             
@@ -186,8 +186,8 @@ class ETFAnalysisService:
             # 2. 获取历史数据（1年）
             df = self.get_historical_data(etf_code, days=365)
             
-            # 3. 获取最新价格信息（使用TushareClient的get_latest_price接口）
-            latest_price_info = self.tushare_client.get_latest_price(etf_code)
+            # 3. 获取最新价格信息
+            latest_price_info = self.akshare_client.get_latest_price(etf_code)
             if not latest_price_info:
                 raise ValueError(f"未获取到ETF最新价格: {etf_code}")
             
@@ -434,7 +434,7 @@ class ETFAnalysisService:
             
             result = {
                 'current_price': current_price,
-                'price_date': latest_price_info.get('trade_date', ''),  # 添加价格对应的交易日期
+                'price_date': latest_price_info.get('timestamp', ''),  # 价格数据更新时间
                 'price_range': {
                     'lower': round(price_lower, 3),
                     'upper': round(price_upper, 3),
